@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INFODEMIC — visual spike v2 (disposable)</title>
+<style>
+  :root {
+    --bg: #0d0e12;
+    --bg-panel: #14161c;
+    --ink: #e8e4da;
+    --ink-dim: #8a8678;
+    --rule: #2a2c34;
+    --misinfo: #c0392b;
+    --biased: #c9932b;
+    --verified: #3f9c5f;
+    --unread: #565a66;
+    --noise: #23252d;
+    --you: #7ea7c9;
+    --mate: #b08bc9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    overflow: hidden; height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  header {
+    padding: 18px 32px 12px;
+    border-bottom: 1px solid var(--rule);
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  h1 { font-size: 24px; letter-spacing: .14em; font-weight: 400; }
+  h1 .thin { color: var(--ink-dim); }
+  .case-tag { font-size: 12px; color: var(--ink-dim); letter-spacing: .08em; text-transform: uppercase; }
+  .case-tag em { color: var(--ink); font-style: normal; }
+  main { flex: 1; display: flex; position: relative; min-height: 0; }
+  #map-wrap { flex: 1; position: relative; }
+  svg { width: 100%; height: 100%; display: block; }
+
+  /* balance strip — plain words */
+  #balance {
+    position: absolute; bottom: 20px; left: 32px; right: 32px;
+    pointer-events: none;
+  }
+  #balance .status {
+    font-size: 13px; font-style: italic; color: var(--ink);
+    margin-bottom: 8px; text-align: center;
+  }
+  #balance .bar { height: 4px; background: var(--noise); position: relative; overflow: hidden; border-radius: 2px; }
+  #balance .fill-v { position: absolute; left: 0; top: 0; bottom: 0; background: var(--verified); transition: width 1s cubic-bezier(.2,.8,.2,1); }
+  #balance .fill-m { position: absolute; right: 0; top: 0; bottom: 0; background: var(--misinfo); transition: width 1s cubic-bezier(.2,.8,.2,1); }
+  #balance .ends {
+    display: flex; justify-content: space-between; margin-top: 6px;
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim);
+  }
+
+  /* dive-deeper inset */
+  #inset {
+    width: 0; transition: width .45s cubic-bezier(.2,.8,.2,1);
+    background: var(--bg-panel); border-left: 1px solid var(--rule);
+    overflow: hidden; flex-shrink: 0;
+  }
+  #inset.open { width: 400px; }
+  #inset .inner { width: 400px; padding: 26px; display: flex; flex-direction: column; gap: 16px; height: 100%; }
+  .state-chip {
+    display: inline-block; font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    padding: 4px 10px; border: 1px solid; align-self: flex-start;
+  }
+  .claim-text { font-size: 20px; line-height: 1.45; font-style: italic; }
+  .meta { font-size: 12px; color: var(--ink-dim); line-height: 1.7; border-top: 1px solid var(--rule); padding-top: 12px; }
+  .meta a { color: var(--ink); }
+  .prompt { font-size: 13px; color: var(--ink-dim); line-height: 1.6; }
+  .classify { display: flex; flex-direction: column; gap: 8px; }
+  .classify button { border-width: 1px; }
+  button {
+    font-family: inherit; font-size: 13px; letter-spacing: .04em;
+    padding: 11px 14px; background: none; color: var(--ink);
+    border: 1px solid var(--ink-dim); cursor: pointer; text-align: left;
+    transition: background .2s, color .2s;
+  }
+  button.b-mis { border-color: var(--misinfo); }   .b-mis:hover { background: var(--misinfo); color: #fff; }
+  button.b-bia { border-color: var(--biased); }    .b-bia:hover { background: var(--biased); color: #fff; }
+  button.b-ver { border-color: var(--verified); }  .b-ver:hover { background: var(--verified); color: #fff; }
+  button.close-btn { border: none; color: var(--ink-dim); padding: 2px 0; font-size: 12px; }
+  button.close-btn:hover { color: var(--ink); }
+  button.re { border: none; color: var(--ink-dim); font-size: 12px; padding: 2px 0; text-decoration: underline; }
+
+  .disposable {
+    position: absolute; top: 14px; right: 20px;
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-dim); opacity: .6;
+  }
+
+  .edge { stroke: var(--noise); stroke-width: 1; }
+  .edge.claim-edge { stroke: var(--rule); }
+  .node { cursor: pointer; }
+  .node circle.core { transition: fill .6s; }
+  .node:hover circle.core { stroke: var(--ink); stroke-width: 1.5; }
+  .node.selected circle.core { stroke: var(--ink); stroke-width: 2; }
+  .noise-node { pointer-events: none; }
+  .unclassified-breathe { animation: breathe 4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { opacity: .75; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>INFO<span class="thin">DEMIC</span></h1>
+  <div class="case-tag">Case File <em>00</em> · placeholder claims · round one — trust your gut</div>
+</header>
+<div class="disposable">visual spike v2 — disposable — 7/10/2026</div>
+<main>
+  <div id="map-wrap">
+    <svg id="map" viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="balance">
+      <div class="status" id="status">14 claims on the board. Tap one to read it.</div>
+      <div class="bar"><div class="fill-v" style="width:0%"></div><div class="fill-m" style="width:0%"></div></div>
+      <div class="ends"><span>Accurate</span><span>False</span></div>
+    </div>
+  </div>
+  <div id="inset"><div class="inner" id="inset-inner"></div></div>
+</main>
+
+<script>
+// ---------------------------------------------------------------
+// DISPOSABLE SPIKE v2 — per Tara feedback 7/10:
+//  · player classifies (misinfo/biased/verified); their call colors the node
+//  · organic force-directed field with ambient noise (the algorithm vibe)
+//  · plain-words balance strip
+//  · no coordination UI — teams self-organize
+// Not architecture. Delete without ceremony.
+// ---------------------------------------------------------------
+
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('map');
+const W = 1200, H = 640;
+
+const CLAIMS = [
+  'A viral clip claims a common food additive was “just banned in 40 countries.”',
+  'A creator says a new study proves 8 glasses of water a day is a myth.',
+  'A montage implies a city’s downtown is “completely abandoned,” using selective footage.',
+  'A shared post claims hospitals get paid extra to report certain diagnoses.',
+  'A group post says a local factory closure was caused by a new regulation.',
+  'A news link reports the school board approved a revised curriculum on Tuesday.',
+  'An account posts an AI-generated image of a disaster “happening right now.”',
+  'A thread claims a celebrity endorsed a supplement they never mentioned.',
+  'A quote is real but clipped to remove the sentence that reverses its meaning.',
+  'Top result is a site that looks like a newspaper but is run by one advocacy group.',
+  'A fact-check traces the viral clip to a 2019 event in a different country.',
+  'An answer box repeats a statistic whose original source no one can find.',
+  'A screenshot of a headline circulates — the article it came from doesn’t exist.',
+  'A chart is accurate but its y-axis starts at 88%, making a tiny gap look huge.',
+];
+
+const STATES = {
+  misinfo:  { color: 'var(--misinfo)',  label: 'Misinformation' },
+  biased:   { color: 'var(--biased)',   label: 'Biased · factual' },
+  verified: { color: 'var(--verified)', label: 'Verified' },
+};
+
+// --- build graph: 14 claims + ~48 ambient noise nodes ---
+const nodes = [];
+CLAIMS.forEach((c, i) => nodes.push({ id: 'c' + i, kind: 'claim', claim: c, call: null }));
+for (let i = 0; i < 48; i++) nodes.push({ id: 'x' + i, kind: 'noise' });
+
+nodes.forEach(n => { n.x = W/2 + (Math.random()-.5)*700; n.y = H/2 + (Math.random()-.5)*380; n.vx = 0; n.vy = 0; });
+
+const edges = [];
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+// each noise node links to 2-3 random nodes; each claim links to 2 noise + 1 claim
+nodes.filter(n => n.kind==='noise').forEach(n => {
+  const k = 2 + Math.floor(Math.random()*2);
+  for (let i=0;i<k;i++) { const o = rnd(nodes); if (o!==n) edges.push([n,o]); }
+});
+nodes.filter(n => n.kind==='claim').forEach((n,i,arr) => {
+  edges.push([n, rnd(nodes.filter(x=>x.kind==='noise'))]);
+  edges.push([n, rnd(nodes.filter(x=>x.kind==='noise'))]);
+  edges.push([n, arr[(i+3)%arr.length]]);
+});
+
+// --- crude force layout, run once ---
+for (let it=0; it<260; it++) {
+  for (const a of nodes) for (const b of nodes) {
+    if (a===b) continue;
+    let dx=a.x-b.x, dy=a.y-b.y, d2=dx*dx+dy*dy+0.01, d=Math.sqrt(d2);
+    const f = 1400/d2;
+    a.vx += dx/d*f; a.vy += dy/d*f;
+  }
+  for (const [a,b] of edges) {
+    let dx=b.x-a.x, dy=b.y-a.y, d=Math.sqrt(dx*dx+dy*dy)+0.01;
+    const f = (d-70)*0.02;
+    a.vx += dx/d*f; a.vy += dy/d*f; b.vx -= dx/d*f; b.vy -= dy/d*f;
+  }
+  for (const n of nodes) {
+    n.vx += (W/2-n.x)*0.002; n.vy += (H/2-n.y)*0.003;
+    n.x += n.vx*.5; n.y += n.vy*.5; n.vx*=.5; n.vy*=.5;
+    n.x = Math.max(30, Math.min(W-30, n.x));
+    n.y = Math.max(50, Math.min(H-70, n.y));
+  }
+}
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent||svg).appendChild(e); return e;
+}
+
+edges.forEach(([a,b]) => el('line', {
+  x1:a.x, y1:a.y, x2:b.x, y2:b.y,
+  class: 'edge' + (a.kind==='claim'&&b.kind==='claim' ? ' claim-edge' : '')
+}));
+nodes.filter(n=>n.kind==='noise').forEach(n =>
+  el('circle', { cx:n.x, cy:n.y, r:2.5, fill:'var(--noise)', class:'noise-node' }));
+nodes.filter(n=>n.kind==='claim').forEach(n => {
+  const g = el('g', { class:'node', id:'g-'+n.id });
+  n.coreEl = el('circle', { cx:n.x, cy:n.y, r:8, class:'core unclassified-breathe', fill:'var(--unread)' }, g);
+  g.addEventListener('click', () => openInset(n));
+});
+
+// --- inset / classification ---
+const inset = document.getElementById('inset');
+const inner = document.getElementById('inset-inner');
+let selected = null;
+
+function openInset(n) {
+  if (selected) document.getElementById('g-'+selected.id).classList.remove('selected');
+  selected = n;
+  document.getElementById('g-'+n.id).classList.add('selected');
+
+  const chip = n.call
+    ? `<span class="state-chip" style="color:${STATES[n.call].color};border-color:${STATES[n.call].color}">${STATES[n.call].label} — your call</span>`
+    : `<span class="state-chip" style="color:var(--unread);border-color:var(--unread)">Unread</span>`;
+
+  inner.innerHTML = `
+    <button class="close-btn" onclick="closeInset()">← back to the board</button>
+    ${chip}
+    <div class="claim-text">“${n.claim}”</div>
+    <div class="meta">
+      Placeholder claim (fictional) · Source: <a href="#" onclick="return false">example-source.org</a> · July 2026
+    </div>
+    ${n.call ? `
+      <div class="prompt">Round two brings the SIFT method — then you can revisit this call with real technique.</div>
+      <button class="re" onclick="unclassify('${n.id}')">clear this call</button>
+    ` : `
+      <div class="prompt">Round one: no tools, no tips. What does your gut say this is?</div>
+      <div class="classify">
+        <button class="b-mis" onclick="classify('${n.id}','misinfo')">Misinformation — false or fabricated</button>
+        <button class="b-bia" onclick="classify('${n.id}','biased')">Biased but factual — true, with a slant</button>
+        <button class="b-ver" onclick="classify('${n.id}','verified')">Verified — accurate and in context</button>
+      </div>
+    `}`;
+  inset.classList.add('open');
+}
+function closeInset() {
+  inset.classList.remove('open');
+  if (selected) document.getElementById('g-'+selected.id).classList.remove('selected');
+  selected = null;
+}
+function classify(id, call) {
+  const n = nodes.find(x=>x.id===id);
+  n.call = call;
+  n.coreEl.setAttribute('fill', STATES[call].color);
+  n.coreEl.classList.remove('unclassified-breathe');
+  updateBalance(); openInset(n);
+}
+function unclassify(id) {
+  const n = nodes.find(x=>x.id===id);
+  n.call = null;
+  n.coreEl.setAttribute('fill','var(--unread)');
+  n.coreEl.classList.add('unclassified-breathe');
+  updateBalance(); openInset(n);
+}
+
+// --- balance strip, plain words ---
+function updateBalance() {
+  const claims = nodes.filter(n=>n.kind==='claim');
+  const called = claims.filter(n=>n.call);
+  const acc = called.filter(n=>n.call==='verified'||n.call==='biased').length;
+  const mis = called.filter(n=>n.call==='misinfo').length;
+  const left = claims.length - called.length;
+  document.querySelector('.fill-v').style.width = (acc/claims.length*100)+'%';
+  document.querySelector('.fill-m').style.width = (mis/claims.length*100)+'%';
+  const s = document.getElementById('status');
+  if (!called.length) s.textContent = `${claims.length} claims on the board. Tap one to read it.`;
+  else if (left) s.textContent = `${left} claim${left>1?'s':''} still unread.`;
+  else s.textContent = 'Every claim has a call. Round two: bring in SIFT and see what holds.';
+}
+updateBalance();
+</script>
+</body>
+</html>

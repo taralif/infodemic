@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Infodemic — Paper Playtest Kit v2 · The Feed</title>
+<style>
+  @page { size: letter; margin: 0.5in; }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: Georgia, serif; color: #111; background: #fff; }
+  .page { page-break-after: always; padding: 8px 4px; }
+  h1 { font-size: 24px; letter-spacing: .08em; }
+  h2 { font-size: 15px; margin: 13px 0 5px; border-bottom: 1px solid #999; padding-bottom: 3px; }
+  p, li { font-size: 12.5px; line-height: 1.42; font-family: Helvetica, Arial, sans-serif; }
+  ol, ul { padding-left: 20px; margin: 4px 0; }
+  .muted { color: #555; }
+  .tag { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #555; font-family: Helvetica, Arial, sans-serif; }
+
+  .cardgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .card { border: 1.5px solid #111; border-radius: 6px; padding: 10px 12px; height: 2.28in; display: flex; flex-direction: column; }
+  .card .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .card .subject { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-family: Helvetica, Arial, sans-serif; font-weight: bold; }
+  .card .num { font-size: 11px; color: #555; font-family: Helvetica, Arial, sans-serif; }
+  .card .claim { font-size: 12.5px; line-height: 1.38; font-style: italic; flex: 1; }
+  .card .source { font-size: 10px; color: #444; font-family: Helvetica, Arial, sans-serif; border-top: 1px solid #ccc; padding-top: 5px; margin-top: 6px; }
+
+  .track { display: flex; gap: 4px; margin: 8px 0 4px; }
+  .track .cell { width: 0.52in; height: 0.52in; border: 1.5px solid #111; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-family: Helvetica, Arial, sans-serif; color: #555; }
+  .track .cell.zero { background: #eee; font-weight: bold; }
+  .legend { display: flex; gap: 18px; margin: 6px 0; }
+  .legend span { font-size: 12px; font-family: Helvetica, Arial, sans-serif; }
+  .dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+  .r { background: #c0392b; } .a { background: #c9932b; } .g { background: #3f9c5f; }
+  table.score { border-collapse: collapse; width: 100%; margin-top: 6px; }
+  table.score th, table.score td { border: 1px solid #999; padding: 6px 7px; font-size: 11px; font-family: Helvetica, Arial, sans-serif; text-align: left; }
+  .cor { border: 2px solid #111; border-radius: 8px; padding: 12px 16px; margin-top: 10px; }
+  .cor h3 { font-size: 14px; margin-bottom: 6px; }
+  .cor li { font-size: 13px; margin-bottom: 4px; }
+  .thread-strip { border: 2px dashed #111; border-radius: 4px; padding: 8px 10px; text-align: center; font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; letter-spacing: .12em; margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: RULES -->
+<div class="page">
+  <div class="tag">Infodemic · Paper Playtest v2 — THE FEED · rules on one page</div>
+  <h1>INFODEMIC</h1>
+  <p class="muted" style="font-style:italic; font-family:Georgia,serif;">Your feed is 16 stories deep today. Some are true, some are bait, one isn't settled yet. Make sense of it — together.</p>
+
+  <h2>You need</h2>
+  <p>2–5 players · 60–90 min · these sheets, cards cut out · tokens in 3 colors (<b>red = misinformation</b>, <b>yellow = biased-but-factual</b>, <b>green = verified</b>) · 1 balance token · the SAME STORY strips · phones in Round 2 only. A big table or floor.</p>
+
+  <h2>Setup (2 min)</h2>
+  <ol>
+    <li>Shuffle the 16 feed cards and lay them out face-up in a loose scatter — no order, no categories. This is the feed: everything at once, nothing organized.</li>
+    <li>Balance token on <b>0</b>. Rating slips + a pen per player.</li>
+  </ol>
+
+  <h2>Round 1 — The scroll (10 min)</h2>
+  <ol>
+    <li>Everyone scrolls: move around the feed and read the cards <b>silently</b> — the way you actually read a feed, alone, fast, no discussion.</li>
+    <li>Each player <b>secretly</b> rates <b>every</b> card on their slip: R / Y / G. Instinct only. No phones.</li>
+    <li>Reveal all slips at once; place everyone's tokens on each card.</li>
+  </ol>
+  <p><b>Read the board:</b> unanimous cards are <i>settled-for-now</i> (leave tokens). Mixed-color cards are <b>CONTESTED</b> — stack their tokens. Contested cards are the game.</p>
+
+  <h2>Round 2 — The investigation (30–35 min)</h2>
+  <p>Work the contested cards, most-split first. Phones on — start from each card's source line. To <b>settle</b> a card red or yellow: answer 2 of the Three Questions aloud, persuade the table, write a one-line case note. To turn a card <b>GREEN</b>: file a full <b>Case Report</b> — no report, no green.</p>
+  <p><b>Threading — the big move.</b> Some of these cards are secretly <i>the same story</i> wearing different clothes. When you can show the table that two cards connect — the fake and its debunk, the hoax and the business behind it — slide them together and lay a <b>SAME STORY</b> strip between them. A discovered thread counts as evidence toward settling every card in it. (Beware: some cards only <i>look</i> connected. Prove it or drop it.)</p>
+  <p>Re-opening a settled-for-now card with new evidence is allowed and admired.</p>
+  <div class="cor">
+    <h3>The Three Questions</h3>
+    <ol>
+      <li><b>Who is behind this information?</b></li>
+      <li><b>What is the evidence?</b></li>
+      <li><b>What do other sources say?</b></li>
+    </ol>
+  </div>
+
+  <h2>The balance (5 min)</h2>
+  <p>Each claim settled <i>with a note or report</i> → 1 toward <b>ACCURATE</b>. Each claim left contested or settled without evidence → 1 toward <b>FALSE</b>. Noise wins the unexamined. A card honestly marked <b>"still unresolved — here's what would settle it"</b> counts as ACCURATE: knowing you don't know yet is sensemaking too.</p>
+
+  <h2>Debrief (15 min)</h2>
+  <p>Reassemble the feed as threads: what did it look like scattered vs. connected? Then the facilitator shares what fact-checkers found — a story to compare notes with, never a score.</p>
+</div>
+
+<!-- PAGES 2-5: FEED CARDS -->
+<div class="page">
+  <div class="tag">Feed Drop #1 · cards 1–4 of 16 · cut along borders</div>
+  <div class="cardgrid">
+    <div class="card"><div class="head"><span class="subject">Disaster</span><span class="num">F·1 · short-video</span></div>
+      <div class="claim">"A dramatic video compilation shows flood destruction across Texas Hill Country."</div>
+      <div class="source">Viral compilation, millions of views</div></div>
+    <div class="card"><div class="head"><span class="subject">Disaster</span><span class="num">F·2 · microblog</span></div>
+      <div class="claim">"The Texas floods were caused by a cloud-seeding operation carried out days earlier."</div>
+      <div class="source">Thread from an anonymous weather account</div></div>
+    <div class="card"><div class="head"><span class="subject">Disaster</span><span class="num">F·3 · search</span></div>
+      <div class="claim">"Wire reporting documents the flash floods' death toll and ongoing rescue operations."</div>
+      <div class="source">AP / Reuters coverage</div></div>
+    <div class="card"><div class="head"><span class="subject">Celebrity</span><span class="num">F·4 · feed</span></div>
+      <div class="claim">"A famous NFL quarterback donated millions to flood victims — and personally rescued people and pets."</div>
+      <div class="source">Shared from a page called "Daily Blessings USA"</div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="tag">Feed Drop #1 · cards 5–8 of 16</div>
+  <div class="cardgrid">
+    <div class="card"><div class="head"><span class="subject">Media</span><span class="num">F·5 · search</span></div>
+      <div class="claim">"An investigation finds the fake flood stories reaching millions on Facebook were run by foreign ad companies profiting from the clicks."</div>
+      <div class="source">Fact-checking newsroom investigation</div></div>
+    <div class="card"><div class="head"><span class="subject">Sports</span><span class="num">F·6 · microblog</span></div>
+      <div class="claim">"Videos show Moroccan fans rioting in the streets of Paris after Morocco's World Cup loss to France."</div>
+      <div class="source">Posts circulating since the Jul 10 quarterfinal · 2026</div></div>
+    <div class="card"><div class="head"><span class="subject">Tech</span><span class="num">F·7 · search</span></div>
+      <div class="claim">"A research firm reports TikTok ads are using deepfaked celebrities — Taylor Swift, Jennifer Aniston and others — to push scams."</div>
+      <div class="source">Security-industry report coverage · 2026</div></div>
+    <div class="card"><div class="head"><span class="subject">Tech</span><span class="num">F·8 · short-video</span></div>
+      <div class="claim">"Every question you ask ChatGPT wastes a full bottle of water. Think about that before your next prompt."</div>
+      <div class="source">Viral explainer video citing "a university study"</div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="tag">Feed Drop #1 · cards 9–12 of 16</div>
+  <div class="cardgrid">
+    <div class="card"><div class="head"><span class="subject">Health</span><span class="num">F·9 · search</span></div>
+      <div class="claim">"A study finds viral medical videos with 5M+ views are 14% more likely to contain misleading advice than smaller ones."</div>
+      <div class="source">Published research, 2026</div></div>
+    <div class="card"><div class="head"><span class="subject">Politics</span><span class="num">F·10 · microblog</span></div>
+      <div class="claim">"That widely shared photo of the senior senator? It's AI-generated — or secretly from his 2023 hospitalization."</div>
+      <div class="source">Posts circulating Jul 12, 2026</div></div>
+    <div class="card"><div class="head"><span class="subject">Politics</span><span class="num">F·11 · feed</span></div>
+      <div class="claim">"Congress just picked the one version of clock reform America has already tried, hated, and repealed."</div>
+      <div class="source">Advocacy account post · Jul 14, 2026</div></div>
+    <div class="card"><div class="head"><span class="subject">World</span><span class="num">F·12 · microblog</span></div>
+      <div class="claim">"Video shows drone strikes on two warehouses inside Russia this month."</div>
+      <div class="source">OSINT accounts + wire follow-up · Jul 2026</div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="tag">Feed Drop #1 · cards 13–16 of 16</div>
+  <div class="cardgrid">
+    <div class="card"><div class="head"><span class="subject">Sports</span><span class="num">F·13 · feed</span></div>
+      <div class="claim">"It's decided — insiders say the superstar has chosen where he'll play the 2026–27 NBA season."</div>
+      <div class="source">Aggregator account citing "sources" · this week</div></div>
+    <div class="card"><div class="head"><span class="subject">Brands</span><span class="num">F·14 · feed</span></div>
+      <div class="claim">"A big-box store is now selling gun-shaped chicken nuggets called 'Freedom Nuggets.'"</div>
+      <div class="source">Photo post, shared 60k times</div></div>
+    <div class="card"><div class="head"><span class="subject">Brands</span><span class="num">F·15 · feed</span></div>
+      <div class="claim">"It's over — the national restaurant chain is shutting down ALL locations across America."</div>
+      <div class="source">Post from "US Consumer Alerts" page</div></div>
+    <div class="card"><div class="head"><span class="subject">Science</span><span class="num">F·16 · search</span></div>
+      <div class="claim">"A science journal profiles researchers going viral on TikTok — to fight misinformation with its own weapons."</div>
+      <div class="source">Science journal feature · 2026</div></div>
+  </div>
+</div>
+
+<!-- PAGE 6: THREADS, BALANCE, SLIPS -->
+<div class="page">
+  <div class="tag">Same-story strips · cut out · lay between threaded cards</div>
+  <div class="thread-strip">⟵&nbsp; SAME STORY &nbsp;⟶</div>
+  <div class="thread-strip">⟵&nbsp; SAME STORY &nbsp;⟶</div>
+  <div class="thread-strip">⟵&nbsp; SAME STORY &nbsp;⟶</div>
+  <div class="thread-strip">⟵&nbsp; SAME STORY &nbsp;⟶</div>
+  <div class="thread-strip">⟵&nbsp; SAME STORY &nbsp;⟶</div>
+
+  <h2 style="margin-top:14px;">The balance</h2>
+  <p class="tag" style="margin-bottom:4px;">False prevails ⟵ — ⟶ Accurate prevails</p>
+  <div class="track">
+    <div class="cell">-8</div><div class="cell">-7</div><div class="cell">-6</div><div class="cell">-5</div><div class="cell">-4</div><div class="cell">-3</div><div class="cell">-2</div><div class="cell">-1</div><div class="cell zero">0</div><div class="cell">+1</div><div class="cell">+2</div><div class="cell">+3</div><div class="cell">+4</div><div class="cell">+5</div><div class="cell">+6</div><div class="cell">+7</div><div class="cell">+8</div>
+  </div>
+  <div class="legend">
+    <span><span class="dot r"></span>Misinformation</span>
+    <span><span class="dot a"></span>Biased-but-factual</span>
+    <span><span class="dot g"></span>Verified</span>
+  </div>
+
+  <h2 style="margin-top:12px;">Rating slips (cut one per player)</h2>
+  <table class="score">
+    <tr><th>Player: ______</th><th>F1</th><th>F2</th><th>F3</th><th>F4</th><th>F5</th><th>F6</th><th>F7</th><th>F8</th></tr>
+    <tr><td>R / Y / G</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><th></th><th>F9</th><th>F10</th><th>F11</th><th>F12</th><th>F13</th><th>F14</th><th>F15</th><th>F16</th></tr>
+    <tr><td>R / Y / G</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+  <table class="score">
+    <tr><th>Player: ______</th><th>F1</th><th>F2</th><th>F3</th><th>F4</th><th>F5</th><th>F6</th><th>F7</th><th>F8</th></tr>
+    <tr><td>R / Y / G</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><th></th><th>F9</th><th>F10</th><th>F11</th><th>F12</th><th>F13</th><th>F14</th><th>F15</th><th>F16</th></tr>
+    <tr><td>R / Y / G</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+  <table class="score">
+    <tr><th>Player: ______</th><th>F1</th><th>F2</th><th>F3</th><th>F4</th><th>F5</th><th>F6</th><th>F7</th><th>F8</th></tr>
+    <tr><td>R / Y / G</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><th></th><th>F9</th><th>F10</th><th>F11</th><th>F12</th><th>F13</th><th>F14</th><th>F15</th><th>F16</th></tr>
+    <tr><td>R / Y / G</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h2 style="margin-top:12px;">Case notes (one line per red/yellow settle)</h2>
+  <table class="score">
+    <tr><th style="width:10%">Card</th><th style="width:12%">Call</th><th>What we found</th></tr>
+    <tr><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7: CASE REPORTS -->
+<div class="page">
+  <div class="tag">Case Report · required to turn any claim GREEN · print several</div>
+
+  <div style="border: 2px solid #111; border-radius: 8px; padding: 14px 18px; margin-top: 10px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <span style="font-size:17px; letter-spacing:.12em; font-weight:bold;">CASE REPORT</span>
+      <span class="tag">card # ____ &nbsp;·&nbsp; date ________</span>
+    </div>
+    <p style="margin-top:8px;">The claim, in our own words: <span style="display:inline-block; border-bottom:1px solid #999; width:64%;">&nbsp;</span></p>
+    <p style="margin-top:12px;"><b>1 · Who is behind this information?</b><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <p style="margin-top:10px;"><b>2 · What is the evidence?</b><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <p style="margin-top:10px;"><b>3 · What do other sources say?</b> <span class="muted">(name one you actually checked)</span><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <p style="margin-top:12px;"><b>If a friend shares this claim, we'd tell them:</b><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+      <span style="font-size:11px; font-family:Helvetica,Arial,sans-serif;">Filed by (everyone who agrees signs): ______________________________</span>
+      <span style="border:2px solid #3f9c5f; color:#3f9c5f; border-radius:4px; padding:4px 10px; font-size:12px; letter-spacing:.15em; font-family:Helvetica,Arial,sans-serif; font-weight:bold;">☐ VERIFIED</span>
+    </div>
+  </div>
+
+  <div style="border: 2px solid #111; border-radius: 8px; padding: 14px 18px; margin-top: 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <span style="font-size:17px; letter-spacing:.12em; font-weight:bold;">CASE REPORT</span>
+      <span class="tag">card # ____ &nbsp;·&nbsp; date ________</span>
+    </div>
+    <p style="margin-top:8px;">The claim, in our own words: <span style="display:inline-block; border-bottom:1px solid #999; width:64%;">&nbsp;</span></p>
+    <p style="margin-top:12px;"><b>1 · Who is behind this information?</b><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <p style="margin-top:10px;"><b>2 · What is the evidence?</b><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <p style="margin-top:10px;"><b>3 · What do other sources say?</b> <span class="muted">(name one you actually checked)</span><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <p style="margin-top:12px;"><b>If a friend shares this claim, we'd tell them:</b><br>
+      <span style="display:inline-block; border-bottom:1px solid #999; width:100%; height:16px;">&nbsp;</span></p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+      <span style="font-size:11px; font-family:Helvetica,Arial,sans-serif;">Filed by (everyone who agrees signs): ______________________________</span>
+      <span style="border:2px solid #3f9c5f; color:#3f9c5f; border-radius:4px; padding:4px 10px; font-size:12px; letter-spacing:.15em; font-family:Helvetica,Arial,sans-serif; font-weight:bold;">☐ VERIFIED</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
