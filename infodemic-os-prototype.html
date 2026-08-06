@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INFODEMIC OS — iPhone Mockup</title>
+<style>
+  :root{
+    --ios-bg:#000000; --ios-bg2:#1c1c1e; --ios-bg3:#2c2c2e; --ios-sep:#38383a;
+    --ios-blue:#0a84ff; --ios-green:#30d158; --ios-red:#ff453a; --ios-orange:#ff9f0a;
+    --ios-label:#ffffff; --ios-label2:rgba(235,235,245,.6); --ios-label3:rgba(235,235,245,.3);
+  }
+  *{box-sizing:border-box; -webkit-font-smoothing:antialiased;}
+  body{
+    margin:0; min-height:100vh; background:#0d0d0f; color:var(--ios-label);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    display:flex; justify-content:center; align-items:flex-start; padding:40px 16px 60px;
+  }
+  .wrap{display:flex; flex-direction:column; align-items:center;}
+
+  .iphone{
+    width:390px; height:844px; background:#000; border-radius:56px; position:relative;
+    box-shadow:0 0 0 3px #2a2a2c, 0 0 0 6px #000, 0 30px 70px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  .notch{
+    position:absolute; top:11px; left:50%; transform:translateX(-50%); width:126px; height:37px;
+    background:#000; border-radius:20px; z-index:60;
+  }
+  .statusbar{
+    position:absolute; top:0; left:0; right:0; height:47px; z-index:55;
+    display:flex; align-items:flex-end; justify-content:space-between; padding:0 26px 8px;
+    font-size:15px; font-weight:600; pointer-events:none; letter-spacing:.2px;
+  }
+  .statusicons{display:flex; align-items:center; gap:5px;}
+  .home-indicator{
+    position:absolute; bottom:8px; left:50%; transform:translateX(-50%); width:134px; height:5px;
+    border-radius:3px; background:rgba(255,255,255,.85); z-index:60; cursor:pointer;
+  }
+  .screen-area{position:absolute; inset:0; overflow:hidden; background:var(--ios-bg);}
+
+  /* ---------- HOME SCREEN ---------- */
+  .homescreen{
+    position:absolute; inset:0; padding:64px 20px 46px;
+    background:
+      radial-gradient(ellipse at 30% 0%, #123527, transparent 55%),
+      radial-gradient(ellipse at 80% 90%, #0a2a3a, transparent 55%),
+      linear-gradient(160deg, #081512, #04070a 70%);
+  }
+  .widgetstack{
+    background:rgba(30,32,30,.55); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border-radius:24px; padding:16px 18px; margin-bottom:26px; cursor:pointer;
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .widget-app-tag{display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--ios-label2); margin-bottom:10px;}
+  .widget-app-tag .dot{width:14px; height:14px; border-radius:4px; background:linear-gradient(160deg,#3ddc84,#0d7a45);}
+  .widget-title{font-size:13px; color:var(--ios-label2); margin-bottom:4px;}
+  .widget-num{font-size:30px; font-weight:700;}
+
+  .iconsgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px 14px; margin-bottom:30px;}
+  .iconcell{display:flex; flex-direction:column; align-items:center; cursor:pointer;}
+  .squircle{
+    width:60px; height:60px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    font-size:26px; box-shadow:0 3px 8px rgba(0,0,0,.4); margin-bottom:6px;
+  }
+  .icontext{font-size:11px; font-weight:500; text-shadow:0 1px 3px rgba(0,0,0,.6);}
+
+  .dock{
+    position:absolute; left:16px; right:16px; bottom:44px; height:88px; border-radius:30px;
+    background:rgba(60,60,64,.45); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+    display:flex; align-items:center; justify-content:space-around; padding:0 14px;
+  }
+  .dockicon{width:58px; height:58px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:26px;}
+
+  /* ---------- APP NAV BAR ---------- */
+  .navbar{
+    position:absolute; top:0; left:0; right:0; height:98px; z-index:30; padding-top:47px;
+    display:flex; align-items:center; padding-left:16px; padding-right:16px;
+    background:rgba(20,20,22,.82); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    border-bottom:0.5px solid var(--ios-sep);
+  }
+  .navback{color:var(--ios-blue); font-size:28px; font-weight:400; cursor:pointer; width:30px;}
+  .navtitle{flex:1; text-align:center; font-size:17px; font-weight:600; margin-right:30px;}
+  .appbody{position:absolute; top:98px; left:0; right:0; bottom:0; overflow-y:auto; padding:14px 16px 34px;}
+  .appbody::-webkit-scrollbar{width:0;}
+
+  /* ---------- FEED (immersive) ---------- */
+  .feedscroll{position:absolute; inset:0; overflow-y:scroll; scroll-snap-type:y mandatory;}
+  .feedscroll::-webkit-scrollbar{width:0;}
+  .feedslide{
+    scroll-snap-align:start; scroll-snap-stop:always; height:100%; min-height:100%; position:relative; overflow:hidden;
+  }
+  .feedtopscrim{position:absolute; top:0; left:0; right:0; height:180px; background:linear-gradient(180deg, rgba(0,0,0,.65), transparent); z-index:5;}
+  .feedbottomscrim{position:absolute; bottom:0; left:0; right:0; height:340px; background:linear-gradient(0deg, rgba(0,0,0,.72), transparent); z-index:5;}
+  .feedtabs{position:absolute; top:54px; left:0; right:0; z-index:20; display:flex; justify-content:center; gap:22px; font-size:15px; font-weight:600; color:rgba(255,255,255,.55);}
+  .feedtabs .on{color:#fff; padding-bottom:6px; border-bottom:2px solid #fff;}
+
+  .fetchoverlay{
+    position:absolute; inset:0; z-index:8; pointer-events:none;
+    background:repeating-linear-gradient(100deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.13) 8%, rgba(255,255,255,.05) 16%);
+    background-size:300% 100%;
+    animation:shimmer 1.1s ease-in-out infinite, fetchfade 700ms ease forwards;
+    animation-delay:0s, 650ms;
+  }
+  @keyframes shimmer{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+  @keyframes fetchfade{ to{opacity:0; visibility:hidden;} }
+  .sourcebadge{
+    position:absolute; top:60px; left:20px; z-index:9; display:flex; align-items:center; gap:5px;
+    background:rgba(0,0,0,.5); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border-radius:999px;
+    padding:5px 10px 5px 8px; font-size:10.5px; font-weight:600; color:rgba(255,255,255,.8);
+    opacity:0; animation:badgein 400ms ease forwards; animation-delay:700ms;
+  }
+  @keyframes badgein{ to{opacity:1;} }
+
+  .feedrail{position:absolute; right:12px; bottom:150px; z-index:20; display:flex; flex-direction:column; align-items:center; gap:19px;}
+  .railavatar{width:46px; height:46px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; background:var(--ios-bg3); position:relative;}
+  .railavatar .plus{position:absolute; bottom:-9px; left:50%; transform:translateX(-50%); width:18px; height:18px; border-radius:50%; background:var(--ios-red); font-size:13px; display:flex; align-items:center; justify-content:center; font-weight:900;}
+  .railitem{display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;}
+  .railicon{font-size:29px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));}
+  .railicon.liked{color:var(--ios-red);}
+  .raillabel{font-size:11.5px; font-weight:600; text-shadow:0 1px 2px rgba(0,0,0,.6);}
+  .raildisc{width:34px; height:34px; border-radius:50%; background:#111; border:2px solid #444; margin-top:4px; display:flex; align-items:center; justify-content:center; font-size:13px; animation:spin 5s linear infinite;}
+  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+  .feedbottom{position:absolute; left:16px; right:90px; bottom:32px; z-index:20;}
+  .polysticker{
+    display:inline-flex; background:rgba(0,0,0,.42); backdrop-filter:blur(8px); border-radius:14px; padding:4px; margin-bottom:12px;
+    border:1px solid rgba(255,255,255,.25);
+  }
+  .pollopt{
+    font-size:11.5px; font-weight:700; padding:7px 10px; border-radius:10px; cursor:pointer; color:#fff; white-space:nowrap;
+  }
+  .pollopt.sel-R{background:var(--ios-red);}
+  .pollopt.sel-Y{background:var(--ios-orange); color:#1a1205;}
+  .pollopt.sel-G{background:var(--ios-green); color:#04140a;}
+  .feeduser{font-size:15px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:8px;}
+  .followpill{font-size:11px; font-weight:700; border:1.4px solid #fff; border-radius:5px; padding:2px 8px;}
+  .feedclaimtext{font-size:15.5px; line-height:1.38; margin-bottom:8px; text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .feedsub{font-size:12.5px; color:rgba(255,255,255,.75); margin-bottom:8px;}
+  .feedsound{display:flex; align-items:center; gap:6px; font-size:12.5px; color:rgba(255,255,255,.85);}
+
+  /* ---------- SEARCH ---------- */
+  .searchfield{
+    display:flex; align-items:center; gap:8px; background:var(--ios-bg2); border-radius:10px; padding:8px 10px; margin-bottom:16px;
+  }
+  .searchfield input{flex:1; background:none; border:none; outline:none; color:#fff; font-size:16px;}
+  .searchfield .cancel{color:var(--ios-blue); font-size:15px; font-weight:500; cursor:pointer;}
+  .sectionhead{font-size:12.5px; font-weight:600; color:var(--ios-label2); text-transform:uppercase; letter-spacing:.4px; margin:16px 4px 6px;}
+  .groupcard{background:var(--ios-bg2); border-radius:12px; overflow:hidden;}
+  .resultrow{padding:12px 14px; border-bottom:0.5px solid var(--ios-sep);}
+  .resultrow:last-child{border-bottom:none;}
+  .resulttext{font-size:14.5px; line-height:1.4; margin-bottom:9px;}
+  .pillrow{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:8px;}
+  .pillbtn{
+    font-size:12.5px; font-weight:600; padding:7px 11px; border-radius:14px; background:var(--ios-bg3); color:var(--ios-blue); cursor:pointer;
+  }
+  .revealtext{font-size:13px; color:var(--ios-label2); background:var(--ios-bg); border-radius:8px; padding:9px 10px; margin-bottom:8px; line-height:1.5;}
+  .infobanner{
+    display:flex; gap:8px; font-size:12.5px; border-radius:8px; padding:9px 10px; margin-bottom:8px; line-height:1.45;
+  }
+  .infobanner.flag{background:rgba(255,159,10,.15); color:var(--ios-orange);}
+  .infobanner.hygiene{background:rgba(10,132,255,.15); color:var(--ios-blue);}
+  .infobanner.neutral{background:rgba(255,255,255,.05); color:var(--ios-label3); font-style:italic;}
+  .unlocktoast{
+    background:linear-gradient(135deg, rgba(197,131,255,.18), rgba(123,63,242,.14)); border:1px solid rgba(197,131,255,.4);
+    color:#e3c9ff; font-size:12.5px; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:14px; cursor:pointer;
+  }
+  .rowctrl{display:flex; gap:8px;}
+  .btnfilled{background:var(--ios-blue); color:#fff; font-size:13.5px; font-weight:600; padding:8px 14px; border-radius:8px; cursor:pointer; border:none;}
+  .btnfilled.evidence{background:var(--ios-green); color:#04140a;}
+  .btnplain{background:none; color:var(--ios-label2); font-size:13.5px; font-weight:500; padding:8px 10px; cursor:pointer; border:none;}
+  .btnplain.reject{color:var(--ios-orange);}
+  .thinkbtn{
+    font-size:13px; font-weight:600; padding:8px 12px; border-radius:8px; background:var(--ios-bg3); color:var(--ios-label2); cursor:pointer; margin-bottom:4px; display:inline-block;
+  }
+  .resolvedtext{font-size:13px; color:var(--ios-label2); display:flex; justify-content:space-between;}
+  .emptystate{text-align:center; color:var(--ios-label2); font-size:14px; padding:60px 20px; line-height:1.7;}
+
+  /* ---------- CASE FILE ---------- */
+  .casehead{display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;}
+  .caseid{font-family:'Space Mono',monospace; font-size:12.5px; color:var(--ios-label2); letter-spacing:.5px;}
+  .statuspill{font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:4px 10px; border-radius:999px; text-transform:uppercase;}
+  .statuspill.open{background:rgba(255,159,10,.18); color:var(--ios-orange);}
+  .statuspill.filed{background:rgba(48,209,88,.18); color:var(--ios-green);}
+  .exhibitbox{background:var(--ios-bg2); border-radius:12px; padding:14px 16px; margin-bottom:18px; border-left:3px solid var(--ios-label3);}
+  .exhibitlabel{font-size:10.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:6px;}
+  .caseclaim{font-size:16px; font-weight:600; line-height:1.4;}
+  .exhibitrow{padding:11px 14px; border-bottom:0.5px solid var(--ios-sep); font-size:13.5px; line-height:1.4; display:flex; gap:10px;}
+  .exhibitrow:last-child{border-bottom:none;}
+  .exhibittag{font-family:'Space Mono',monospace; font-size:10.5px; color:var(--ios-label3); flex:0 0 auto; padding-top:1px;}
+  .boarddot{width:8px; height:8px; border-radius:50%; margin-top:5px; flex:0 0 auto;}
+  .boarddot.flag{background:var(--ios-orange);} .boarddot.hygiene{background:var(--ios-blue);} .boarddot.none{background:var(--ios-label3);}
+  .radiorow{display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:0.5px solid var(--ios-sep); cursor:pointer; font-size:14px; font-weight:600;}
+  .radiorow:last-child{border-bottom:none;}
+  .radiocircle{width:20px; height:20px; border-radius:50%; border:1.6px solid var(--ios-label3); flex:0 0 auto; position:relative;}
+  .radiocircle.selected{border-color:var(--ios-blue);}
+  .radiocircle.selected::after{content:""; position:absolute; inset:3px; border-radius:50%; background:var(--ios-blue);}
+  .confirmrow{display:flex; align-items:flex-start; gap:12px; padding:14px 4px; cursor:pointer;}
+  .checkbox{width:20px; height:20px; border-radius:5px; border:1.6px solid var(--ios-label3); flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; color:#04140a; margin-top:1px;}
+  .checkbox.checked{background:var(--ios-blue); border-color:var(--ios-blue); color:#fff;}
+  .confirmtext{font-size:13px; color:var(--ios-label2); line-height:1.5;}
+  .filebtn{
+    width:100%; text-align:center; font-size:16px; font-weight:600; padding:14px; border-radius:12px; background:var(--ios-blue); color:#fff; border:none; cursor:pointer;
+  }
+  .filebtn:disabled{opacity:.35;}
+  .stamp{
+    position:absolute; top:110px; right:26px; border:3px solid var(--ios-green); color:var(--ios-green);
+    font-family:'Space Mono',monospace; font-weight:700; font-size:13px; letter-spacing:1.5px; padding:6px 14px;
+    border-radius:8px; transform:rotate(-14deg); opacity:.85; pointer-events:none; z-index:10;
+  }
+  .receiptcard{background:var(--ios-bg2); border-radius:12px; padding:16px; margin-top:16px;}
+  .receiptrow{display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:0.5px solid var(--ios-sep);}
+  .receiptrow:last-child{border-bottom:none;}
+  .receiptrow span:first-child{color:var(--ios-label3);}
+  .filedbanner{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--ios-green); margin-top:14px;}
+
+  /* ---------- WIDGETS ---------- */
+  .wtile{
+    background:rgba(255,255,255,.06); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.08);
+    border-radius:22px; padding:16px; margin-bottom:14px;
+  }
+  .wtag{display:flex; align-items:center; gap:6px; font-size:10.5px; font-weight:700; color:var(--ios-label2); margin-bottom:10px;}
+  .wtag .dot{width:12px; height:12px; border-radius:3px; background:linear-gradient(160deg,#3ddc84,#0d7a45);}
+  .wnum{font-size:32px; font-weight:700;}
+  .wsub{font-size:12.5px; color:var(--ios-label2); margin-top:4px;}
+  .wrow2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .balancebar{height:10px; border-radius:5px; overflow:hidden; display:flex; background:var(--ios-bg3); margin-top:10px;}
+  .balancebar .r{background:var(--ios-red);} .balancebar .g{background:var(--ios-green);}
+  .topclaim{font-size:14px; font-weight:600; margin-bottom:6px;}
+
+  /* ---------- CLIP IMAGES + REVERSE SEARCH ---------- */
+  .clipimage{margin-bottom:10px; border-radius:8px; overflow:hidden; background:#0c0e0c;}
+  .clipimage svg{display:block; width:100%; height:auto;}
+  .reversebtn{
+    font-size:12.5px; font-weight:600; padding:7px 11px; border-radius:14px; background:var(--ios-bg3); color:var(--ios-blue);
+    cursor:pointer; display:inline-block; margin-bottom:10px;
+  }
+  .reversegrid{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:10px;}
+  .reverseimg{height:44px; border-radius:6px; margin-bottom:5px;}
+  .reversetile{font-size:9.5px; color:var(--ios-label2); line-height:1.3;}
+  .reverselabel{font-weight:600; color:var(--ios-label); margin-bottom:1px;}
+  .reversemeta{color:var(--ios-label3);}
+
+  /* ---------- ASK AI ---------- */
+  .chatbubble{display:table; max-width:86%; padding:11px 14px; border-radius:16px; font-size:14px; line-height:1.42; margin-bottom:10px;}
+  .chatbubble.user{background:var(--ios-blue); color:#fff; margin-left:auto; margin-right:0; border-bottom-right-radius:4px;}
+  .chatbubble.ai{background:var(--ios-bg2); color:var(--ios-label); margin-right:auto; margin-left:0; border-bottom-left-radius:4px;}
+  .chatbubble.typing{padding:14px 18px;}
+  .typingdots{letter-spacing:2px; animation:blink 1.1s infinite; font-weight:900;}
+  @keyframes blink{ 0%,100%{opacity:.25;} 50%{opacity:1;} }
+
+  /* ---------- PRO TIPS LIBRARY ---------- */
+  .tacticsintro{font-size:13px; color:var(--ios-label2); line-height:1.55; margin-bottom:4px;}
+  .sectionintro{font-size:11.5px; color:var(--ios-label3); line-height:1.5; margin:2px 4px 12px;}
+  .tacticgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;}
+  .tacticcard{background:var(--ios-bg2); border-radius:14px; padding:14px; cursor:pointer; border-top:3px solid var(--ios-label3);}
+  .tacticcard.flag{border-top-color:var(--ios-orange);}
+  .tacticcard.hygiene{border-top-color:var(--ios-blue);}
+  .tacticcard.locked{opacity:.5; cursor:default; border-top-color:var(--ios-label3);}
+  .tacticcard .temoji{font-size:22px; margin-bottom:8px;}
+  .tacticcard .ttitle{font-size:13.5px; font-weight:700; margin-bottom:4px; line-height:1.3;}
+  .tacticcard .tdesc{font-size:11.5px; color:var(--ios-label2); line-height:1.4;}
+  .tacticcard .texpand{font-size:11px; color:var(--ios-blue); font-weight:600; margin-top:9px;}
+  .tacticcard .tmeta{font-size:10.5px; color:var(--ios-label3); margin-top:9px; line-height:1.4; border-top:0.5px solid var(--ios-sep); padding-top:8px;}
+  .tacticcard.justunlocked{animation:cardpop .55s cubic-bezier(.2,1.4,.4,1);}
+  @keyframes cardpop{ 0%{transform:scale(.4); opacity:0;} 60%{transform:scale(1.08); opacity:1;} 100%{transform:scale(1);} }
+  .emptysection{font-size:12px; color:var(--ios-label3); font-style:italic; padding:4px 4px 14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="iphone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span id="clock">9:41</span>
+      <span class="statusicons">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="#fff"/><rect x="10" y="3" width="3" height="9" rx="0.5" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="#fff"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 4.5C4.5 1.5 11.5 1.5 15 4.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M3.5 7C6 5 10 5 12.5 7" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="10" r="1.2" fill="#fff"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="#fff" opacity=".4" fill="none"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#fff"/><rect x="22.5" y="4" width="1.5" height="4" rx="0.7" fill="#fff" opacity=".4"/></svg>
+      </span>
+    </div>
+    <div class="screen-area" id="screenArea"></div>
+    <div class="home-indicator" onclick="goHome()"></div>
+  </div>
+  <div class="footnote" style="max-width:390px; margin:20px auto 0; color:#7d8a83; font-size:12.5px; line-height:1.6;">
+    Six apps now: Feed / Search / Ask AI / Case File / Widgets / Pro Tips. Search and Ask AI are two different ways into the same investigation — Search practices spotting who's behind an anonymous post, Ask AI practices checking a confident-sounding answer's own citations (it's right most of the time, but not always). Selective-framing and misleading-chart clips show illustrative graphics plus a mocked reverse image search. Pro Tips is a browsable reference of every tactic, styled after growth.design's psychology library — cards stay locked until you've actually resolved a clip with that pattern in Search or Ask AI. Feed cards now open with a brief shimmer and a source-domain badge before settling — standing in for the production plan's runtime og:image preview (fetched live from the original post, nothing stored in the content files) rather than baked-in art.
+  </div>
+</div>
+
+<script>
+// ---------------- DATA ----------------
+var FEED = [
+  {id:1, subject:"Tech", seen:"Short-video", claim:"Every question you ask ChatGPT wastes a full bottle of water.", handle:"@EcoFactsDaily", hue:195, wired:true, engagement:14, myCall:null, sourceUrl:"tiktok.com/@ecofactsdaily/video/74123"},
+  {id:2, subject:"Science", seen:"Short-video", claim:"This chart proves scientists are wrong about climate change.", handle:"@ClimateRealTalk", hue:150, wired:true, engagement:9, myCall:null, sourceUrl:"tiktok.com/@climaterealtalk/video/74556"},
+  {id:3, subject:"Sports", seen:"Feed", claim:"World Cup victory photos are missing one very specific person.", handle:"@WorldCupUncut", hue:30, wired:true, engagement:11, myCall:null, sourceUrl:"instagram.com/worldcupuncut/p/c9x2k"},
+  {id:4, subject:"Health", seen:"Feed", claim:"The measles vaccine is riskier than measles itself.", handle:"@WellnessWithMara", hue:340, wired:true, engagement:17, myCall:null, sourceUrl:"instagram.com/wellnesswithmara/p/c8m1q"},
+  {id:5, subject:"Politics", seen:"Microblog", claim:"BREAKING: video shows a senator collapsing getting into a car.", handle:"@BreakingPoliticsNow", hue:0, wired:true, engagement:19, myCall:null, sourceUrl:"x.com/breakingpoliticsnow/status/19834"},
+  {id:6, subject:"Disaster", seen:"Search", claim:"Wire reporting: a heat wave has pushed 50M+ people under heat alerts.", handle:"NBC News", hue:25, wired:true, engagement:6, myCall:null, sourceUrl:"nbcnews.com/news/us-news/heat-wave-alerts"},
+  {id:7, subject:"Brands", seen:"Feed", claim:"A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.", handle:"@dailyhaul_finds", hue:270, wired:true, engagement:13, myCall:null, sourceUrl:"tiktok.com/@dailyhaul_finds/video/74998"}
+];
+function domainFor(url){ return url.split("/")[0]; }
+
+var TACTICS = [
+  {name:"Misleading chart", emoji:"📊", kind:"flag", desc:"A real chart can still mislead if it's cropped, outdated, or comparing things that aren't actually comparable."},
+  {name:"Selective framing", emoji:"🖼", kind:"flag", desc:"A real photo or clip can tell a different story depending on what's left outside the frame."},
+  {name:"Cherry picking", emoji:"🍒", kind:"flag", desc:"One real data point can still mislead if it's standing in for a much bigger, messier picture."},
+  {name:"Unverifiable source", emoji:"❓", kind:"flag", desc:"No name, no history, no way to check it yourself — that doesn't make it false, but it means you can't confirm it either."},
+  {name:"Old footage, new label", emoji:"🕰", kind:"flag", desc:"A real photo or video can still mislead if it's actually from a different time or place than the post claims."},
+  {name:"Satire misread as news", emoji:"🎭", kind:"flag", desc:"A joke made to look like news doesn't stop being a joke just because it got screenshotted."},
+  {name:"Loaded language", emoji:"🌶", kind:"flag", desc:"Words picked for how they make you feel can do a lot of convincing before any evidence shows up."},
+  {name:"AI-generated or altered", emoji:"🤖", kind:"flag", desc:"Some images, video, or audio are wholly or partly AI-generated — increasingly hard to tell just by looking."},
+  {name:"Named, checkable source", emoji:"🔗", kind:"hygiene", desc:"This one names exactly where the information comes from, and you can go check it yourself."},
+  {name:"Named expert, own field", emoji:"🎓", kind:"hygiene", desc:"A named, credentialed person speaking about their own area of expertise — worth noticing when it's true, not just when it's missing."},
+  {name:"Independent confirmation", emoji:"🤝", kind:"hygiene", desc:"Two sources that don't rely on each other landing on the same conclusion is real confirmation — worth noticing when it happens."},
+  {name:"Corrected by the source", emoji:"🔄", kind:"hygiene", desc:"The outlet or account updated or corrected this after publishing — a sign they're accountable to getting it right."}
+];
+var PROTIP_COPY = {}, TACTIC_KIND = {}, TACTIC_EMOJI = {};
+TACTICS.forEach(function(t){ PROTIP_COPY[t.name]=t.desc; TACTIC_KIND[t.name]=t.kind; TACTIC_EMOJI[t.name]=t.emoji; });
+
+var CLIPS = {
+  1: [
+    {id:"1a", text:"A wellness account says every ChatGPT question drains a full water bottle.", who:"Influencer", detail:"3.8M followers, no citation linked in bio or caption.", tactic:null},
+    {id:"1b", text:"The original 2023 UC Riverside study: about 500ml per 10–50-question session.", who:"News / institution", detail:"A named university study — the paper itself is public and checkable.", tactic:"Named, checkable source"},
+    {id:"1c", text:"A Reddit thread calling the water claim \"basically made up.\"", who:"Can't tell — bot or AI?", detail:"Account created two weeks ago, no other posts.", tactic:"Unverifiable source"},
+    {id:"1d", text:"A research institute's note: large data centers draw millions of gallons a day, concentrated in a few regions.", who:"News / institution", detail:"A named research organization's public report.", tactic:"Named, checkable source"},
+    {id:"1ai1", text:"Individual ChatGPT queries use a negligible amount of water — about 0.0001 liters per question. Comparisons to a full bottle are a well-known internet exaggeration.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
+    {id:"1ai2", text:"Large AI data centers do use meaningful water for cooling at scale — the real debate is per-query impact versus aggregate infrastructure impact.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  4: [
+    {id:"4a", text:"A parent's post: \"my toddler had a bad reaction within a day of the MMR shot.\"", who:"Friend", detail:"A personal account, no medical background listed — one family's story, not a study.", tactic:null},
+    {id:"4b", text:"HHS statement: the MMR vaccine contains \"millions of DNA fragments.\"", who:"News / institution", detail:"An official statement — official doesn't mean stake-free; this office has taken a public position.", tactic:null},
+    {id:"4c", text:"\"This vaccine is more dangerous than the disease itself,\" says a wellness creator.", who:"Influencer", detail:"610k followers, no medical credentials listed anywhere on the profile.", tactic:null},
+    {id:"4d", text:"An anonymous account reposts vaccine-injury numbers with no source attached.", who:"Can't tell — bot or AI?", detail:"No posting history further back than three days ago.", tactic:null},
+    {id:"4e", text:"CDC vaccine safety monitoring data, updated this year.", who:"News / institution", detail:"A federal health agency's own public dataset — named, dated, checkable yourself.", tactic:"Named, checkable source"},
+    {id:"4f", text:"A Stanford infectious-disease doctor's op-ed rebutting the DNA-fragment claim.", who:"News / institution", detail:"A named, credentialed doctor writing in her own field, under her real name.", tactic:"Named expert, own field"},
+    {id:"4g", text:"The original viral chart placing vaccine side effects next to measles death rates.", who:"Can't tell — bot or AI?", detail:"No named source on the original post — traced only by its chart style.", tactic:"Misleading chart", image:"bar-misleading", reverseSearch:[{label:"Original CDC safety chart", meta:"cdc.gov · published last year", color:"#12221a"},{label:"Same comparison, earlier repost", meta:"posted 8 months ago", color:"#221c12"},{label:"Fact-check breakdown", meta:"posted 1 day ago", color:"#121c22"}]},
+    {id:"4ai1", text:"This is a sensitive health topic — I'd point you to CDC and WHO vaccine safety monitoring data rather than a single anecdotal report or opinion piece.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"4ai2", text:"I can't independently confirm the details of any one post's claims. Cross-checking with a named medical source is the more reliable path here.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  2: [
+    {id:"2a", text:"A viral chart claims satellite data disproves the climate models entirely.", who:"Can't tell — bot or AI?", detail:"No named source, and the y-axis is cropped right where the trend turns upward.", tactic:"Misleading chart", image:"chart-crop", reverseSearch:[{label:"Original NASA chart", meta:"nasa.gov · 14 months ago", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 6 times this week", color:"#221c12"},{label:"Meteorologist's rebuttal thread", meta:"posted 2 days ago", color:"#121c22"}]},
+    {id:"2b", text:"NASA's public global temperature dataset, plotted without the crop.", who:"News / institution", detail:"NASA's own published dataset — publicly downloadable and checkable.", tactic:"Named, checkable source", image:"chart-full"},
+    {id:"2c", text:"A climate scientist's video walking through exactly what's wrong with the cropped chart.", who:"News / institution", detail:"A named, credentialed researcher explaining the distortion in her own field.", tactic:"Named expert, own field"},
+    {id:"2d", text:"A comment thread just reposting the same chart image with a new caption.", who:"Friend", detail:"A regular commenter adding nothing new to check — same chart, recirculated.", tactic:null},
+    {id:"2ai1", text:"I can't verify a specific chart without seeing the original source and axis labels. Claims that a single chart \"disproves\" broad scientific consensus deserve extra scrutiny.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"2ai2", text:"NASA and NOAA both publish raw temperature datasets you can check directly, rather than relying on a chart shared secondhand.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  3: [
+    {id:"3a", text:"FIFA's official victory photo, cropped tight at one edge of the frame.", who:"News / institution", detail:"A sports wire photo — the crop is visible if you compare it to the wire's original file.", tactic:"Selective framing", image:"photo-crop", reverseSearch:[{label:"FIFA press feed, uncropped", meta:"fifa.com · same day", color:"#12221a"},{label:"Broadcast footage, wide shot", meta:"official broadcast · same day", color:"#221c12"},{label:"Recropped repost", meta:"posted 3 hours later", color:"#121c22"}]},
+    {id:"3b", text:"Spain's federation photo of the same moment, from a different angle.", who:"News / institution", detail:"A separate photographer's shot, not edited — he'd already stepped out of frame.", tactic:"Named, checkable source", image:"photo-full"},
+    {id:"3c", text:"A fan account claims both photos were \"obviously doctored\" by the federations.", who:"Can't tell — bot or AI?", detail:"Anonymous fan account, no sourcing beyond the claim itself.", tactic:"Unverifiable source"},
+    {id:"3ai1", text:"Based on available reporting, both photos are unedited and simply show different camera angles of the same celebration — there's no evidence of selective cropping.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
+    {id:"3ai2", text:"If you want to verify further, reverse-searching both images can usually surface their original, uncropped versions.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  5: [
+    {id:"5a", text:"A fact-checking outlet's frame-by-frame comparison shows the clip is spliced from unrelated footage.", who:"News / institution", detail:"A named outlet's own visual analysis, with the source clip identified.", tactic:"Named, checkable source"},
+    {id:"5b", text:"The account that posted it has no activity before this week.", who:"Can't tell — bot or AI?", detail:"Account created six days ago, this is its first viral post.", tactic:null},
+    {id:"5c", text:"The original, unedited footage the clip was spliced from.", who:"News / institution", detail:"Matches a real but unrelated public event from months earlier.", tactic:"Named, checkable source"},
+    {id:"5ai1", text:"Videos can be edited or taken out of context. Without frame-level analysis or the original source, I can't confirm whether this clip is authentic.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"5ai2", text:"Accounts with little posting history before a viral moment are worth extra scrutiny — that's a common pattern with manufactured \"breaking news.\"", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  6: [
+    {id:"6a", text:"NBC's wire report: 50M+ people under heat alerts, wildfires burning.", who:"News / institution", detail:"Standard wire service reporting, with a byline and dateline.", tactic:"Named, checkable source"},
+    {id:"6b", text:"A companion post blaming the heat wave on \"weather manipulation.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, appeared the same day as the real story, riding its attention.", tactic:"Unverifiable source"},
+    {id:"6c", text:"NOAA's public heat advisory map covering the same dates.", who:"News / institution", detail:"A federal agency's own public advisory system — checkable in real time.", tactic:"Named, checkable source"},
+    {id:"6ai1", text:"Multiple wire services are reporting this heat wave with specific figures — independent, named coverage like that is a good reliability signal.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"6ai2", text:"Claims attributing the heat wave to \"weather manipulation\" aren't supported by any research I'm aware of.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  7: [
+    {id:"7a", text:"An independent lab's test claims to have found a cancer-linked chemical in the brand's products.", who:"News / institution", detail:"One lab's test, cited in the court filings — a real data point, not the whole picture.", tactic:"Cherry picking"},
+    {id:"7b", text:"The FDA's own broader review found different results across most products tested.", who:"News / institution", detail:"A federal review with a wider sample than the lawsuit's single lab.", tactic:"Named, checkable source"},
+    {id:"7c", text:"A comment thread claiming \"everyone already knows this brand is toxic.\"", who:"Friend", detail:"An anecdotal thread with no data cited, just repeated assertion.", tactic:null},
+    {id:"7ai1", text:"Yes — this has been confirmed. The FDA issued a nationwide recall of the product line after the lab results were verified.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
+    {id:"7ai2", text:"Class-action lawsuits like this typically take months or years to resolve, so it's worth checking the case status directly rather than relying on secondhand summaries.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ]
+};
+
+// ---------------- STATE ----------------
+var currentApp = "home";
+var currentCaseId = null;
+var CASES = {};
+var clipState = {};
+Object.keys(CLIPS).forEach(function(id){
+  CLIPS[id].forEach(function(c){ clipState[c.id] = {revealed: c.source==="ai", who:null, shared:false, skipped:false}; });
+});
+var reverseOpen = {};
+var aiRevealed = {};
+var tacticExpanded = {};
+var unlockedTactics = {};
+var justUnlockedTactic = null;
+var pendingToast = null;
+function findClipById(id){
+  var found = null;
+  Object.keys(CLIPS).forEach(function(fid){
+    CLIPS[fid].forEach(function(c){ if(c.id===id) found = c; });
+  });
+  return found;
+}
+function maybeUnlock(clipId){
+  var clip = findClipById(clipId);
+  if(clip && clip.tactic && !unlockedTactics[clip.tactic]){
+    unlockedTactics[clip.tactic] = true;
+    justUnlockedTactic = clip.tactic;
+    pendingToast = "✨ New pro tip unlocked — check Pro Tips";
+  }
+}
+function getCase(id){ if(!CASES[id]) CASES[id] = {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}; return CASES[id]; }
+function caseNumber(id){ return "INF-" + String(4000 + id*137).slice(-5); }
+function letterFor(i){ return String.fromCharCode(65+i); }
+function formatCount(n){ return n>=1000 ? (n/1000).toFixed(1)+"K" : Math.round(n); }
+function toggleReverse(id){ reverseOpen[id] = !reverseOpen[id]; render(); }
+function svgFor(key){
+  var svgs = {
+    "chart-crop": '<svg viewBox="0 0 320 110" width="100%" height="110"><rect width="320" height="110" fill="#0c0e0c"/><line x1="24" y1="14" x2="24" y2="90" stroke="#38383a"/><line x1="24" y1="90" x2="300" y2="90" stroke="#38383a"/><polyline points="24,60 90,64 150,58 210,55 270,50 300,46" fill="none" stroke="#ff453a" stroke-width="3"/><line x1="18" y1="4" x2="30" y2="14" stroke="#ff9f0a" stroke-width="2"/><line x1="18" y1="14" x2="30" y2="4" stroke="#ff9f0a" stroke-width="2"/><text x="34" y="14" font-size="9" fill="#ff9f0a" font-family="monospace">axis cropped</text></svg>',
+    "chart-full": '<svg viewBox="0 0 320 110" width="100%" height="110"><rect width="320" height="110" fill="#0c0e0c"/><line x1="24" y1="14" x2="24" y2="90" stroke="#38383a"/><line x1="24" y1="90" x2="300" y2="90" stroke="#38383a"/><polyline points="24,86 60,82 96,76 132,66 168,58 204,50 240,40 270,28 300,18" fill="none" stroke="#30d158" stroke-width="3"/><rect x="240" y="12" width="60" height="70" fill="none" stroke="#0a84ff" stroke-width="1.5" stroke-dasharray="3,3"/><text x="150" y="10" font-size="8" fill="#0a84ff" font-family="monospace">box = the cropped view</text></svg>',
+    "bar-misleading": '<svg viewBox="0 0 320 120" width="100%" height="120"><rect width="320" height="120" fill="#0c0e0c"/><line x1="24" y1="14" x2="24" y2="96" stroke="#38383a"/><line x1="24" y1="96" x2="300" y2="96" stroke="#38383a"/><rect x="60" y="60" width="60" height="36" fill="#ff453a"/><text x="52" y="112" font-size="9" fill="#9aa39a" font-family="-apple-system,sans-serif">side effects</text><rect x="190" y="40" width="60" height="56" fill="#c9932b"/><text x="172" y="112" font-size="9" fill="#9aa39a" font-family="-apple-system,sans-serif">measles deaths</text><text x="30" y="26" font-size="8" fill="#ff9f0a" font-family="monospace">y-axis doesn\'t start at 0</text></svg>',
+    "photo-crop": '<svg viewBox="0 0 320 130" width="100%" height="130"><rect width="320" height="130" fill="#0e1a14"/><rect x="0" y="100" width="320" height="30" fill="#16241c"/><g fill="#2c9e5e"><circle cx="60" cy="68" r="12"/><rect x="48" y="80" width="24" height="30" rx="6"/><circle cx="120" cy="72" r="12"/><rect x="108" y="84" width="24" height="26" rx="6"/><circle cx="180" cy="66" r="12"/><rect x="168" y="78" width="24" height="32" rx="6"/><circle cx="240" cy="70" r="12"/><rect x="228" y="82" width="24" height="28" rx="6"/></g><g fill="#2c9e5e" opacity="0.25"><circle cx="300" cy="68" r="12"/><rect x="288" y="80" width="24" height="30" rx="6"/></g><line x1="280" y1="6" x2="280" y2="124" stroke="#ff9f0a" stroke-width="2" stroke-dasharray="4,3"/><text x="196" y="20" font-size="8" fill="#ff9f0a" font-family="monospace">frame edge →</text></svg>',
+    "photo-full": '<svg viewBox="0 0 320 130" width="100%" height="130"><rect width="320" height="130" fill="#0e1a14"/><rect x="0" y="100" width="320" height="30" fill="#16241c"/><g fill="#2c9e5e"><circle cx="50" cy="68" r="12"/><rect x="38" y="80" width="24" height="30" rx="6"/><circle cx="105" cy="72" r="12"/><rect x="93" y="84" width="24" height="26" rx="6"/><circle cx="160" cy="66" r="12"/><rect x="148" y="78" width="24" height="32" rx="6"/><circle cx="215" cy="70" r="12"/><rect x="203" y="82" width="24" height="28" rx="6"/><circle cx="270" cy="68" r="12"/><rect x="258" y="80" width="24" height="30" rx="6"/></g><circle cx="270" cy="68" r="20" fill="none" stroke="#0a84ff" stroke-width="2" stroke-dasharray="3,3"/><text x="176" y="20" font-size="8" fill="#0a84ff" font-family="monospace">not in the other photo</text></svg>'
+  };
+  return svgs[key] || "";
+}
+function renderClipImage(c){ return c.image ? ('<div class="clipimage">'+svgFor(c.image)+'</div>') : ""; }
+function renderTacticBanner(c){
+  if(c.tactic){
+    var kind = TACTIC_KIND[c.tactic] || "flag";
+    return '<div class="infobanner '+kind+'"><span>'+TACTIC_EMOJI[c.tactic]+'</span><span><b>'+c.tactic+'</b> — '+PROTIP_COPY[c.tactic]+'</span></div>';
+  }
+  return '<div class="infobanner neutral"><span>—</span><span>Nothing flagged here — not every piece of evidence has a tell.</span></div>';
+}
+function renderReverseBlock(c){
+  if(!c.reverseSearch) return "";
+  var open = reverseOpen[c.id];
+  var html = '<span class="reversebtn" onclick="toggleReverse(\''+c.id+'\')">🔎 '+(open?'Hide reverse search':'Reverse image search')+'</span>';
+  if(open){
+    html += '<div class="reversegrid">';
+    c.reverseSearch.forEach(function(r){
+      html += '<div class="reversetile"><div class="reverseimg" style="background:'+(r.color||"#1c1c1e")+';"></div><div class="reverselabel">'+r.label+'</div><div class="reversemeta">'+r.meta+'</div></div>';
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+function openApp(name){ currentApp = name; render(); }
+function goHome(){ currentApp = "home"; render(); }
+function investigate(feedId){ currentCaseId = feedId; currentApp = "search"; render(); }
+
+// ---------------- HOME ----------------
+function renderHome(){
+  var contained = FEED.filter(function(f){ return CASES[f.id] && CASES[f.id].filed; });
+  var growing = FEED.filter(function(f){ return !(CASES[f.id] && CASES[f.id].filed); });
+  var redSum = growing.reduce(function(a,f){ return a+f.engagement; }, 0);
+  var greenSum = contained.reduce(function(a,f){ return a+f.engagement; }, 0);
+  var total = Math.max(1, redSum+greenSum);
+  var pr = Math.round(100*redSum/total);
+  var html = '<div class="homescreen">';
+  html += '<div class="widgetstack" onclick="openApp(\'widgets\')">';
+  html += '<div class="widget-app-tag"><span class="dot"></span>INFODEMIC</div>';
+  html += '<div class="widget-title">Balance — misinfo vs. verified attention</div>';
+  html += '<div class="balancebar"><div class="r" style="width:'+pr+'%"></div><div class="g" style="width:'+(100-pr)+'%"></div></div>';
+  html += '<div class="wsub" style="margin-top:8px;">' + growing.length + ' spreading · ' + contained.length + ' contained</div></div>';
+  html += '<div class="iconsgrid">';
+  html += iconCell('feed','📱','Feed','linear-gradient(160deg,#3ddc84,#0d7a45)');
+  html += iconCell('search','🔍','Search','linear-gradient(160deg,#5ac8fa,#0a84ff)');
+  html += iconCell('case','🗂️','Case File','linear-gradient(160deg,#ff9f5a,#d9480f)');
+  html += iconCell('widgets','📊','Widgets','linear-gradient(160deg,#8e8e93,#3a3a3c)');
+  html += iconCell('ai','🤖','Ask AI','linear-gradient(160deg,#c583ff,#7b3ff2)');
+  html += iconCell('tactics','🧠','Pro Tips','linear-gradient(160deg,#ffd166,#e8590c)');
+  html += '</div></div>';
+  html += '<div class="dock">';
+  ["💬","📷","🎵","⚙️"].forEach(function(e){ html += '<div class="dockicon" style="background:#2c2c2e;">'+e+'</div>'; });
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+function iconCell(app, emoji, label, bg){
+  return '<div class="iconcell" onclick="openApp(\''+app+'\')"><div class="squircle" style="background:'+bg+';">'+emoji+'</div><div class="icontext">'+label+'</div></div>';
+}
+
+function navbar(title){
+  return '<div class="navbar"><span class="navback" onclick="goHome()">‹</span><span class="navtitle">'+title+'</span><span style="width:30px;"></span></div>';
+}
+function consumeToast(){
+  if(!pendingToast) return "";
+  var html = '<div class="unlocktoast" onclick="openApp(\'tactics\')">'+pendingToast+'</div>';
+  pendingToast = null;
+  return html;
+}
+
+// ---------------- FEED (immersive) ----------------
+function renderFeed(){
+  var html = '<div class="feedscroll" id="feedscroll">';
+  FEED.forEach(function(f){
+    var bg = 'linear-gradient(200deg, hsl('+f.hue+',55%,22%), #05060a 70%)';
+    var contained = CASES[f.id] && CASES[f.id].filed;
+    var likes = formatCount(Math.round(f.engagement*1000 + f.id*173));
+    var comments = formatCount(Math.round(f.engagement*180 + f.id*37));
+    html += '<div class="feedslide" style="background:'+bg+';">';
+    html += '<div class="fetchoverlay"></div>';
+    html += '<div class="sourcebadge">🔗 '+domainFor(f.sourceUrl)+'</div>';
+    html += '<div class="feedtopscrim"></div><div class="feedbottomscrim"></div>';
+    html += '<div class="feedtabs"><span>Following</span><span class="on">For You</span></div>';
+
+    html += '<div class="feedrail">';
+    html += '<div class="railavatar">'+f.handle.replace("@","").charAt(0).toUpperCase()+'<span class="plus">+</span></div>';
+    html += '<div class="railitem"><span class="railicon liked-'+f.id+'">❤️</span><span class="raillabel">'+likes+'</span></div>';
+    html += '<div class="railitem"><span class="railicon">💬</span><span class="raillabel">'+comments+'</span></div>';
+    html += '<div class="railitem" onclick="investigate('+f.id+')"><span class="railicon">'+(contained?'✅':'🔍')+'</span><span class="raillabel">'+(contained?'filed':'search')+'</span></div>';
+    html += '<div class="raildisc">🎵</div>';
+    html += '</div>';
+
+    html += '<div class="feedbottom">';
+    html += '<div class="polysticker">';
+    ["R","Y","G"].forEach(function(v){
+      var lbl = v==="R"?"🚩 Misinfo":v==="Y"?"🤔 Biased":"✅ Verified";
+      html += '<span class="pollopt'+(f.myCall===v?' sel-'+v:'')+'" onclick="setCall('+f.id+',\''+v+'\')">'+lbl+'</span>';
+    });
+    html += '</div>';
+    html += '<div class="feeduser">'+f.handle+' <span class="followpill">Follow</span></div>';
+    html += '<div class="feedclaimtext">'+f.claim+'</div>';
+    html += '<div class="feedsub">'+f.subject+' · seen on '+f.seen+'</div>';
+    html += '<div class="feedsound">🎵 original sound — '+f.handle.replace("@","")+'</div>';
+    html += '</div>';
+
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+function setCall(id, v){
+  var f = FEED.find(function(x){ return x.id===id; });
+  f.myCall = (f.myCall===v) ? null : v;
+  renderFeed();
+}
+
+// ---------------- SEARCH ----------------
+function renderSearch(){
+  var html = navbar('Search');
+  html += '<div class="appbody">';
+  html += consumeToast();
+  html += '<div class="searchfield"><span>🔍</span><input id="searchInput" readonly value="'+(currentCaseId? FEED.find(function(x){return x.id===currentCaseId;}).claim.slice(0,34)+'…' : '')+'" placeholder="Search a claim…"><span class="cancel" onclick="goHome()">Cancel</span></div>';
+
+  if(currentCaseId===null){
+    html += '<div class="emptystate">Nothing loaded yet.<br>Tap 🔍 on a claim in the Feed to pull its story here.<br><br><span class="btnfilled" onclick="openApp(\'feed\')">Go to Feed</span></div>';
+    html += '</div>';
+    document.getElementById("screenArea").innerHTML = html;
+    return;
+  }
+  var f = FEED.find(function(x){ return x.id===currentCaseId; });
+  if(!f.wired){
+    html += '<div class="emptystate">No results yet for this story — could be the first.<br><br><span class="btnfilled" onclick="openApp(\'feed\')">Back to Feed</span></div>';
+    html += '</div>';
+    document.getElementById("screenArea").innerHTML = html;
+    return;
+  }
+  var clips = CLIPS[currentCaseId].filter(function(c){ return c.source!=="ai"; });
+  var doneCount = clips.filter(function(c){ var s=clipState[c.id]; return s.shared||s.skipped; }).length;
+  html += '<div class="sectionhead">Results · '+doneCount+' of '+clips.length+' reviewed</div>';
+  html += '<div class="groupcard">';
+  clips.forEach(function(c){
+    var s = clipState[c.id];
+    html += '<div class="resultrow">' + renderClipImage(c) + '<div class="resulttext">'+c.text+'</div>' + renderReverseBlock(c);
+    if(!s.revealed){
+      html += '<div class="pillrow">';
+      ["Friend","Influencer","News / institution","Can't tell — bot or AI?"].forEach(function(opt){
+        html += '<span class="pillbtn" onclick="revealClip(\''+c.id+'\',\''+opt.replace(/'/g,"\\'")+'\')">'+opt+'</span>';
+      });
+      html += '</div>';
+    } else if(!s.shared && !s.skipped){
+      html += '<div class="revealtext">'+c.detail+'</div>';
+      html += '<div class="rowctrl"><button class="btnfilled evidence" onclick="addToBoard('+currentCaseId+',\''+c.id+'\')">✓ Counts as evidence</button><button class="btnplain reject" onclick="skipClip(\''+c.id+'\')">Doesn\'t hold up</button></div>';
+    } else {
+      html += '<div class="resolvedtext"><span>reviewed</span><span>'+(s.shared?'✓ filed as evidence':'— doesn\'t hold up')+'</span></div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div style="margin-top:16px; display:flex; gap:8px;"><button class="filebtn" style="flex:1;" onclick="openApp(\'case\')">🗂️ Case File</button><button class="filebtn" style="flex:1; background:#7b3ff2;" onclick="openApp(\'ai\')">🤖 Ask AI instead</button></div>';
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+function revealClip(id, guess){ clipState[id].who = guess; clipState[id].revealed = true; render(); }
+function addToBoard(caseId, clipId){
+  clipState[clipId].shared = true;
+  maybeUnlock(clipId);
+  var c = getCase(caseId);
+  if(c.board.indexOf(clipId)===-1) c.board.push(clipId);
+  render();
+}
+function skipClip(id){ clipState[id].skipped = true; maybeUnlock(id); render(); }
+
+// ---------------- CASE FILE ----------------
+function renderCase(){
+  var html = navbar('Case File');
+  html += '<div class="appbody">';
+  if(currentCaseId===null){
+    html += '<div class="emptystate">No case open.<br>Investigate a claim first.<br><br><span class="btnfilled" onclick="openApp(\'feed\')">Go to Feed</span></div></div>';
+    document.getElementById("screenArea").innerHTML = html;
+    return;
+  }
+  var f = FEED.find(function(x){ return x.id===currentCaseId; });
+  var c = getCase(currentCaseId);
+
+  if(c.filed) html += '<div class="stamp">FILED ✓</div>';
+
+  html += '<div class="casehead"><span class="caseid">CASE #'+caseNumber(currentCaseId)+'</span><span class="statuspill '+(c.filed?'filed':'open')+'">'+(c.filed?'Filed':'Open')+'</span></div>';
+
+  html += '<div class="exhibitbox"><div class="exhibitlabel">Claim under review</div><div class="caseclaim">'+f.claim+'</div></div>';
+
+  html += '<div class="sectionhead">Evidence attached ('+c.board.length+')</div>';
+  html += '<div class="groupcard">';
+  if(c.board.length===0){
+    html += '<div class="resultrow"><span style="color:var(--ios-label2); font-size:13px;">No evidence attached yet — go back to Search and file a few results here.</span></div>';
+  } else {
+    var allClips = CLIPS[currentCaseId];
+    c.board.forEach(function(clipId, idx){
+      var clip = allClips.find(function(x){ return x.id===clipId; });
+      var kind = clip.tactic ? (TACTIC_KIND[clip.tactic]||"flag") : "none";
+      var origin = clip.source==="ai" ? "🤖 " : "";
+      var imgHtml = clip.image ? '<div class="clipimage" style="max-width:220px;">'+svgFor(clip.image)+'</div>' : "";
+      html += '<div class="exhibitrow"><span class="exhibittag">EXHIBIT '+letterFor(idx)+'</span><div style="flex:1;">'+imgHtml+'<span><span class="boarddot '+kind+'" style="display:inline-block; margin-right:6px; margin-top:1px; vertical-align:middle;"></span>'+origin+clip.text+(clip.tactic?' <b style="color:var(--ios-label2);">· '+clip.tactic+'</b>':'')+'</span></div></div>';
+    });
+  }
+  html += '</div>';
+
+  html += '<div class="sectionhead">Determination</div>';
+  html += '<div class="groupcard">';
+  ["MISINFO","BIASED","VERIFIED","STILL UNSETTLED"].forEach(function(v){
+    html += '<div class="radiorow" onclick="setTeamCall('+currentCaseId+',\''+v+'\')"><span class="radiocircle'+(c.teamCall===v?' selected':'')+'"></span><span>'+v+'</span></div>';
+  });
+  html += '</div>';
+
+  if(!c.filed){
+    html += '<div class="confirmrow" onclick="toggleConfirm('+currentCaseId+')"><span class="checkbox'+(c.confirmed?' checked':'')+'">'+(c.confirmed?'✓':'')+'</span><span class="confirmtext">I confirm this determination reflects the team\'s review of the attached evidence.</span></div>';
+    html += '<button class="filebtn" onclick="fileCase('+currentCaseId+')" '+(!c.teamCall||!c.confirmed?'disabled':'')+'>Submit Case Report</button>';
+  } else {
+    html += '<div class="receiptcard">';
+    html += '<div class="receiptrow"><span>Case number</span><span>'+caseNumber(currentCaseId)+'</span></div>';
+    html += '<div class="receiptrow"><span>Determination</span><span>'+c.teamCall+'</span></div>';
+    html += '<div class="receiptrow"><span>Evidence attached</span><span>'+c.board.length+'</span></div>';
+    html += '<div class="receiptrow"><span>Filed</span><span>'+c.filedAt+'</span></div>';
+    html += '</div>';
+    html += '<div class="filedbanner">✓ Sent to Widgets — containment in progress.</div>';
+  }
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+function setTeamCall(caseId, v){
+  var c = getCase(caseId);
+  if(c.filed) return;
+  c.teamCall = (c.teamCall===v) ? null : v;
+  renderCase();
+}
+function toggleConfirm(caseId){
+  var c = getCase(caseId);
+  if(c.filed) return;
+  c.confirmed = !c.confirmed;
+  renderCase();
+}
+function fileCase(caseId){
+  var c = getCase(caseId);
+  if(!c.teamCall || !c.confirmed) return;
+  c.filed = true;
+  var d = new Date();
+  var h = d.getHours() % 12 || 12;
+  var m = d.getMinutes();
+  c.filedAt = (d.getMonth()+1)+"/"+d.getDate()+"/"+d.getFullYear()+" · "+h+":"+(m<10?"0":"")+m;
+  renderCase();
+}
+
+// ---------------- WIDGETS ----------------
+function renderWidgets(){
+  var html = navbar('Widgets');
+  html += '<div class="appbody">';
+  var contained = FEED.filter(function(f){ return CASES[f.id] && CASES[f.id].filed; });
+  var growing = FEED.filter(function(f){ return !(CASES[f.id] && CASES[f.id].filed); });
+  var redSum = growing.reduce(function(a,f){ return a+f.engagement; }, 0);
+  var greenSum = contained.reduce(function(a,f){ return a+f.engagement; }, 0);
+  var total = Math.max(1, redSum+greenSum);
+  var pr = Math.round(100*redSum/total);
+  var top = growing.slice().sort(function(a,b){ return b.engagement-a.engagement; })[0];
+
+  html += '<div class="wrow2">';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>SPREADING</div><div class="wnum" style="color:var(--ios-red);">'+growing.length+'</div><div class="wsub">still uncontained</div></div>';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>CONTAINED</div><div class="wnum" style="color:var(--ios-green);">'+contained.length+'</div><div class="wsub">case reports filed</div></div>';
+  html += '</div>';
+
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>BALANCE</div><div class="wsub">misinfo vs. verified attention</div>';
+  html += '<div class="balancebar"><div class="r" style="width:'+pr+'%"></div><div class="g" style="width:'+(100-pr)+'%"></div></div></div>';
+
+  if(top){
+    html += '<div class="wtile" style="cursor:pointer;" onclick="investigate('+top.id+'); openApp(\'search\');">';
+    html += '<div class="wtag"><span class="dot"></span>TOP SPREADING RIGHT NOW</div>';
+    html += '<div class="topclaim">'+top.claim+'</div>';
+    html += '<div class="wsub">🔥 '+Math.round(top.engagement)+' engagement · tap to investigate</div></div>';
+  }
+  html += '<div style="color:var(--ios-label3); font-size:12px; line-height:1.6; margin-top:6px;">Numbers tick up on their own every couple seconds while a claim sits uncontained. Filing a Case Report in Case File is the only thing that brings one down.</div>';
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+
+// ---------------- ASK AI ----------------
+function renderAI(){
+  var html = navbar('Ask AI');
+  html += '<div class="appbody">';
+  html += consumeToast();
+  if(currentCaseId===null){
+    html += '<div class="emptystate">No claim loaded.<br>Tap 🔍 on a claim in the Feed, then come here to ask AI.<br><br><span class="btnfilled" onclick="openApp(\'feed\')">Go to Feed</span></div></div>';
+    document.getElementById("screenArea").innerHTML = html;
+    return;
+  }
+  var f = FEED.find(function(x){ return x.id===currentCaseId; });
+  html += '<div class="chatbubble user">Is this true?<br>"'+f.claim+'"</div>';
+
+  if(!aiRevealed[currentCaseId]){
+    html += '<div class="chatbubble ai typing"><span class="typingdots">● ● ●</span></div>';
+    html += '</div>';
+    document.getElementById("screenArea").innerHTML = html;
+    setTimeout(function(){
+      aiRevealed[currentCaseId] = true;
+      if(currentApp==="ai") renderAI();
+    }, 1100);
+    return;
+  }
+
+  var aiClips = (CLIPS[currentCaseId]||[]).filter(function(c){ return c.source==="ai"; });
+  if(aiClips.length===0){
+    html += '<div class="chatbubble ai">I don\'t have anything specific on this one yet.</div></div>';
+    document.getElementById("screenArea").innerHTML = html;
+    return;
+  }
+  var doneCount = aiClips.filter(function(c){ var s=clipState[c.id]; return s.shared||s.skipped; }).length;
+  html += '<div class="sectionhead">AI response · '+doneCount+' of '+aiClips.length+' reviewed</div>';
+  aiClips.forEach(function(c){
+    var s = clipState[c.id];
+    html += '<div class="chatbubble ai">'+c.text+'</div>';
+    if(!s.shared && !s.skipped){
+      html += '<div class="rowctrl"><button class="btnfilled evidence" onclick="addToBoard('+currentCaseId+',\''+c.id+'\')">✓ Counts as evidence</button><button class="btnplain reject" onclick="skipClip(\''+c.id+'\')">Doesn\'t hold up</button></div>';
+    } else {
+      html += '<div class="resolvedtext"><span>reviewed</span><span>'+(s.shared?'✓ filed as evidence':'— doesn\'t hold up')+'</span></div>';
+    }
+  });
+  html += '<div style="margin-top:16px;"><button class="filebtn" onclick="openApp(\'case\')">🗂️ Go to Case File</button></div>';
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+
+// ---------------- PRO TIPS LIBRARY ----------------
+function findClaimsForTactic(name){
+  var out = [];
+  Object.keys(CLIPS).forEach(function(fid){
+    var has = CLIPS[fid].some(function(c){ return c.tactic===name; });
+    if(has){
+      var f = FEED.find(function(x){ return x.id==fid; });
+      if(f && out.indexOf(f.subject)===-1) out.push(f.subject);
+    }
+  });
+  return out;
+}
+function toggleTactic(name){
+  if(!unlockedTactics[name]) return;
+  tacticExpanded[name] = !tacticExpanded[name];
+  renderTactics();
+}
+function renderTactics(){
+  var html = navbar('Pro Tips');
+  html += '<div class="appbody">';
+  var unlockedCount = TACTICS.filter(function(t){ return unlockedTactics[t.name]; }).length;
+  html += '<div class="tacticsintro">'+unlockedCount+' of '+TACTICS.length+' spotted so far. You don\'t get told which pattern a piece of evidence has while you\'re deciding on it — this board fills in as you go, from what you\'ve actually reviewed in Search or Ask AI.</div>';
+
+  var flashName = justUnlockedTactic;
+  justUnlockedTactic = null;
+
+  [{kind:"flag", label:"🚩 Flag — worth questioning", sub:"Patterns that show up when a claim is being spun, distorted, or can't be checked."},
+   {kind:"hygiene", label:"✅ Hygiene — worth noticing", sub:"Patterns that show a source is doing the work to be checkable."}
+  ].forEach(function(section){
+    var items = TACTICS.filter(function(t){ return t.kind===section.kind && unlockedTactics[t.name]; });
+    html += '<div class="sectionhead" style="margin-top:18px;">'+section.label+'</div>';
+    html += '<div class="sectionintro">'+section.sub+'</div>';
+    if(items.length===0){
+      html += '<div class="emptysection">None spotted yet.</div>';
+    } else {
+      html += '<div class="tacticgrid">';
+      items.forEach(function(t){
+        var expanded = tacticExpanded[t.name];
+        html += '<div class="tacticcard '+t.kind+(t.name===flashName?' justunlocked':'')+'" onclick="toggleTactic(\''+t.name+'\')">';
+        html += '<div class="temoji">'+t.emoji+'</div>';
+        html += '<div class="ttitle">'+t.name+'</div>';
+        html += '<div class="tdesc">'+t.desc+'</div>';
+        if(!expanded){
+          html += '<div class="texpand">Expand ↓</div>';
+        } else {
+          var seenIn = findClaimsForTactic(t.name);
+          html += '<div class="tmeta">'+(seenIn.length ? 'Spotted in: '+seenIn.join(', ') : 'Not spotted in this feed drop yet.')+'</div>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+  });
+
+  var locked = TACTICS.filter(function(t){ return !unlockedTactics[t.name]; });
+  html += '<div class="sectionhead" style="margin-top:18px;">🔒 Not yet spotted ('+locked.length+')</div>';
+  html += '<div class="sectionintro">Keep investigating in Search or Ask AI — these fill in on their own.</div>';
+  if(locked.length===0){
+    html += '<div class="emptysection">Every pattern in this drop has been spotted.</div>';
+  } else {
+    html += '<div class="tacticgrid">';
+    locked.forEach(function(t){
+      html += '<div class="tacticcard locked">';
+      html += '<div class="temoji">❔</div>';
+      html += '<div class="ttitle">???</div>';
+      html += '<div class="tdesc">Spot a pattern like this in Search or Ask AI to unlock it.</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+
+// ---------------- MASTER RENDER ----------------
+function render(){
+  if(currentApp==="home") renderHome();
+  else if(currentApp==="feed") renderFeed();
+  else if(currentApp==="search") renderSearch();
+  else if(currentApp==="case") renderCase();
+  else if(currentApp==="widgets") renderWidgets();
+  else if(currentApp==="ai") renderAI();
+  else if(currentApp==="tactics") renderTactics();
+}
+
+setInterval(function(){
+  FEED.forEach(function(f){
+    var contained = CASES[f.id] && CASES[f.id].filed;
+    if(contained){ f.engagement = Math.max(4, f.engagement - 0.3); }
+    else { f.engagement = Math.min(30, f.engagement + Math.random()*1.4); }
+  });
+  if(currentApp==="widgets" || currentApp==="home") render();
+}, 2200);
+
+function tickClock(){
+  var d = new Date();
+  var h = d.getHours() % 12 || 12;
+  var m = d.getMinutes();
+  document.getElementById("clock").textContent = h + ":" + (m<10?"0":"") + m;
+}
+setInterval(tickClock, 15000);
+tickClock();
+
+render();
+</script>
+</body>
+</html>
