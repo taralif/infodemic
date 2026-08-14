@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INFODEMIC — Multiplayer Prototype (Week 2)</title>
+<style>
+  :root{
+    --ios-bg:#000000; --ios-bg2:#1c1c1e; --ios-bg3:#2c2c2e; --ios-sep:#38383a;
+    --ios-blue:#0a84ff; --ios-green:#30d158; --ios-red:#ff453a; --ios-orange:#ff9f0a;
+    --ios-label:#ffffff; --ios-label2:rgba(235,235,245,.6); --ios-label3:rgba(235,235,245,.3);
+    /* Contrast fix (Jared, 8/11 demo): the flipped investigation face was
+       --ios-bg2, barely lighter than the near-black feed it flips out of —
+       read as "black card on black background." Lighter than both --ios-bg2
+       and --ios-bg3 so the nested groupcard/receiptcard (bg2) and mode tabs
+       (bg3) still read as insets on top of it, not swallowed into it. */
+    --ios-cardback:#34343a;
+  }
+  *{box-sizing:border-box; -webkit-font-smoothing:antialiased;}
+  body{
+    margin:0; min-height:100vh; background:#0d0d0f; color:var(--ios-label);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    display:flex; justify-content:center; align-items:flex-start; padding:40px 16px 60px;
+  }
+  .wrap{display:flex; flex-direction:column; align-items:center;}
+
+  .iphone{
+    width:390px; height:844px; background:#000; border-radius:56px; position:relative;
+    box-shadow:0 0 0 3px #2a2a2c, 0 0 0 6px #000, 0 30px 70px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  .notch{
+    position:absolute; top:11px; left:50%; transform:translateX(-50%); width:126px; height:37px;
+    background:#000; border-radius:20px; z-index:60;
+  }
+  .statusbar{
+    position:absolute; top:0; left:0; right:0; height:47px; z-index:55;
+    display:flex; align-items:flex-end; justify-content:space-between; padding:0 26px 8px;
+    font-size:15px; font-weight:600; pointer-events:none; letter-spacing:.2px;
+  }
+  .statusicons{display:flex; align-items:center; gap:5px;}
+  .home-indicator{
+    position:absolute; bottom:8px; left:50%; transform:translateX(-50%); width:134px; height:5px;
+    border-radius:3px; background:rgba(255,255,255,.85); z-index:60; cursor:pointer;
+  }
+  .screen-area{position:absolute; inset:0; overflow:hidden; background:var(--ios-bg);}
+
+  /* ---------- CONTEXTUAL ONBOARDING SHEET ---------- */
+  .onboard-scrim{
+    position:absolute; inset:0; z-index:57; display:flex; align-items:flex-end; justify-content:center;
+    background:rgba(0,0,0,0); opacity:0; pointer-events:none; transition:opacity .25s ease, background .25s ease;
+  }
+  .onboard-scrim.active{ opacity:1; pointer-events:auto; background:rgba(0,0,0,.55); }
+  .onboard-sheet{
+    width:100%; background:var(--ios-bg2); border-radius:38px 38px 0 0; padding:14px 26px 34px;
+    transform:translateY(100%); transition:transform .32s cubic-bezier(.22,1,.36,1); box-shadow:0 -10px 40px rgba(0,0,0,.5);
+  }
+  .onboard-scrim.active .onboard-sheet{ transform:translateY(0); }
+  .onboard-grip{ width:36px; height:5px; border-radius:3px; background:var(--ios-sep); margin:0 auto 18px; }
+  .onboard-kicker{ font-size:12.5px; font-weight:700; color:var(--ios-blue); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; text-align:center; }
+  .onboard-title{ font-size:22px; font-weight:800; text-align:center; margin-bottom:8px; line-height:1.2; }
+  .onboard-sub{ font-size:13.5px; color:var(--ios-label2); text-align:center; line-height:1.4; margin-bottom:22px; padding:0 8px; }
+  .onboard-row{ display:flex; gap:14px; align-items:flex-start; margin-bottom:18px; }
+  .onboard-icon{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; background:var(--ios-bg3); }
+  .onboard-rowtitle{ font-size:14.5px; font-weight:700; margin-bottom:2px; }
+  .onboard-rowdesc{ font-size:12.5px; color:var(--ios-label2); line-height:1.4; }
+  .onboard-btn{ margin-top:6px; background:var(--ios-blue); color:#fff; text-align:center; font-size:16px; font-weight:600; padding:13px; border-radius:14px; cursor:pointer; }
+
+  /* ---------- APP NAV / BODY ---------- */
+  .navbar{
+    position:absolute; top:0; left:0; right:0; height:98px; z-index:30; padding-top:47px;
+    display:flex; align-items:center; padding-left:16px; padding-right:16px;
+    background:rgba(20,20,22,.82); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    border-bottom:0.5px solid var(--ios-sep);
+  }
+  .navback{color:var(--ios-blue); font-size:28px; font-weight:400; cursor:pointer; width:30px;}
+  .navtitle{flex:1; text-align:center; font-size:17px; font-weight:600; margin-right:30px;}
+  .appbody{position:absolute; top:98px; left:0; right:0; bottom:0; overflow-y:auto; padding:14px 16px 34px;}
+  .appbody::-webkit-scrollbar{width:0;}
+
+  /* ---------- ROUND 1: CARD STACK ---------- */
+  .r1wrap{position:absolute; inset:0; overflow-y:auto; padding:58px 16px 30px;}
+  .r1wrap::-webkit-scrollbar{width:0;}
+  .spreadmini{
+    background:rgba(30,32,30,.6); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border-radius:20px; padding:13px 16px; margin-bottom:16px; cursor:pointer; border:1px solid rgba(255,255,255,.08);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .spreadmini .smtag{font-size:10.5px; font-weight:700; color:var(--ios-label2); display:flex; align-items:center; gap:6px;}
+  .spreadmini .smtag .dot{width:11px; height:11px; border-radius:3px; background:linear-gradient(160deg,#ff6a3d,#c22b06);}
+  .spreadmini .smbar{flex:1; height:8px; border-radius:4px; overflow:hidden; display:flex; background:var(--ios-bg3); margin:0 10px;}
+  .spreadmini .smbar .r{background:var(--ios-red);} .spreadmini .smbar .g{background:var(--ios-green);}
+  .spreadmini .smarrow{color:var(--ios-label3); font-size:14px;}
+
+  .r1header{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+  .r1title{font-size:22px; font-weight:800;}
+  .r1timer{font-family:'Space Mono',monospace; font-size:19px; font-weight:700; color:var(--ios-green); background:var(--ios-bg2); padding:5px 12px; border-radius:10px;}
+  .r1timer.urgent{color:var(--ios-red); animation:blink 0.8s infinite;}
+  .r1sub{font-size:13px; color:var(--ios-label2); line-height:1.5; margin-bottom:18px;}
+
+  .claimlist{display:flex; flex-direction:column; gap:12px;}
+  .claimcard{background:var(--ios-bg2); border-radius:18px; padding:15px 16px; border:1px solid rgba(255,255,255,.05); transition:transform .2s ease;}
+  .claimcard.contested{cursor:pointer; border-color:rgba(255,69,58,.35); background:linear-gradient(160deg, rgba(255,69,58,.08), var(--ios-bg2) 55%);}
+  .claimcard.contested:active{transform:scale(.98);}
+  .claimcard.agreed{opacity:.5;}
+  .claimcard.justsorted{animation:cardpop .5s cubic-bezier(.2,1.4,.4,1);}
+  @keyframes cardpop{ 0%{transform:scale(.85); opacity:0;} 60%{transform:scale(1.03); opacity:1;} 100%{transform:scale(1);} }
+  .claimtop{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .claimsource{font-size:11px; font-weight:600; color:var(--ios-label3);}
+  .statustag{font-size:9.5px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; padding:3px 8px; border-radius:999px;}
+  .statustag.contested{background:rgba(255,69,58,.18); color:var(--ios-red);}
+  .statustag.agreed{background:rgba(255,255,255,.08); color:var(--ios-label3);}
+  .claimheadline{font-size:15px; font-weight:600; line-height:1.38; margin-bottom:12px;}
+
+  .votebtns{display:flex; gap:7px; margin-bottom:11px;}
+  .voteopt{flex:1; text-align:center; font-size:11.5px; font-weight:700; padding:9px 4px; border-radius:10px; background:var(--ios-bg3); color:var(--ios-label2); cursor:pointer;}
+  .voteopt.sel-misinfo{background:var(--ios-red); color:#fff;}
+  .voteopt.sel-biased{background:var(--ios-orange); color:#1a1205;}
+  .voteopt.sel-true{background:var(--ios-green); color:#04140a;}
+
+  .voterow{display:flex; gap:6px; flex-wrap:wrap;}
+  .avatardot{width:26px; height:26px; border-radius:50%; border:1.6px solid var(--ios-sep); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--ios-label3);}
+  .avatardot.pending{background:var(--ios-bg3);}
+  .avatardot.you{border-color:var(--ios-green);}
+  .avatardot.sel-misinfo{background:rgba(255,69,58,.25); border-color:var(--ios-red);}
+  .avatardot.sel-biased{background:rgba(255,159,10,.25); border-color:var(--ios-orange);}
+  .avatardot.sel-true{background:rgba(48,209,88,.25); border-color:var(--ios-green);}
+  .voterow.revealed{gap:7px;}
+  .voterow.revealed.justrevealed{animation:cardpop .5s cubic-bezier(.2,1.4,.4,1);}
+  .avatarpill{font-size:10.5px; font-weight:700; padding:5px 9px; border-radius:999px; background:var(--ios-bg3); color:var(--ios-label2);}
+  .avatarpill.misinfo{background:rgba(255,69,58,.18); color:var(--ios-red);}
+  .avatarpill.biased{background:rgba(255,159,10,.18); color:var(--ios-orange);}
+  .avatarpill.true{background:rgba(48,209,88,.18); color:var(--ios-green);}
+  .claimcta{margin-top:10px; font-size:12px; font-weight:700; color:var(--ios-red);}
+
+  .protipslink{display:block; text-align:center; font-size:12.5px; font-weight:600; color:var(--ios-blue); margin-top:20px; padding-bottom:10px; cursor:pointer;}
+
+  /* ---------- ROUND 1: card-stack feed (everything for a story lives on its own card) ---------- */
+  .r1topbar{
+    position:absolute; top:0; left:0; right:0; height:98px; z-index:40; padding-top:47px;
+    display:flex; align-items:center; justify-content:space-between; padding-left:18px; padding-right:14px;
+    background:rgba(15,16,15,.74); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border-bottom:0.5px solid var(--ios-sep);
+  }
+  .r1toptitle{font-size:17px; font-weight:800;}
+  .r1topsub{font-size:11px; color:var(--ios-label2); margin-top:1px;}
+  .r1toptools{display:flex; align-items:center; gap:8px;}
+  .spreadbadge{
+    background:rgba(255,255,255,.1); border-radius:999px; padding:6px 11px; font-size:11px; font-weight:700; color:#ffb199; cursor:pointer;
+  }
+  .tipsbadge{
+    background:rgba(255,255,255,.1); border-radius:999px; width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+    font-size:14px; cursor:pointer;
+  }
+  .roundbadge{
+    font-family:'Space Mono',monospace; font-size:14px; font-weight:700; background:rgba(255,255,255,.1); color:var(--ios-green);
+    padding:6px 11px; border-radius:999px; cursor:pointer;
+  }
+  .roundbadge.urgent{color:var(--ios-red); animation:blink 0.8s infinite;}
+
+  .feedscroll{position:absolute; top:98px; left:0; right:0; bottom:0; overflow-y:scroll; scroll-snap-type:y proximity; padding:14px 14px 26px;}
+  .feedscroll::-webkit-scrollbar{width:0;}
+  /* scroll-snap-stop:normal (not "always") lets a fast scroll/fling glide past several
+     cards instead of forcing a stop at every single one — this is what makes the feed
+     feel light to scroll through instead of sticky. scroll-snap-type is "proximity" not
+     "mandatory" so snapping never fights a scroll gesture that started inside a flipped
+     card's own scrollable back face (see .cardback-scroll below). */
+  .feedcard{
+    scroll-snap-align:start; scroll-snap-stop:normal; height:74vh; min-height:500px; max-height:620px;
+    position:relative; margin-bottom:18px; box-shadow:0 14px 34px rgba(0,0,0,.45); perspective:1600px;
+  }
+  /* ---------- CARD FLIP (front = feed card, back = inline investigation) ---------- */
+  .cardflip-inner{
+    position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.15,.2,1);
+    transform-style:preserve-3d;
+  }
+  .cardflip-inner.flipped{ transform:rotateY(180deg); }
+  .cardface{
+    position:absolute; inset:0; border-radius:26px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border:1px solid rgba(255,255,255,.07);
+    /* Both faces occupy the exact same box at all times (only the rotation makes one
+       of them face away) — without this, the hidden face can still sit "on top" for
+       hit-testing purposes and swallow taps meant for the visible face underneath it.
+       Only the currently front-facing side should ever receive pointer events. */
+    pointer-events:none;
+  }
+  .cardflip-inner:not(.flipped) .cardface-front{ pointer-events:auto; }
+  .cardflip-inner.flipped .cardface-back{ pointer-events:auto; }
+  .cardface-back{
+    transform:rotateY(180deg); background:var(--ios-cardback); display:flex; flex-direction:column;
+    border-color:rgba(255,255,255,.18); box-shadow:0 24px 60px rgba(0,0,0,.55);
+  }
+  .cardback-head{
+    display:flex; align-items:flex-start; gap:10px; padding:14px 16px 12px; border-bottom:0.5px solid var(--ios-sep); flex:0 0 auto;
+  }
+  .cardback-flipclose{ font-size:21px; color:var(--ios-blue); cursor:pointer; flex:0 0 auto; width:24px; line-height:1; margin-top:1px; }
+  .cardback-titlewrap{ min-width:0; flex:1; }
+  .cardback-subject{ font-size:10px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:3px; }
+  .cardback-headline{ font-size:15px; font-weight:700; line-height:1.35; }
+  /* This is the ONLY scroll region that grows with content — the card itself stays a
+     fixed 74vh so it never breaks the outer feed's scroll-snap sizing. overscroll-behavior
+     keeps a scroll gesture that hits the top/bottom of this list from bleeding into the
+     outer feed scroll underneath it. */
+  .cardback-scroll{ flex:1 1 auto; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:14px 16px 22px; }
+  .cardhook{
+    font-size:13px; line-height:1.5; color:#fff; background:rgba(10,132,255,.12); border:1px solid rgba(10,132,255,.3);
+    border-radius:12px; padding:11px 13px; margin-bottom:14px;
+  }
+  .cardmodetabs{ display:flex; gap:8px; margin-bottom:14px; }
+  .cardmodetab{ flex:1; text-align:center; font-size:12px; font-weight:700; padding:9px 4px; border-radius:11px; background:var(--ios-bg3); color:var(--ios-label2); cursor:pointer; }
+  .cardmodetab.active{ background:var(--ios-blue); color:#fff; }
+  .cardback-caselink{
+    display:block; text-align:center; margin-top:16px; font-size:13px; font-weight:700; color:var(--ios-green);
+    background:rgba(48,209,88,.12); border:1px solid rgba(48,209,88,.35); border-radius:12px; padding:11px; cursor:pointer;
+  }
+  .feedtopscrim{position:absolute; top:0; left:0; right:0; height:100px; background:linear-gradient(180deg, rgba(0,0,0,.5), transparent); z-index:5;}
+  .feedbottomscrim{position:absolute; bottom:0; left:0; right:0; height:250px; background:linear-gradient(0deg, rgba(0,0,0,.8), transparent); z-index:5;}
+
+  .feedrail{position:absolute; right:12px; bottom:120px; z-index:20; display:flex; flex-direction:column; align-items:center; gap:12px;}
+  .railavatar{width:40px; height:40px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; background:var(--ios-bg3);}
+  .railitem{display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;}
+  .railicon{font-size:24px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));}
+  .raillabel{font-size:10px; font-weight:700; text-shadow:0 1px 2px rgba(0,0,0,.6); color:#fff;}
+  .raillabel.contested{color:rgba(255,255,255,.85);}
+  .raillabel.agreed{color:var(--ios-label2);}
+  .raildisc{width:28px; height:28px; border-radius:50%; background:#111; border:2px solid #444; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:11px; animation:spin 5s linear infinite;}
+  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+  /* Subtle card-flip affordance, modeled on flashcard-app corners (Quizlet) and the
+     small "tap to inspect" corner icons common in digital card games — quiet by
+     default, a soft pulsing ring is the only thing inviting the tap, no loud color. */
+  .flipnub-wrap{
+    display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer;
+  }
+  .flipnub{
+    position:relative; width:40px; height:40px; border-radius:50%;
+    background:rgba(20,20,22,.55); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center;
+    font-size:17px; box-shadow:0 4px 14px rgba(0,0,0,.35);
+  }
+  .flipnub::after{
+    content:""; position:absolute; inset:-5px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35);
+    animation:flippulse 2.4s ease-out infinite;
+  }
+  @keyframes flippulse{ 0%{transform:scale(.86); opacity:.55;} 70%{transform:scale(1.22); opacity:0;} 100%{opacity:0;} }
+  .flipnub-label{
+    font-size:9px; font-weight:700; letter-spacing:.3px; color:rgba(255,255,255,.65); text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
+  /* Two nubs side by side — investigate + case board are both story-specific spokes
+     that should be visible together on the card, not just one generic flip icon. */
+  .flipcluster{ position:absolute; right:14px; bottom:16px; z-index:22; display:flex; gap:12px; }
+  .flipnub-badge{
+    position:absolute; top:-3px; right:-3px; background:var(--ios-green); color:#04140a; font-size:9px; font-weight:800;
+    border-radius:999px; padding:1px 5px; border:1.5px solid #141416;
+  }
+
+  /* ---------- MOVE MENU: "how do you wanna dig in" agency picker ----------
+     2x2 grid, one card per mode — mirrors the layout Tara referenced, just in
+     Infodemic's existing dark palette (colored top-border accent per mode) rather
+     than the reference's neon gradient fills. */
+  .moveintro{ font-size:13.5px; font-weight:700; color:var(--ios-label2); margin-bottom:10px; }
+  .movegrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
+  .movecard{
+    background:var(--ios-bg3); border-radius:16px; padding:14px 13px; cursor:pointer;
+    border-top:3px solid var(--ios-label3); display:flex; flex-direction:column; gap:9px;
+  }
+  .movecard.move-search{ border-top-color:var(--ios-blue); }
+  .movecard.move-ai{ border-top-color:#8a5cff; }
+  .movecard.move-bg{ border-top-color:#ff6b6b; }
+  .movecard.move-board{ border-top-color:var(--ios-green); }
+  .moveicon{
+    font-size:19px; flex:0 0 auto; width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,.06);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .movetitlewrap{ min-width:0; }
+  .movetitle{ font-size:13.5px; font-weight:700; margin-bottom:3px; line-height:1.25; }
+  .movedesc{ font-size:11px; color:var(--ios-label2); line-height:1.35; }
+
+  .feedbottom{position:absolute; left:16px; right:78px; bottom:18px; z-index:20;}
+  .cardsource{
+    display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:#fff;
+    background:rgba(255,255,255,.14); border-radius:999px; padding:5px 10px; margin-bottom:9px; cursor:pointer;
+  }
+  .cardsource .chev{opacity:.65; font-size:9px;}
+  .cardsourceextra{font-size:10.5px; color:rgba(255,255,255,.6); margin:-3px 0 9px 3px;}
+  .subjecttag{font-size:10.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:6px;}
+  .headline{font-size:18px; font-weight:800; line-height:1.32; text-shadow:0 1px 4px rgba(0,0,0,.5); margin-bottom:10px;}
+  .cardstats{display:flex; gap:16px; font-size:12px; font-weight:600; color:rgba(255,255,255,.65); margin-bottom:12px;}
+  .polysticker{
+    display:inline-flex; background:rgba(0,0,0,.42); backdrop-filter:blur(8px); border-radius:14px; padding:4px; margin-bottom:12px;
+    border:1px solid rgba(255,255,255,.25);
+  }
+  .pollopt{font-size:11.5px; font-weight:700; padding:7px 10px; border-radius:10px; cursor:pointer; color:#fff; white-space:nowrap;}
+  .pollopt.sel-misinfo{background:var(--ios-red);}
+  .pollopt.sel-biased{background:var(--ios-orange); color:#1a1205;}
+  .pollopt.sel-true{background:var(--ios-green); color:#04140a;}
+  .investigatecta{
+    display:inline-block; margin-top:2px; background:var(--ios-red); color:#fff; font-size:13px; font-weight:700;
+    padding:9px 14px; border-radius:12px;
+  }
+  .agreedcta{
+    display:inline-block; margin-top:2px; background:rgba(255,255,255,.12); color:rgba(255,255,255,.7); font-size:13px; font-weight:600;
+    padding:9px 14px; border-radius:12px;
+  }
+  /* Filed verdict, promoted to the top of the hub card (above the headline) — this is
+     now the highest-hierarchy thing on a filed card, not a low pill buried near the
+     vote reveal. The gut-check votes still render further down on this same face, so
+     the two together are the then/now comparison. */
+  .hubfiled{
+    display:inline-flex; align-items:center; gap:10px; margin-bottom:9px; cursor:pointer;
+  }
+  .hubstamp{
+    font-family:'Space Mono',monospace; font-weight:800; font-size:13.5px; letter-spacing:1.5px; color:var(--ios-green);
+    border:2px solid var(--ios-green); border-radius:8px; padding:4px 10px; transform:rotate(-5deg);
+    background:rgba(48,209,88,.14); text-shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  .hubverdict{font-size:14.5px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5);}
+
+  .stoplight{display:flex; gap:14px;}
+  .stoplightopt{
+    width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:23px; border:3px solid rgba(255,255,255,.28); cursor:pointer; transition:transform .15s ease, border-color .15s ease;
+    box-shadow:0 4px 12px rgba(0,0,0,.35);
+  }
+  .stoplightopt.red{background:var(--ios-red);}
+  .stoplightopt.yellow{background:var(--ios-orange);}
+  .stoplightopt.green{background:var(--ios-green);}
+  .stoplightopt.selected{border-color:#fff; transform:scale(1.14);}
+  .stoplight.readonly .stoplightopt{cursor:default;}
+  .stoplightcount{font-size:15px; font-weight:800; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .voteexpand{display:inline-block; margin-top:10px; font-size:12px; font-weight:700; color:#fff; opacity:.8; cursor:pointer;}
+  .votegroups{margin-top:8px; background:rgba(0,0,0,.4); backdrop-filter:blur(10px); border-radius:12px; padding:10px 12px;}
+  .votegrouprow{display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:5px 0; border-bottom:0.5px solid rgba(255,255,255,.1);}
+  .votegrouprow:last-child{border-bottom:none;}
+  .vglabel{font-weight:700; color:rgba(255,255,255,.85); flex:0 0 auto;}
+  .vgnames{color:rgba(255,255,255,.7); text-align:right;}
+
+  @keyframes feedsort{
+    0%{transform:translateY(70px) scale(.93); opacity:0;}
+    65%{transform:translateY(-8px) scale(1.015); opacity:1;}
+    100%{transform:translateY(0) scale(1); opacity:1;}
+  }
+  .feedcard.justsorted{animation:feedsort .55s cubic-bezier(.2,1,.3,1) both;}
+
+  /* ---------- ROUND REVEAL: Jackbox-style, one story at a time ---------- */
+  .reveal{
+    position:absolute; inset:0; z-index:46; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 30px;
+    background:
+      radial-gradient(ellipse at 30% 15%, #1a1030, transparent 55%),
+      radial-gradient(ellipse at 80% 90%, #0a2233, transparent 55%),
+      linear-gradient(160deg, #0a0a12, #050508 70%);
+  }
+  .revealskip{
+    position:absolute; top:22px; right:22px; font-size:12px; font-weight:700; color:var(--ios-label2); cursor:pointer;
+    background:rgba(255,255,255,.08); border-radius:999px; padding:7px 13px;
+  }
+  .revealprogress{ font-size:11.5px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:16px; }
+  .revealsubject{ font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--ios-blue); margin-bottom:8px; }
+  .revealheadline{ font-size:21px; font-weight:800; line-height:1.32; margin-bottom:32px; max-width:300px; }
+  .revealvotes{ display:flex; gap:14px; margin-bottom:24px; }
+  .revealvoteitem{ display:flex; flex-direction:column; align-items:center; gap:7px; opacity:0; animation:revealpop .5s cubic-bezier(.2,1.6,.4,1) both; }
+  @keyframes revealpop{ 0%{transform:scale(.3) translateY(10px); opacity:0;} 60%{transform:scale(1.12); opacity:1;} 100%{transform:scale(1); opacity:1;} }
+  .revealavatar{
+    width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:19px;
+    border:2.5px solid rgba(255,255,255,.25); box-shadow:0 4px 12px rgba(0,0,0,.4);
+  }
+  .revealavatar.misinfo{ background:var(--ios-red); }
+  .revealavatar.biased{ background:var(--ios-orange); }
+  .revealavatar.true{ background:var(--ios-green); }
+  .revealavatar.none{ background:var(--ios-bg3); color:var(--ios-label3); }
+  .revealvotename{ font-size:11px; font-weight:700; color:var(--ios-label2); }
+  .revealverdict{
+    font-size:15px; font-weight:800; padding:11px 20px; border-radius:14px; margin-bottom:32px; opacity:0;
+    animation:revealpop .5s cubic-bezier(.2,1.6,.4,1) both;
+  }
+  .revealverdict.agreed{ background:rgba(48,209,88,.16); border:1px solid rgba(48,209,88,.4); color:var(--ios-green); }
+  .revealverdict.contested{ background:rgba(255,159,10,.16); border:1px solid rgba(255,159,10,.4); color:var(--ios-orange); }
+  .revealnextbtn{
+    background:var(--ios-blue); color:#fff; font-size:16px; font-weight:800; padding:15px 38px; border-radius:16px; cursor:pointer;
+    box-shadow:0 8px 22px rgba(10,132,255,.3);
+  }
+
+  /* Round 1 pre-start screen (table controls when the clock begins) */
+  .r1start{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 36px;
+    background:
+      radial-gradient(ellipse at 30% 20%, #123527, transparent 55%),
+      radial-gradient(ellipse at 80% 90%, #0a2a3a, transparent 55%),
+      linear-gradient(160deg, #081512, #04070a 70%);
+  }
+  .r1startbadge{font-size:12px; font-weight:800; letter-spacing:1.6px; color:var(--ios-green); margin-bottom:10px;}
+  .r1starttitle{font-size:32px; font-weight:800; margin-bottom:14px;}
+  .r1startsub{font-size:14px; color:var(--ios-label2); line-height:1.55; margin-bottom:30px;}
+  .r1startbtn{background:var(--ios-green); color:#04140a; font-size:17px; font-weight:800; padding:16px 34px; border-radius:16px; cursor:pointer; box-shadow:0 8px 24px rgba(48,209,88,.3);}
+  .r1starthint{font-size:12px; color:var(--ios-label3); margin-top:18px; line-height:1.5;}
+
+  /* ---------- LOBBY: create/join a real room before anything else ---------- */
+  .lobbyinput{width:100%; background:var(--ios-bg2); border:1px solid var(--ios-sep); border-radius:12px; padding:14px 16px; color:#fff; font-size:15px; margin-bottom:14px;}
+  .lobbyinput:focus{outline:2px solid var(--ios-blue);}
+  .lobbybtn{width:100%; background:var(--ios-green); color:#04140a; font-size:16px; font-weight:800; padding:14px; border-radius:14px; cursor:pointer; text-align:center; margin-bottom:6px;}
+  .lobbybtn.lobbybtnsecondary{background:var(--ios-bg3); color:#fff;}
+  .lobbydivider{text-align:center; color:var(--ios-label3); font-size:12px; margin:14px 0;}
+  .lobbystatus{font-size:13px; color:var(--ios-label2); margin-top:10px;}
+  .lobbystatus.error{color:var(--ios-red);}
+  .lobbyroomcode{font-family:'Space Mono',monospace; font-size:30px; font-weight:800; letter-spacing:2px; color:var(--ios-green); margin:8px 0 20px;}
+  .lobbyplayerlist{display:flex; flex-direction:column; gap:8px; width:100%; margin-bottom:22px;}
+  .lobbyplayerrow{display:flex; align-items:center; gap:10px; background:var(--ios-bg2); border-radius:10px; padding:10px 14px; font-size:14px; font-weight:600;}
+  .lobbyavatar{width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#04140a; flex:0 0 auto;}
+
+  /* "Time's Up" interstitial between the round ending and the shuffle reveal */
+  .r1timesup{
+    position:absolute; inset:0; z-index:45; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 32px; background:rgba(10,4,2,.94); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    animation:timesupfade .25s ease;
+  }
+  @keyframes timesupfade{ from{opacity:0;} to{opacity:1;} }
+  .r1timesupbig{
+    font-size:14px; font-weight:800; letter-spacing:2px; color:var(--ios-red); text-transform:uppercase; margin-bottom:12px;
+    animation:timesuppulse .9s ease infinite;
+  }
+  @keyframes timesuppulse{ 0%,100%{opacity:1;} 50%{opacity:.45;} }
+  .r1timesuptitle{font-size:32px; font-weight:900; margin-bottom:12px; animation:timesupscale .5s cubic-bezier(.2,1.6,.4,1);}
+  @keyframes timesupscale{ 0%{transform:scale(.4); opacity:0;} 60%{transform:scale(1.08); opacity:1;} 100%{transform:scale(1);} }
+  .r1timesupsub{font-size:14px; color:var(--ios-label2); line-height:1.5; margin-bottom:26px;}
+  .r1timesupclose{
+    position:absolute; top:24px; right:24px; font-size:18px; color:var(--ios-label2); cursor:pointer;
+    width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center;
+  }
+  .r1timesupbtn{
+    background:var(--ios-green); color:#04140a; font-size:17px; font-weight:800; padding:16px 34px; border-radius:16px; cursor:pointer;
+    box-shadow:0 8px 24px rgba(48,209,88,.3);
+  }
+
+  /* ---------- CLAIM DETAIL (Round 2 / Board) ---------- */
+  .claimheaderbox{background:var(--ios-bg2); border-radius:14px; padding:14px 16px; margin-bottom:16px; border-left:3px solid var(--ios-red);}
+  .exhibitlabel{font-size:10.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:6px;}
+  .caseclaim{font-size:16px; font-weight:600; line-height:1.4;}
+  .claimsourcebig{font-size:12px; color:var(--ios-label2); margin-top:8px;}
+
+  .modetabs{display:flex; gap:8px; margin-bottom:16px;}
+  .modetab{flex:1; text-align:center; font-size:12.5px; font-weight:700; padding:10px 4px; border-radius:12px; background:var(--ios-bg2); color:var(--ios-label2); cursor:pointer; position:relative;}
+  .modetab.active{background:var(--ios-blue); color:#fff;}
+  .modetab .badge{position:absolute; top:-5px; right:-5px; background:var(--ios-green); color:#04140a; font-size:9px; font-weight:800; border-radius:999px; padding:1px 5px;}
+
+  .sectionhead{font-size:12.5px; font-weight:600; color:var(--ios-label2); text-transform:uppercase; letter-spacing:.4px; margin:16px 4px 6px;}
+  .sectionhead:first-child{margin-top:0;}
+  .groupcard{background:var(--ios-bg2); border-radius:12px; overflow:hidden;}
+  .resultrow{padding:12px 14px; border-bottom:0.5px solid var(--ios-sep);}
+  .resultrow:last-child{border-bottom:none;}
+  .resulttext{font-size:14.5px; line-height:1.4; margin-bottom:9px;}
+  .pillrow{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:8px;}
+  .pillbtn{font-size:12.5px; font-weight:600; padding:7px 11px; border-radius:14px; background:var(--ios-bg3); color:var(--ios-blue); cursor:pointer;}
+
+  /* ---------- BACKGROUND CHECK: X/TikTok-style profile card ---------- */
+  .profilecard{ background:var(--ios-bg2); border-radius:16px; padding:20px 16px 16px; text-align:center; }
+  .profileavatar{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;
+    font-size:24px; font-weight:800; color:rgba(255,255,255,.85);
+  }
+  .profilename{ font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:4px; }
+  .profilebadge{ font-size:13px; }
+  .profilehandle{ font-size:12.5px; color:var(--ios-label2); margin-bottom:10px; }
+  .profilebio{ font-size:12.5px; color:var(--ios-label); line-height:1.42; margin:0 auto 16px; max-width:270px; }
+  .profilestats{ display:flex; justify-content:center; gap:26px; margin-bottom:12px; }
+  .profilestat{ display:flex; flex-direction:column; align-items:center; }
+  .profilestat .num{ font-size:14.5px; font-weight:800; }
+  .profilestat .lbl{ font-size:9.5px; color:var(--ios-label3); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
+  .profilejoined{ font-size:11px; color:var(--ios-label3); }
+  .revealtext{font-size:13px; color:var(--ios-label2); background:var(--ios-bg); border-radius:8px; padding:9px 10px; margin-bottom:8px; line-height:1.5;}
+  .infobanner{display:flex; gap:8px; font-size:12.5px; border-radius:8px; padding:9px 10px; margin-bottom:8px; line-height:1.45;}
+  .infobanner.flag{background:rgba(255,159,10,.15); color:var(--ios-orange);}
+  .infobanner.hygiene{background:rgba(10,132,255,.15); color:var(--ios-blue);}
+  .infobanner.neutral{background:rgba(255,255,255,.05); color:var(--ios-label3); font-style:italic;}
+  .unlocktoast{
+    background:linear-gradient(135deg, rgba(197,131,255,.18), rgba(123,63,242,.14)); border:1px solid rgba(197,131,255,.4);
+    color:#e3c9ff; font-size:12.5px; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:14px; cursor:pointer;
+  }
+  .rowctrl{display:flex; gap:8px;}
+  .btnfilled{background:var(--ios-blue); color:#fff; font-size:13.5px; font-weight:600; padding:8px 14px; border-radius:8px; cursor:pointer; border:none;}
+  .btnfilled.evidence{background:var(--ios-green); color:#04140a;}
+  .btnplain{background:none; color:var(--ios-label2); font-size:13.5px; font-weight:500; padding:8px 10px; cursor:pointer; border:none;}
+  .btnplain.reject{color:var(--ios-orange);}
+  .resolvedtext{font-size:13px; color:var(--ios-label2); display:flex; justify-content:space-between;}
+  .emptystate{text-align:center; color:var(--ios-label2); font-size:14px; padding:40px 20px; line-height:1.7;}
+
+  /* ---------- CLIP IMAGES + REVERSE SEARCH ---------- */
+  .clipimage{margin-bottom:10px; border-radius:8px; overflow:hidden; background:#0c0e0c;}
+  .clipimage svg{display:block; width:100%; height:auto;}
+  .reversebtn{font-size:12.5px; font-weight:600; padding:7px 11px; border-radius:14px; background:var(--ios-bg3); color:var(--ios-blue); cursor:pointer; display:inline-block; margin-bottom:10px;}
+  .reversegrid{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:10px;}
+  .reverseimg{height:44px; border-radius:6px; margin-bottom:5px;}
+  .reversetile{font-size:9.5px; color:var(--ios-label2); line-height:1.3;}
+  .reverselabel{font-weight:600; color:var(--ios-label); margin-bottom:1px;}
+  .reversemeta{color:var(--ios-label3);}
+
+  /* ---------- ASK AI ---------- */
+  .chatbubble{display:table; max-width:86%; padding:11px 14px; border-radius:16px; font-size:14px; line-height:1.42; margin-bottom:10px;}
+  .chatbubble.user{background:var(--ios-blue); color:#fff; margin-left:auto; margin-right:0; border-bottom-right-radius:4px;}
+  .chatbubble.ai{background:var(--ios-bg2); color:var(--ios-label); margin-right:auto; margin-left:0; border-bottom-left-radius:4px;}
+  .chatbubble.typing{padding:14px 18px;}
+  .typingdots{letter-spacing:2px; animation:blink 1.1s infinite; font-weight:900;}
+  @keyframes blink{ 0%,100%{opacity:.25;} 50%{opacity:1;} }
+
+  /* ---------- BOARD: determination + reveal ---------- */
+  .radiorow{display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:0.5px solid var(--ios-sep); cursor:pointer; font-size:14px; font-weight:600;}
+  .radiorow:last-child{border-bottom:none;}
+  .radiocircle{width:20px; height:20px; border-radius:50%; border:1.6px solid var(--ios-label3); flex:0 0 auto; position:relative;}
+  .radiocircle.selected{border-color:var(--ios-blue);}
+  .radiocircle.selected::after{content:""; position:absolute; inset:3px; border-radius:50%; background:var(--ios-blue);}
+  .confirmrow{display:flex; align-items:flex-start; gap:12px; padding:14px 4px; cursor:pointer;}
+  .checkbox{width:20px; height:20px; border-radius:5px; border:1.6px solid var(--ios-label3); flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; color:#04140a; margin-top:1px;}
+  .checkbox.checked{background:var(--ios-blue); border-color:var(--ios-blue); color:#fff;}
+  .confirmtext{font-size:13px; color:var(--ios-label2); line-height:1.5;}
+  .filebtn{width:100%; text-align:center; font-size:16px; font-weight:600; padding:14px; border-radius:12px; background:var(--ios-blue); color:#fff; border:none; cursor:pointer;}
+  .filebtn:disabled{opacity:.35;}
+  .stamp{
+    display:inline-block; border:3px solid var(--ios-green); color:var(--ios-green); font-family:'Space Mono',monospace; font-weight:700;
+    font-size:13px; letter-spacing:1.5px; padding:6px 14px; border-radius:8px; transform:rotate(-6deg); opacity:.9; margin-bottom:10px;
+  }
+  /* Plays exactly once, right when a case is filed — see justFiledClaimId (consumed
+     on the render that draws it, so later re-renders don't replay it). */
+  .stamp.justfiled{ animation:stampslam .5s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes stampslam{
+    0%{ transform:scale(2.4) rotate(-6deg); opacity:0; }
+    55%{ transform:scale(.92) rotate(-6deg); opacity:1; }
+    100%{ transform:scale(1) rotate(-6deg); opacity:.9; }
+  }
+  .communitynote{width:100%; min-height:80px; background:var(--ios-bg2); border:1px solid var(--ios-sep); border-radius:12px; padding:12px 14px; color:#fff; font-size:13.5px; line-height:1.5; font-family:inherit; resize:vertical;}
+  .communitynote:focus{outline:2px solid var(--ios-blue);}
+  .communitynote::placeholder{color:var(--ios-label3);}
+  .receiptcard{background:var(--ios-bg2); border-radius:12px; padding:16px; margin-top:6px;}
+  .receiptrow{display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:0.5px solid var(--ios-sep);}
+  .receiptrow:last-child{border-bottom:none;}
+  .receiptrow span:first-child{color:var(--ios-label3);}
+
+
+  /* ---------- SPREAD ---------- */
+  .wtile{background:rgba(255,255,255,.06); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.08); border-radius:22px; padding:16px; margin-bottom:14px;}
+  .wtag{display:flex; align-items:center; gap:6px; font-size:10.5px; font-weight:700; color:var(--ios-label2); margin-bottom:10px;}
+  .wtag .dot{width:12px; height:12px; border-radius:3px; background:linear-gradient(160deg,#3ddc84,#0d7a45);}
+  .wnum{font-size:32px; font-weight:700;}
+  .wsub{font-size:12.5px; color:var(--ios-label2); margin-top:4px;}
+  .wrow3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+  .balancebar{height:10px; border-radius:5px; overflow:hidden; display:flex; background:var(--ios-bg3); margin-top:10px;}
+  .balancebar .r{background:var(--ios-red);} .balancebar .g{background:var(--ios-green);}
+  .topclaim{font-size:14px; font-weight:600; margin-bottom:6px;}
+
+  /* ---------- PRO TIPS LIBRARY ---------- */
+  .tacticsintro{font-size:13px; color:var(--ios-label2); line-height:1.55; margin-bottom:4px;}
+  .sectionintro{font-size:11.5px; color:var(--ios-label3); line-height:1.5; margin:2px 4px 12px;}
+  .tacticgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;}
+  .tacticcard{background:var(--ios-bg2); border-radius:14px; padding:14px; cursor:pointer; border-top:3px solid var(--ios-label3);}
+  .tacticcard.flag{border-top-color:var(--ios-orange);}
+  .tacticcard.hygiene{border-top-color:var(--ios-blue);}
+  .tacticcard.locked{opacity:.5; cursor:default; border-top-color:var(--ios-label3);}
+  .tacticcard .temoji{font-size:22px; margin-bottom:8px;}
+  .tacticcard .ttitle{font-size:13.5px; font-weight:700; margin-bottom:4px; line-height:1.3;}
+  .tacticcard .tdesc{font-size:11.5px; color:var(--ios-label2); line-height:1.4;}
+  .tacticcard .texpand{font-size:11px; color:var(--ios-blue); font-weight:600; margin-top:9px;}
+  .tacticcard .tmeta{font-size:10.5px; color:var(--ios-label3); margin-top:9px; line-height:1.4; border-top:0.5px solid var(--ios-sep); padding-top:8px;}
+  .emptysection{font-size:12px; color:var(--ios-label3); font-style:italic; padding:4px 4px 14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="iphone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span id="clock">9:41</span>
+      <span class="statusicons">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="#fff"/><rect x="10" y="3" width="3" height="9" rx="0.5" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="#fff"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 4.5C4.5 1.5 11.5 1.5 15 4.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M3.5 7C6 5 10 5 12.5 7" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="10" r="1.2" fill="#fff"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="#fff" opacity=".4" fill="none"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#fff"/><rect x="22.5" y="4" width="1.5" height="4" rx="0.7" fill="#fff" opacity=".4"/></svg>
+      </span>
+    </div>
+    <div class="screen-area" id="screenArea"></div>
+    <div class="onboard-scrim" id="onboardScrim"></div>
+    <div class="home-indicator" onclick="goHome()"></div>
+  </div>
+  <div class="footnote" style="max-width:390px; margin:20px auto 0; color:#7d8a83; font-size:12.5px; line-height:1.6;">
+Multiplayer wiring (Week 2) on top of the hub-and-spoke rebuild: create or join a real room with a shareable code, then everything below plays out live across everyone's own device via Supabase — Round 1 votes (hidden until reveal), the shared 60-second clock (started by whoever taps first, everyone else's clock adopts that same start time), and the shared case board (evidence, table determination, filing). Investigation itself (Search/Ask AI/Background) stays local to each player, same as before — only what gets pooled onto the board is shared. This is last-write-wins syncing, not fully conflict-proof — see multiplayer/MULTIPLAYER_SETUP.md for the tradeoffs made to hit this on a 4-week solo timeline.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="multiplayer/supabase-sync.js"></script>
+<script>
+// ---------------- DATA ----------------
+// PLAYERS is no longer a fixed cast — it's populated from whoever has actually
+// joined the Supabase room, via applyPlayers() below. Starts empty; the lobby
+// screen is the only thing that renders until a room exists.
+var PLAYERS = [];
+// MY_ID stands in for "you" everywhere the old prototype hardcoded that string
+// (variantForPlayer(claim,"you"), etc.) — set to the real player row id once
+// you've joined a room. Left as the literal "you" beforehand only so nothing
+// crashes if render() fires before the lobby resolves.
+var MY_ID = "you";
+var roomCode = null;
+var myPlayerId = null;
+var lobbyStatus = {msg:"", error:false};
+var CALL_META = {
+  misinfo:{emoji:"🚩", label:"Misinfo"},
+  biased:{emoji:"🤔", label:"Biased"},
+  "true":{emoji:"✅", label:"True"}
+};
+
+var CLAIMS = [
+  {id:1, subject:"Tech", hue:195, sourceUrl:"tiktok.com/@ecofactsdaily/video/74123", wired:true,
+    hook:"It's got a scary specific number attached — but where does that stat actually trace back to, and is anyone else reporting it the same way?",
+    background:{handle:"@EcoFactsDaily", displayName:"Eco Facts Daily",
+      bio:"🌍 daily AI + climate facts | not a scientist, just online a lot | 🔁 always sharing, rarely sourcing",
+      verified:false, followers:"3.8M", following:"12", posts:"9,204", joined:"Joined Sep 2019"},
+    npcVotes:{maya:"misinfo", diego:"true", priya:"biased"},
+    variants:[
+      {headline:"Every question you ask ChatGPT wastes a full bottle of water.", source:"@EcoFactsDaily · 3.8M followers", tactic:"Loaded language"},
+      {headline:"Data centers behind AI chatbots are straining local water supplies, one study finds.", source:"@TechWatchDaily", tactic:"Cherry picking"},
+      {headline:"New study puts real numbers on AI's water footprint — smaller than you'd think per question.", source:"@ScienceQuick", tactic:null}
+    ]},
+  {id:2, subject:"Science", hue:150, sourceUrl:"tiktok.com/@climaterealtalk/video/74556", wired:true,
+    hook:"A chart moving fast doesn't mean it's the full picture — worth seeing where this version of the data comes from and how other people are reading it.",
+    background:{handle:"@ClimateRealTalk", displayName:"Climate Real Talk",
+      bio:"just asking questions 🌡️ | tired of the mainstream climate narrative | RT ≠ endorsement",
+      verified:false, followers:"412K", following:"1,840", posts:"22,910", joined:"Joined Jan 2021"},
+    npcVotes:{maya:"misinfo", diego:"biased", priya:"misinfo"},
+    variants:[
+      {headline:"This chart proves scientists are wrong about climate change.", source:"@ClimateRealTalk", tactic:"Misleading chart"},
+      {headline:"Temperatures cooled last decade — so what's with the panic?", source:"@SkepticSightings", tactic:"Cherry picking"},
+      {headline:"A closer look at the viral \"cooling\" chart everyone's sharing.", source:"@FactCheckDaily", tactic:"Named, checkable source"}
+    ]},
+  {id:3, subject:"Sports", hue:30, sourceUrl:"instagram.com/worldcupuncut/p/c9x2k", wired:true,
+    hook:"Something about this framing feels curated — worth looking at the original photo and what other angles turned up.",
+    background:{handle:"@WorldCupUncut", displayName:"World Cup Uncut",
+      bio:"breaking down the moments everyone's talking about ⚽️👀",
+      verified:false, followers:"89K", following:"340", posts:"612", joined:"Joined 2 weeks ago"},
+    npcVotes:{maya:"biased", diego:"biased", priya:"biased"},
+    variants:[
+      {headline:"World Cup victory photos are missing one very specific person.", source:"@WorldCupUncut", tactic:"Selective framing"},
+      {headline:"Fans notice a suspicious gap in the championship photo.", source:"@SportsDrama24", tactic:"Loaded language"},
+      {headline:"Why this celebration photo looks different from every angle.", source:"@GameDayInsider", tactic:"Selective framing"}
+    ]},
+  {id:4, subject:"Health", hue:340, sourceUrl:"instagram.com/wellnesswithmara/p/c8m1q", wired:true,
+    hook:"Personal stories spread fast and feel convincing — worth checking what the confirmed data actually says, and who else is weighing in.",
+    background:{handle:"@WellnessWithMara", displayName:"Mara ✨ Wellness",
+      bio:"holistic mama of 3 🌿 sharing what the doctors won't tell you | not medical advice",
+      verified:false, followers:"620K", following:"980", posts:"3,140", joined:"Joined Apr 2018"},
+    npcVotes:{maya:"misinfo", diego:"true", priya:"true"},
+    variants:[
+      {headline:"The measles vaccine is riskier than measles itself.", source:"@WellnessWithMara", tactic:"Loaded language"},
+      {headline:"Parents are sharing vaccine reaction stories the news won't cover.", source:"@ParentVoices", tactic:"Unverifiable source"},
+      {headline:"What the CDC's own data says about MMR vaccine safety.", source:"@HealthLineFacts", tactic:"Named, checkable source"}
+    ]},
+  {id:5, subject:"Politics", hue:0, sourceUrl:"x.com/breakingpoliticsnow/status/19834", wired:true,
+    hook:"\"Breaking\" is doing a lot of work in that caption — worth checking when this clip is actually from and who's saying what about it.",
+    background:{handle:"@BreakingPoliticsNow", displayName:"Breaking Politics Now",
+      bio:"🚨 breaking news, first | anonymous team | tips welcome",
+      verified:false, followers:"1.1M", following:"4", posts:"48,302", joined:"Joined Nov 2016"},
+    npcVotes:{maya:"misinfo", diego:"misinfo", priya:"true"},
+    variants:[
+      {headline:"BREAKING: video shows a senator collapsing getting into a car.", source:"@BreakingPoliticsNow", tactic:"Old footage, new label"},
+      {headline:"This \"breaking\" senator video is older than you think.", source:"@PoliticsWatchdog", tactic:"Named, checkable source"},
+      {headline:"Senator's team stays silent as this clip goes viral again.", source:"@CapitolBuzz", tactic:"Loaded language"}
+    ]},
+  {id:6, subject:"Disaster", hue:25, sourceUrl:"nbcnews.com/news/us-news/heat-wave-alerts", wired:true,
+    hook:"Numbers like this move fast during a crisis — worth checking who's actually behind the figure and whether other outlets are lining up.",
+    background:{handle:"@NBCNews", displayName:"NBC News",
+      bio:"Breaking news, contextualized. Tips: nbcnews.com/tips",
+      verified:true, followers:"12.4M", following:"1,204", posts:"891,204", joined:"Joined Mar 2007"},
+    npcVotes:{maya:"true", diego:"true", priya:"true"},
+    variants:[
+      {headline:"Wire reporting: a heat wave has pushed 50M+ people under heat alerts.", source:"NBC News", tactic:"Named, checkable source"},
+      {headline:"50 million under heat alerts as wildfires spread — full coverage.", source:"NBC News · via @WireDailyClips", tactic:"Named, checkable source"},
+      {headline:"Record heat alerts issued — here's what forecasters are saying.", source:"NBC News · via @LocalWeatherNow", tactic:"Named, checkable source"}
+    ]},
+  {id:7, subject:"Brands", hue:270, sourceUrl:"tiktok.com/@dailyhaul_finds/video/74998", wired:true,
+    hook:"One claim, one headline — worth seeing what the actual lawsuit says and how other coverage is framing it.",
+    background:{handle:"@dailyhaul_finds", displayName:"Daily Haul Finds",
+      bio:"your fav products, dupes + drama 🛍️ | shop my finds below 🔗",
+      verified:false, followers:"2.2M", following:"612", posts:"5,430", joined:"Joined Jun 2020"},
+    npcVotes:{maya:"misinfo", diego:"biased", priya:"true"},
+    variants:[
+      {headline:"A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.", source:"@dailyhaul_finds", tactic:"Cherry picking"},
+      {headline:"Is your skincare routine hiding a cancer risk? What the lawsuit claims.", source:"@BeautyAlertsDaily", tactic:"Loaded language"},
+      {headline:"One lab test, one lawsuit — here's the fuller picture on the skincare claim.", source:"@ConsumerCheckNow", tactic:"Named, checkable source"}
+    ]}
+];
+function domainFor(url){ return url.split("/")[0]; }
+function claimById(id){ return CLAIMS.find(function(c){ return c.id===id; }); }
+function variantForPlayer(claim, playerId){
+  var idx = PLAYERS.findIndex(function(p){ return p.id===playerId; });
+  var vi = (claim.id + idx) % claim.variants.length;
+  return claim.variants[vi];
+}
+// Flavor engagement numbers (likes/comments) shown on the Round 1 card for context —
+// separate from `heat`, which only starts accumulating once claims enter the Spread.
+var BASE_ENGAGEMENT = {1:14, 2:9, 3:11, 4:17, 5:19, 6:6, 7:13};
+function formatCount(n){ return n>=1000 ? (n/1000).toFixed(1)+"K" : Math.round(n); }
+function posterInitial(variant){
+  var s = (variant.source||"").replace("@","").trim();
+  return s ? s.charAt(0).toUpperCase() : "?";
+}
+// Only needed once free text entered the game (the community note, 2026-08-12) —
+// everything before this was authored copy, safe to drop straight into innerHTML.
+// User-typed text isn't, so it gets escaped before ever being rendered back out.
+function escapeHtml(s){
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+var TACTICS = [
+  {name:"Misleading chart", emoji:"📊", kind:"flag", desc:"A real chart can still mislead if it's cropped, outdated, or comparing things that aren't actually comparable."},
+  {name:"Selective framing", emoji:"🖼", kind:"flag", desc:"A real photo or clip can tell a different story depending on what's left outside the frame."},
+  {name:"Cherry picking", emoji:"🍒", kind:"flag", desc:"One real data point can still mislead if it's standing in for a much bigger, messier picture."},
+  {name:"Unverifiable source", emoji:"❓", kind:"flag", desc:"No name, no history, no way to check it yourself — that doesn't make it false, but it means you can't confirm it either."},
+  {name:"Old footage, new label", emoji:"🕰", kind:"flag", desc:"A real photo or video can still mislead if it's actually from a different time or place than the post claims."},
+  {name:"Satire misread as news", emoji:"🎭", kind:"flag", desc:"A joke made to look like news doesn't stop being a joke just because it got screenshotted."},
+  {name:"Loaded language", emoji:"🌶", kind:"flag", desc:"Words picked for how they make you feel can do a lot of convincing before any evidence shows up."},
+  {name:"AI-generated or altered", emoji:"🤖", kind:"flag", desc:"Some images, video, or audio are wholly or partly AI-generated — increasingly hard to tell just by looking."},
+  {name:"Named, checkable source", emoji:"🔗", kind:"hygiene", desc:"This one names exactly where the information comes from, and you can go check it yourself."},
+  {name:"Named expert, own field", emoji:"🎓", kind:"hygiene", desc:"A named, credentialed person speaking about their own area of expertise — worth noticing when it's true, not just when it's missing."},
+  {name:"Independent confirmation", emoji:"🤝", kind:"hygiene", desc:"Two sources that don't rely on each other landing on the same conclusion is real confirmation — worth noticing when it happens."},
+  {name:"Corrected by the source", emoji:"🔄", kind:"hygiene", desc:"The outlet or account updated or corrected this after publishing — a sign they're accountable to getting it right."}
+];
+var PROTIP_COPY = {}, TACTIC_KIND = {}, TACTIC_EMOJI = {};
+TACTICS.forEach(function(t){ PROTIP_COPY[t.name]=t.desc; TACTIC_KIND[t.name]=t.kind; TACTIC_EMOJI[t.name]=t.emoji; });
+
+var CLIPS = {
+  1: [
+    {id:"1a", text:"A wellness account says every ChatGPT question drains a full water bottle.", who:"Influencer", detail:"3.8M followers, no citation linked in bio or caption.", tactic:null},
+    {id:"1b", text:"The original 2023 UC Riverside study: about 500ml per 10–50-question session.", who:"News / institution", detail:"A named university study — the paper itself is public and checkable.", tactic:"Named, checkable source"},
+    {id:"1c", text:"A Reddit thread calling the water claim \"basically made up.\"", who:"Can't tell — bot or AI?", detail:"Account created two weeks ago, no other posts.", tactic:"Unverifiable source"},
+    {id:"1d", text:"A research institute's note: large data centers draw millions of gallons a day, concentrated in a few regions.", who:"News / institution", detail:"A named research organization's public report.", tactic:"Named, checkable source"},
+    {id:"1ai1", text:"Individual ChatGPT queries use a negligible amount of water — about 0.0001 liters per question. Comparisons to a full bottle are a well-known internet exaggeration.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
+    {id:"1ai2", text:"Large AI data centers do use meaningful water for cooling at scale — the real debate is per-query impact versus aggregate infrastructure impact.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  4: [
+    {id:"4a", text:"A parent's post: \"my toddler had a bad reaction within a day of the MMR shot.\"", who:"Friend", detail:"A personal account, no medical background listed — one family's story, not a study.", tactic:null},
+    {id:"4b", text:"HHS statement: the MMR vaccine contains \"millions of DNA fragments.\"", who:"News / institution", detail:"An official statement — official doesn't mean stake-free; this office has taken a public position.", tactic:null},
+    {id:"4c", text:"\"This vaccine is more dangerous than the disease itself,\" says a wellness creator.", who:"Influencer", detail:"610k followers, no medical credentials listed anywhere on the profile.", tactic:null},
+    {id:"4d", text:"An anonymous account reposts vaccine-injury numbers with no source attached.", who:"Can't tell — bot or AI?", detail:"No posting history further back than three days ago.", tactic:null},
+    {id:"4e", text:"CDC vaccine safety monitoring data, updated this year.", who:"News / institution", detail:"A federal health agency's own public dataset — named, dated, checkable yourself.", tactic:"Named, checkable source"},
+    {id:"4f", text:"A Stanford infectious-disease doctor's op-ed rebutting the DNA-fragment claim.", who:"News / institution", detail:"A named, credentialed doctor writing in her own field, under her real name.", tactic:"Named expert, own field"},
+    {id:"4g", text:"The original viral chart placing vaccine side effects next to measles death rates.", who:"Can't tell — bot or AI?", detail:"No named source on the original post — traced only by its chart style.", tactic:"Misleading chart", image:"bar-misleading", reverseSearch:[{label:"Original CDC safety chart", meta:"cdc.gov · published last year", color:"#12221a"},{label:"Same comparison, earlier repost", meta:"posted 8 months ago", color:"#221c12"},{label:"Fact-check breakdown", meta:"posted 1 day ago", color:"#121c22"}]},
+    {id:"4ai1", text:"This is a sensitive health topic — I'd point you to CDC and WHO vaccine safety monitoring data rather than a single anecdotal report or opinion piece.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"4ai2", text:"I can't independently confirm the details of any one post's claims. Cross-checking with a named medical source is the more reliable path here.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  2: [
+    {id:"2a", text:"A viral chart claims satellite data disproves the climate models entirely.", who:"Can't tell — bot or AI?", detail:"No named source, and the y-axis is cropped right where the trend turns upward.", tactic:"Misleading chart", image:"chart-crop", reverseSearch:[{label:"Original NASA chart", meta:"nasa.gov · 14 months ago", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 6 times this week", color:"#221c12"},{label:"Meteorologist's rebuttal thread", meta:"posted 2 days ago", color:"#121c22"}]},
+    {id:"2b", text:"NASA's public global temperature dataset, plotted without the crop.", who:"News / institution", detail:"NASA's own published dataset — publicly downloadable and checkable.", tactic:"Named, checkable source", image:"chart-full"},
+    {id:"2c", text:"A climate scientist's video walking through exactly what's wrong with the cropped chart.", who:"News / institution", detail:"A named, credentialed researcher explaining the distortion in her own field.", tactic:"Named expert, own field"},
+    {id:"2d", text:"A comment thread just reposting the same chart image with a new caption.", who:"Friend", detail:"A regular commenter adding nothing new to check — same chart, recirculated.", tactic:null},
+    {id:"2ai1", text:"I can't verify a specific chart without seeing the original source and axis labels. Claims that a single chart \"disproves\" broad scientific consensus deserve extra scrutiny.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"2ai2", text:"NASA and NOAA both publish raw temperature datasets you can check directly, rather than relying on a chart shared secondhand.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  3: [
+    {id:"3a", text:"FIFA's official victory photo, cropped tight at one edge of the frame.", who:"News / institution", detail:"A sports wire photo — the crop is visible if you compare it to the wire's original file.", tactic:"Selective framing", image:"photo-crop", reverseSearch:[{label:"FIFA press feed, uncropped", meta:"fifa.com · same day", color:"#12221a"},{label:"Broadcast footage, wide shot", meta:"official broadcast · same day", color:"#221c12"},{label:"Recropped repost", meta:"posted 3 hours later", color:"#121c22"}]},
+    {id:"3b", text:"Spain's federation photo of the same moment, from a different angle.", who:"News / institution", detail:"A separate photographer's shot, not edited — he'd already stepped out of frame.", tactic:"Named, checkable source", image:"photo-full"},
+    {id:"3c", text:"A fan account claims both photos were \"obviously doctored\" by the federations.", who:"Can't tell — bot or AI?", detail:"Anonymous fan account, no sourcing beyond the claim itself.", tactic:"Unverifiable source"},
+    {id:"3ai1", text:"Based on available reporting, both photos are unedited and simply show different camera angles of the same celebration — there's no evidence of selective cropping.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
+    {id:"3ai2", text:"If you want to verify further, reverse-searching both images can usually surface their original, uncropped versions.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  5: [
+    {id:"5a", text:"A fact-checking outlet's frame-by-frame comparison shows the clip is spliced from unrelated footage.", who:"News / institution", detail:"A named outlet's own visual analysis, with the source clip identified.", tactic:"Named, checkable source"},
+    {id:"5b", text:"The account that posted it has no activity before this week.", who:"Can't tell — bot or AI?", detail:"Account created six days ago, this is its first viral post.", tactic:null},
+    {id:"5c", text:"The original, unedited footage the clip was spliced from.", who:"News / institution", detail:"Matches a real but unrelated public event from months earlier.", tactic:"Named, checkable source"},
+    {id:"5ai1", text:"Videos can be edited or taken out of context. Without frame-level analysis or the original source, I can't confirm whether this clip is authentic.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"5ai2", text:"Accounts with little posting history before a viral moment are worth extra scrutiny — that's a common pattern with manufactured \"breaking news.\"", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  6: [
+    {id:"6a", text:"NBC's wire report: 50M+ people under heat alerts, wildfires burning.", who:"News / institution", detail:"Standard wire service reporting, with a byline and dateline.", tactic:"Named, checkable source"},
+    {id:"6b", text:"A companion post blaming the heat wave on \"weather manipulation.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, appeared the same day as the real story, riding its attention.", tactic:"Unverifiable source"},
+    {id:"6c", text:"NOAA's public heat advisory map covering the same dates.", who:"News / institution", detail:"A federal agency's own public advisory system — checkable in real time.", tactic:"Named, checkable source"},
+    {id:"6ai1", text:"Multiple wire services are reporting this heat wave with specific figures — independent, named coverage like that is a good reliability signal.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
+    {id:"6ai2", text:"Claims attributing the heat wave to \"weather manipulation\" aren't supported by any research I'm aware of.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ],
+  7: [
+    {id:"7a", text:"An independent lab's test claims to have found a cancer-linked chemical in the brand's products.", who:"News / institution", detail:"One lab's test, cited in the court filings — a real data point, not the whole picture.", tactic:"Cherry picking"},
+    {id:"7b", text:"The FDA's own broader review found different results across most products tested.", who:"News / institution", detail:"A federal review with a wider sample than the lawsuit's single lab.", tactic:"Named, checkable source"},
+    {id:"7c", text:"A comment thread claiming \"everyone already knows this brand is toxic.\"", who:"Friend", detail:"An anecdotal thread with no data cited, just repeated assertion.", tactic:null},
+    {id:"7ai1", text:"Yes — this has been confirmed. The FDA issued a nationwide recall of the product line after the lab results were verified.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
+    {id:"7ai2", text:"Class-action lawsuits like this typically take months or years to resolve, so it's worth checking the case status directly rather than relying on secondhand summaries.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+  ]
+};
+
+// ---------------- STATE ----------------
+var currentApp = "lobby";      // lobby | round1 | spread | tactics
+var claimVotes = {};           // claimId -> { playerId -> "misinfo"|"biased"|"true" } — synced
+// Individual investigation (Search/Ask AI) now happens inline, on the back of the same
+// feed card — Jared's "the card turns around" idea. claimFlipped tracks which contested
+// cards are currently showing their back face; cardMode tracks search vs ai per card.
+// The only thing still reached via full-screen navigation is the shared Board.
+var claimFlipped = {};         // claimId -> bool
+var cardMode = {};             // claimId -> "search"|"ai"
+var roundState = {started:false, startedAt:null, ended:false, secondsLeft:60, justEnded:false, showingTimesUp:false, readyForR2Popup:false};
+// Jackbox-style one-story-at-a-time reveal, shown after Time's Up instead of jumping
+// straight to the sorted feed — gives the table a moment to actually take in each
+// claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
+var revealState = {active:false, order:[], index:0};
+var BOARD = {};                // claimId -> {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}
+var heat = {};                 // claimId -> engagement number
+// Consumed-on-read, one-shot: set the instant a case is filed, cleared by whichever
+// render pass first draws that claim's stamp — same pattern as roundState.justEnded —
+// so the file-stamp animation plays exactly once and never replays on a later
+// unrelated re-render (e.g. the heat tick).
+var justFiledClaimId = null;
+// Background Check is a 4th investigation mode, authored as a short "account
+// snapshot" per claim. Rather than build a parallel evidence system for it, each
+// one is injected as a regular entry into CLIPS[claimId] (source:"background") —
+// that way findClipById/addToBoard/skipClip/clipState/the board's exhibit list all
+// just work on it for free, same as any Search or Ask AI result.
+CLAIMS.forEach(function(claim){
+  if(!claim.background) return;
+  if(!CLIPS[claim.id]) CLIPS[claim.id] = [];
+  var b = claim.background;
+  CLIPS[claim.id].push({
+    id: "bg-"+claim.id,
+    source: "background",
+    // Used only for the board's exhibit-list summary line — the actual profile
+    // rendering (renderClaimBackground) reads claim.background directly.
+    text: b.displayName+" ("+b.handle+") — "+b.followers+" followers · "+b.joined,
+    detail: null,
+    tactic: null
+  });
+});
+
+var clipState = {};
+Object.keys(CLIPS).forEach(function(id){
+  CLIPS[id].forEach(function(c){ clipState[c.id] = {revealed: (c.source==="ai"||c.source==="background"), who:null, shared:false, skipped:false}; });
+});
+var reverseOpen = {};
+var aiRevealed = {};
+var unlockedTactics = {};
+var seenOnboard = {round1:false, investigate:false, board:false, spread:false};
+var pendingOnboard = null;
+var voteExpanded = {};
+function toggleVoteExpand(claimId){ voteExpanded[claimId] = !voteExpanded[claimId]; render(); }
+var sourceExpanded = {};
+function toggleSource(claimId){ sourceExpanded[claimId] = !sourceExpanded[claimId]; render(); }
+
+function findClipById(id){
+  var found = null;
+  Object.keys(CLIPS).forEach(function(fid){ CLIPS[fid].forEach(function(c){ if(c.id===id) found = c; }); });
+  return found;
+}
+function maybeUnlock(clipId){
+  // Pro Tips is never gated — this just quietly marks a tactic as "found" for the
+  // small ✓ badge in the library, no popup, nothing to unlock.
+  var clip = findClipById(clipId);
+  if(clip && clip.tactic) unlockedTactics[clip.tactic] = true;
+}
+function getBoard(id){ if(!BOARD[id]) BOARD[id] = {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}; return BOARD[id]; }
+function claimNumber(id){ return "INF-" + String(4000 + id*137).slice(-5); }
+function letterFor(i){ return String.fromCharCode(65+i); }
+function toggleReverse(id){ reverseOpen[id] = !reverseOpen[id]; render(); }
+
+function svgFor(key){
+  var svgs = {
+    "chart-crop": '<svg viewBox="0 0 320 110" width="100%" height="110"><rect width="320" height="110" fill="#0c0e0c"/><line x1="24" y1="14" x2="24" y2="90" stroke="#38383a"/><line x1="24" y1="90" x2="300" y2="90" stroke="#38383a"/><polyline points="24,60 90,64 150,58 210,55 270,50 300,46" fill="none" stroke="#ff453a" stroke-width="3"/><line x1="18" y1="4" x2="30" y2="14" stroke="#ff9f0a" stroke-width="2"/><line x1="18" y1="14" x2="30" y2="4" stroke="#ff9f0a" stroke-width="2"/><text x="34" y="14" font-size="9" fill="#ff9f0a" font-family="monospace">axis cropped</text></svg>',
+    "chart-full": '<svg viewBox="0 0 320 110" width="100%" height="110"><rect width="320" height="110" fill="#0c0e0c"/><line x1="24" y1="14" x2="24" y2="90" stroke="#38383a"/><line x1="24" y1="90" x2="300" y2="90" stroke="#38383a"/><polyline points="24,86 60,82 96,76 132,66 168,58 204,50 240,40 270,28 300,18" fill="none" stroke="#30d158" stroke-width="3"/><rect x="240" y="12" width="60" height="70" fill="none" stroke="#0a84ff" stroke-width="1.5" stroke-dasharray="3,3"/><text x="150" y="10" font-size="8" fill="#0a84ff" font-family="monospace">box = the cropped view</text></svg>',
+    "bar-misleading": '<svg viewBox="0 0 320 120" width="100%" height="120"><rect width="320" height="120" fill="#0c0e0c"/><line x1="24" y1="14" x2="24" y2="96" stroke="#38383a"/><line x1="24" y1="96" x2="300" y2="96" stroke="#38383a"/><rect x="60" y="60" width="60" height="36" fill="#ff453a"/><text x="52" y="112" font-size="9" fill="#9aa39a" font-family="-apple-system,sans-serif">side effects</text><rect x="190" y="40" width="60" height="56" fill="#c9932b"/><text x="172" y="112" font-size="9" fill="#9aa39a" font-family="-apple-system,sans-serif">measles deaths</text><text x="30" y="26" font-size="8" fill="#ff9f0a" font-family="monospace">y-axis doesn\'t start at 0</text></svg>',
+    "photo-crop": '<svg viewBox="0 0 320 130" width="100%" height="130"><rect width="320" height="130" fill="#0e1a14"/><rect x="0" y="100" width="320" height="30" fill="#16241c"/><g fill="#2c9e5e"><circle cx="60" cy="68" r="12"/><rect x="48" y="80" width="24" height="30" rx="6"/><circle cx="120" cy="72" r="12"/><rect x="108" y="84" width="24" height="26" rx="6"/><circle cx="180" cy="66" r="12"/><rect x="168" y="78" width="24" height="32" rx="6"/><circle cx="240" cy="70" r="12"/><rect x="228" y="82" width="24" height="28" rx="6"/></g><g fill="#2c9e5e" opacity="0.25"><circle cx="300" cy="68" r="12"/><rect x="288" y="80" width="24" height="30" rx="6"/></g><line x1="280" y1="6" x2="280" y2="124" stroke="#ff9f0a" stroke-width="2" stroke-dasharray="4,3"/><text x="196" y="20" font-size="8" fill="#ff9f0a" font-family="monospace">frame edge →</text></svg>',
+    "photo-full": '<svg viewBox="0 0 320 130" width="100%" height="130"><rect width="320" height="130" fill="#0e1a14"/><rect x="0" y="100" width="320" height="30" fill="#16241c"/><g fill="#2c9e5e"><circle cx="50" cy="68" r="12"/><rect x="38" y="80" width="24" height="30" rx="6"/><circle cx="105" cy="72" r="12"/><rect x="93" y="84" width="24" height="26" rx="6"/><circle cx="160" cy="66" r="12"/><rect x="148" y="78" width="24" height="32" rx="6"/><circle cx="215" cy="70" r="12"/><rect x="203" y="82" width="24" height="28" rx="6"/><circle cx="270" cy="68" r="12"/><rect x="258" y="80" width="24" height="30" rx="6"/></g><circle cx="270" cy="68" r="20" fill="none" stroke="#0a84ff" stroke-width="2" stroke-dasharray="3,3"/><text x="176" y="20" font-size="8" fill="#0a84ff" font-family="monospace">not in the other photo</text></svg>'
+  };
+  return svgs[key] || "";
+}
+function renderClipImage(c){ return c.image ? ('<div class="clipimage">'+svgFor(c.image)+'</div>') : ""; }
+function renderReverseBlock(c){
+  if(!c.reverseSearch) return "";
+  var open = reverseOpen[c.id];
+  var html = '<span class="reversebtn" onclick="toggleReverse(\''+c.id+'\')">🔎 '+(open?'Hide reverse search':'Reverse image search')+'</span>';
+  if(open){
+    html += '<div class="reversegrid">';
+    c.reverseSearch.forEach(function(r){
+      html += '<div class="reversetile"><div class="reverseimg" style="background:'+(r.color||"#1c1c1e")+';"></div><div class="reverselabel">'+r.label+'</div><div class="reversemeta">'+r.meta+'</div></div>';
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+// ---------------- MULTIPLAYER: lobby + sync ----------------
+// Everything below is new for Week 2. The lobby is the only screen that shows
+// before a room exists; joining populates PLAYERS from real Supabase rows and
+// wires up realtime subscriptions before ever touching Round 1.
+function renderLobby(){
+  var html = '<div class="r1start">';
+  if(!roomCode){
+    html += '<div class="r1startbadge">INFODEMIC</div>';
+    html += '<div class="r1starttitle">Join the Table</div>';
+    html += '<div class="r1startsub">Enter your name, then create a new room or join one with a code from someone at your table.</div>';
+    html += '<input class="lobbyinput" id="lobbyName" placeholder="Your name">';
+    html += '<div class="lobbybtn" onclick="doCreateRoom()">Create a new room</div>';
+    html += '<div class="lobbydivider">— or —</div>';
+    html += '<input class="lobbyinput" id="lobbyCode" placeholder="Room code, e.g. FOX-4213" style="text-transform:uppercase;">';
+    html += '<div class="lobbybtn lobbybtnsecondary" onclick="doJoinRoom()">Join room</div>';
+    if(lobbyStatus.msg) html += '<div class="lobbystatus'+(lobbyStatus.error?' error':'')+'">'+lobbyStatus.msg+'</div>';
+  } else {
+    html += '<div class="r1startbadge">ROOM CODE — SHARE THIS</div>';
+    html += '<div class="lobbyroomcode">'+roomCode+'</div>';
+    html += '<div class="r1startsub">Waiting for your table to join — everyone needs this code.</div>';
+    html += '<div class="lobbyplayerlist">';
+    PLAYERS.forEach(function(p){
+      html += '<div class="lobbyplayerrow"><span class="lobbyavatar" style="background:'+p.color+';">'+p.initial+'</span><span>'+p.name+(p.isYou?' (you)':'')+'</span></div>';
+    });
+    html += '</div>';
+    html += '<div class="lobbybtn" onclick="enterGame()">Enter game ▶</div>';
+  }
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+function doCreateRoom(){
+  var name = document.getElementById("lobbyName").value.trim();
+  if(!name){ lobbyStatus = {msg:"Enter your name first.", error:true}; render(); return; }
+  lobbyStatus = {msg:"Creating room…", error:false}; render();
+  InfodemicSync.createRoom(name).then(function(result){
+    onJoinedRoom(result.code, result.player.id);
+  }).catch(function(err){
+    lobbyStatus = {msg:err.message, error:true}; render();
+  });
+}
+function doJoinRoom(){
+  var name = document.getElementById("lobbyName").value.trim();
+  var code = document.getElementById("lobbyCode").value.trim().toUpperCase();
+  if(!name){ lobbyStatus = {msg:"Enter your name first.", error:true}; render(); return; }
+  if(!code){ lobbyStatus = {msg:"Enter a room code.", error:true}; render(); return; }
+  lobbyStatus = {msg:"Joining room…", error:false}; render();
+  InfodemicSync.joinRoom(code, name).then(function(result){
+    onJoinedRoom(result.code, result.player.id);
+  }).catch(function(err){
+    lobbyStatus = {msg:err.message, error:true}; render();
+  });
+}
+function onJoinedRoom(code, playerId){
+  roomCode = code;
+  myPlayerId = playerId;
+  MY_ID = playerId;
+  lobbyStatus = {msg:"", error:false};
+  InfodemicSync.getPlayers(code).then(applyPlayers);
+  InfodemicSync.getRoomState(code).then(applyRemoteState);
+  InfodemicSync.subscribeRoom(code, {
+    onPlayersChange: applyPlayers,
+    onStateChange: applyRemoteState
+  });
+  render();
+}
+function applyPlayers(rows){
+  PLAYERS = rows.map(function(r){
+    return {id:r.id, name:r.name, initial:r.initial, color:r.color, isYou:r.id===myPlayerId};
+  });
+  render();
+}
+// Merges the canonical Supabase room state into local globals. Fires on the
+// initial fetch after joining AND on every subsequent realtime update (from
+// any player, including this client's own writes echoing back). Only three
+// fields are shared at all — claimVotes, board, and the round's startedAt —
+// everything else (which screen you're on, which card is flipped, Search/AI
+// exploration) is local-only per player, on purpose.
+function applyRemoteState(state){
+  state = state || {};
+  if(state.claimVotes) claimVotes = state.claimVotes;
+  if(state.board){
+    Object.keys(state.board).forEach(function(cid){ BOARD[cid] = state.board[cid]; });
+  }
+  if(state.roundState && state.roundState.startedAt) adoptSharedStart(state.roundState.startedAt);
+  if(currentApp!=="lobby") render();
+}
+function enterGame(){
+  currentApp = "round1";
+  render();
+}
+// ---- write helpers: local mutation already happened by the time these are
+// called (see castVote/addToBoard/etc.) — these just persist + broadcast it.
+// Fire-and-forget, last-write-wins, per the "whatever's easiest for MVP" call —
+// see multiplayer/MULTIPLAYER_SETUP.md for what that trades away.
+function syncVote(claimId){
+  if(!roomCode) return;
+  InfodemicSync.updateRoomState(roomCode, function(state){
+    state.claimVotes = state.claimVotes || {};
+    state.claimVotes[claimId] = claimVotes[claimId];
+    return state;
+  }).catch(function(e){ console.error("vote sync failed", e); });
+}
+function syncBoard(claimId){
+  if(!roomCode) return;
+  InfodemicSync.updateRoomState(roomCode, function(state){
+    state.board = state.board || {};
+    state.board[claimId] = BOARD[claimId];
+    return state;
+  }).catch(function(e){ console.error("board sync failed", e); });
+}
+function syncRoundStart(startedAtMs){
+  if(!roomCode) return;
+  InfodemicSync.updateRoomState(roomCode, function(state){
+    state.roundState = state.roundState || {};
+    state.roundState.startedAt = startedAtMs;
+    return state;
+  }).catch(function(e){ console.error("round-start sync failed", e); });
+}
+
+// ---------------- ROUND 1 TIMER ----------------
+// Timer no longer auto-starts on render — the table decides when it's ready
+// (see renderRound1Start / beginRound1 below).
+//
+// Multiplayer note: the ONLY thing that needs to sync for the timer is the
+// shared startedAt timestamp — whoever taps "Start Round 1" writes it to the
+// room, and every other client's local tick just computes secondsLeft off
+// that same shared timestamp (see adoptSharedStart). Nothing about the tick
+// itself is server-authoritative; each client independently notices when its
+// own clock reaches 0. Good enough for a small cooperative table, per the
+// "whatever's easiest for MVP" call.
+var roundTimerHandle = null;
+function startTicking(){
+  roundTimerHandle = setInterval(function(){
+    var elapsed = Math.floor((Date.now()-roundState.startedAt)/1000);
+    roundState.secondsLeft = Math.max(0, 60-elapsed);
+    if(roundState.secondsLeft<=0 && !roundState.ended && !roundState.showingTimesUp){
+      // Time's up: hold on the interstitial until the table explicitly continues
+      // (see dismissTimesUp) — it no longer auto-advances on its own.
+      roundState.showingTimesUp = true;
+      clearInterval(roundTimerHandle);
+      if(currentApp==="round1") render();
+    } else if(currentApp==="round1" && !roundState.showingTimesUp){
+      // Only touch the countdown badge directly instead of calling the full render() —
+      // rebuilding the whole feed's innerHTML every 250ms was destroying and recreating
+      // the vote buttons out from under a tap in progress, which is why picking a color
+      // sometimes took several clicks to register (and why auto-advance-to-next-card
+      // sometimes looked broken — the smooth scroll got cut off mid-animation by the
+      // next rebuild). The countdown is the only thing that actually changes each tick,
+      // so that's the only thing that needs to update.
+      var badge = document.getElementById("roundbadge");
+      if(badge){
+        badge.textContent = "⏱ " + roundState.secondsLeft + "s";
+        badge.className = "roundbadge" + (roundState.secondsLeft<=10 ? " urgent" : "");
+      } else {
+        render();
+      }
+    }
+  }, 250);
+}
+function beginRound1(){
+  if(roundState.started) return;
+  roundState.started = true;
+  roundState.startedAt = Date.now();
+  startTicking();
+  render();
+  syncRoundStart(roundState.startedAt);
+}
+// Fires when another player's "Start Round 1" tap arrives over sync, or when
+// this client fetches room state on join and a round is already underway —
+// both cases just mean "adopt the shared start time and begin ticking locally."
+function adoptSharedStart(startedAtMs){
+  if(roundState.started) return;
+  roundState.started = true;
+  roundState.startedAt = startedAtMs;
+  startTicking();
+  if(currentApp==="round1") render();
+}
+// Demo/testing shortcut — tap the countdown badge to skip straight to Time's Up,
+// instead of waiting out the full 60s. Mirrors exactly what the interval above does
+// when it naturally hits 0.
+function forceTimesUp(){
+  if(!roundState.started || roundState.ended || roundState.showingTimesUp) return;
+  if(roundTimerHandle) clearInterval(roundTimerHandle);
+  roundState.secondsLeft = 0;
+  roundState.showingTimesUp = true;
+  if(currentApp==="round1") render();
+}
+function endRound1(){
+  roundState.ended = true;
+  roundState.justEnded = true;
+}
+
+// ---------------- VOTES / SORTING ----------------
+function castVote(claimId, call){
+  if(roundState.ended) return;
+  claimVotes[claimId] = claimVotes[claimId] || {};
+  var cur = claimVotes[claimId][MY_ID];
+  claimVotes[claimId][MY_ID] = (cur===call) ? null : call;
+  render();
+  syncVote(claimId);
+  // Picking a color (not un-picking one) bounces you straight to the next card —
+  // keeps the gut-check moving instead of making players manually scroll each time.
+  if(claimVotes[claimId][MY_ID] !== null) scrollToNextCard(claimId);
+}
+function scrollToNextCard(claimId){
+  var current = document.getElementById("slide-"+claimId);
+  if(!current || !current.nextElementSibling) return;
+  var next = current.nextElementSibling;
+  if(typeof next.scrollIntoView === "function"){
+    next.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+function claimVotesFor(claim){
+  // Reads real per-player votes from the synced claimVotes map (claimVotes[id][playerId]).
+  // claim.npcVotes is unused now — left in CLAIMS as harmless leftover data from the
+  // solo-simulated prototype rather than stripped out of all 7 claim objects.
+  var v = {};
+  PLAYERS.forEach(function(p){
+    v[p.id] = (claimVotes[claim.id] && claimVotes[claim.id][p.id]) || null;
+  });
+  return v;
+}
+function claimStatus(claim){
+  if(!roundState.ended) return "voting";
+  var v = claimVotesFor(claim);
+  var vals = Object.keys(v).map(function(k){ return v[k]; }).filter(function(x){ return x!=null; });
+  var uniq = vals.filter(function(x,i){ return vals.indexOf(x)===i; });
+  return uniq.length<=1 ? "agreed" : "contested";
+}
+
+// ---------------- NAV ----------------
+function goHome(){ currentApp = "round1"; render(); }
+// There's no separate full-screen claim view anymore — everything about a story
+// (investigate, case board) lives on that story's own card. Jumping to a claim from
+// elsewhere (e.g. the Spread's "top contested claim" tile) means: go back to the
+// feed, flip that card open straight to its Board tab, and scroll it into view.
+function openClaim(id){
+  var claim = claimById(id);
+  if(claimStatus(claim)!=="contested") return;
+  currentApp = "round1";
+  openSpoke(id, "board");
+  setTimeout(function(){
+    var el = document.getElementById("slide-"+id);
+    if(el && typeof el.scrollIntoView === "function") el.scrollIntoView({behavior:"smooth", block:"start"});
+  }, 50);
+}
+function openApp(name){ currentApp = name; render(); }
+
+// ---------------- CARD FLIP (inline Round 2 investigation) ----------------
+// Pure front<->back toggle — only used by the back face's own ↩ close control now.
+// Filed claims can still flip (to review the read-only board/receipt), they just
+// can't reach Search/Ask AI anymore — renderCardBack enforces that, not this.
+function flipCard(claimId){
+  var claim = claimById(claimId);
+  if(claimStatus(claim)!=="contested") return;
+  claimFlipped[claimId] = !claimFlipped[claimId];
+  render();
+}
+// Front-face buttons use this instead — always flips IN (never toggles back out,
+// since these buttons are only reachable while the front face is showing) and can
+// jump straight to a specific spoke. Passing no mode leaves cardMode as-is, which
+// means "investigate" reopens wherever you last left off, or the move-menu the very
+// first time — see renderCardBack/renderMoveMenu.
+function openSpoke(claimId, mode){
+  var claim = claimById(claimId);
+  if(claimStatus(claim)!=="contested") return;
+  claimFlipped[claimId] = true;
+  if(mode) cardMode[claimId] = mode;
+  render();
+}
+function setCardMode(claimId, mode){ cardMode[claimId] = mode; render(); }
+
+// ---------------- ROUND 1 RENDER ("For You" immersive feed) ----------------
+function renderRound1Start(){
+  var html = '<div class="r1start">';
+  html += '<div class="r1startbadge">ROUND 1</div>';
+  html += '<div class="r1starttitle">Gut Check</div>';
+  html += '<div class="r1startsub">'+CLAIMS.length+' stories, one shared 60-second clock. Red, yellow, or green — go with your gut on each one before time runs out.</div>';
+  html += '<div class="r1startbtn" onclick="beginRound1()">▶ Start Round 1</div>';
+  html += '<div class="r1starthint">Everyone at the table starts together — tap when your group is ready.</div>';
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+function renderRound1TimesUp(){
+  var html = '<div class="r1timesup">';
+  html += '<span class="r1timesupclose" onclick="dismissTimesUp()">✕</span>';
+  html += '<div class="r1timesupbig">⏰ TIME\'S UP</div>';
+  html += '<div class="r1timesuptitle">Let\'s see where you landed</div>';
+  html += '<div class="r1timesupsub">Tap continue to go through each story, one at a time — how it was called, and where your table agreed or split.</div>';
+  html += '<div class="r1timesupbtn" onclick="dismissTimesUp()">Continue</div>';
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+// Stays on screen until the table explicitly continues (or X's out) — no auto-timeout.
+function dismissTimesUp(){
+  roundState.showingTimesUp = false;
+  startRoundReveal();
+}
+
+// ---------------- ROUND REVEAL (Jackbox-style, one story at a time) ----------------
+function startRoundReveal(){
+  endRound1(); // locks in final vote tallies so claimStatus/claimVotesFor are stable through the reveal
+  revealState.active = true;
+  revealState.index = 0;
+  revealState.order = CLAIMS.slice();
+  if(currentApp==="round1") render();
+}
+function revealNext(){
+  if(revealState.index < revealState.order.length - 1){
+    revealState.index++;
+    if(currentApp==="round1") render();
+  } else {
+    finishRoundReveal();
+  }
+}
+function skipRoundReveal(){ finishRoundReveal(); }
+function finishRoundReveal(){
+  revealState.active = false;
+  roundState.justEnded = true; // still shows the feed's shuffle-into-place animation
+  if(currentApp==="round1") render();
+  setTimeout(function(){
+    // Let the shuffle actually settle before the Round 2 sheet slides up —
+    // otherwise the popup covers the animation you're trying to show off.
+    roundState.readyForR2Popup = true;
+    if(currentApp==="round1") maybeShowOnboard();
+  }, 900);
+}
+function renderRoundReveal(){
+  var claim = revealState.order[revealState.index];
+  var variant = variantForPlayer(claim, MY_ID);
+  var v = claimVotesFor(claim);
+  var status = claimStatus(claim);
+  var isLast = revealState.index === revealState.order.length - 1;
+
+  var html = '<div class="reveal">';
+  html += '<span class="revealskip" onclick="skipRoundReveal()">Skip ✕</span>';
+  html += '<div class="revealprogress">Story '+(revealState.index+1)+' of '+revealState.order.length+'</div>';
+  html += '<div class="revealsubject">'+claim.subject+'</div>';
+  html += '<div class="revealheadline">'+variant.headline+'</div>';
+
+  html += '<div class="revealvotes">';
+  PLAYERS.forEach(function(p, i){
+    var vote = v[p.id];
+    var cls = vote || "none";
+    html += '<div class="revealvoteitem" style="animation-delay:'+(i*160)+'ms;">';
+    html += '<div class="revealavatar '+cls+'">'+(vote ? CALL_META[vote].emoji : "—")+'</div>';
+    html += '<div class="revealvotename">'+(p.isYou?"You":p.name)+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  var verdictDelay = PLAYERS.length*160 + 250;
+  if(status==="agreed"){
+    html += '<div class="revealverdict agreed" style="animation-delay:'+verdictDelay+'ms;">✅ Table agreed</div>';
+  } else {
+    html += '<div class="revealverdict contested" style="animation-delay:'+verdictDelay+'ms;">⚡ Contested — worth a closer look</div>';
+  }
+
+  html += '<div class="revealnextbtn" onclick="revealNext()">'+(isLast ? "See Round 2 →" : "Next →")+'</div>';
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+
+function renderRound1(){
+  if(!roundState.started){ renderRound1Start(); return; }
+  if(roundState.showingTimesUp){ renderRound1TimesUp(); return; }
+  if(revealState.active){ renderRoundReveal(); return; }
+  var justSorted = roundState.justEnded;
+  roundState.justEnded = false;
+
+  var contested = CLAIMS.filter(function(c){ return claimStatus(c)==="contested"; });
+  var agreed = CLAIMS.filter(function(c){ return claimStatus(c)==="agreed"; });
+  var voting = CLAIMS.filter(function(c){ return claimStatus(c)==="voting"; });
+  var order = roundState.ended ? contested.concat(agreed) : voting;
+
+  // Preserve scroll position across re-renders (timer ticks, vote taps) so scrolling
+  // through the feed isn't reset every 250ms. The one exception is right after the
+  // round sorts — that's the intentional "pull contested claims to the front" moment.
+  var prevEl = document.getElementById("feedscroll");
+  var prevScroll = prevEl ? prevEl.scrollTop : 0;
+  // Same idea for any flipped card's own inline scroll region (evidence marking, mode
+  // switches, and the AI typing reveal all trigger a full re-render too) — otherwise
+  // reading through Search results would keep getting yanked back to the top.
+  var prevCardScrolls = {};
+  Object.keys(claimFlipped).forEach(function(id){
+    if(!claimFlipped[id]) return;
+    var el = document.getElementById("cardback-scroll-"+id);
+    if(el) prevCardScrolls[id] = el.scrollTop;
+  });
+
+  // Round/timer/spread info now lives once in a persistent top bar instead of being
+  // repeated on every card — keeps each card focused on just its own story.
+  var s = spreadStats();
+  var pr = s.total>0 ? Math.round(100*s.redHeat/s.total) : 0;
+  var html = '<div class="r1topbar"><div><div class="r1toptitle">For You</div>';
+  html += '<div class="r1topsub">'+(roundState.ended ? (contested.length+' contested · '+agreed.length+' agreed') : 'Round 1 · Gut check')+'</div></div>';
+  html += '<div class="r1toptools">';
+  html += '<div class="spreadbadge" onclick="openApp(\'spread\')">🔥 '+pr+'%</div>';
+  // Pro Tips lives here now instead of on every card's rail — it's not tied to any
+  // one story, so it belongs in the persistent header, not repeated per-card.
+  html += '<div class="tipsbadge" onclick="openApp(\'tactics\')">🧠</div>';
+  if(!roundState.ended) html += '<div class="roundbadge'+(roundState.secondsLeft<=10?' urgent':'')+'" id="roundbadge" onclick="forceTimesUp()">⏱ '+roundState.secondsLeft+'s</div>';
+  html += '</div></div>';
+
+  html += '<div class="feedscroll" id="feedscroll">';
+  order.forEach(function(c, idx){ html += renderFeedCard(c, justSorted, idx); });
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+
+  var newEl = document.getElementById("feedscroll");
+  if(newEl && !justSorted) newEl.scrollTop = prevScroll;
+  Object.keys(prevCardScrolls).forEach(function(id){
+    var el = document.getElementById("cardback-scroll-"+id);
+    if(el) el.scrollTop = prevCardScrolls[id];
+  });
+}
+function renderFeedCard(claim, justSorted, idx){
+  var status = claimStatus(claim);
+  var variant = variantForPlayer(claim, MY_ID);
+  var myVote = (claimVotes[claim.id] && claimVotes[claim.id][MY_ID]) || null;
+  var bg = 'linear-gradient(200deg, hsl('+claim.hue+',55%,22%), #05060a 70%)';
+  var eng = BASE_ENGAGEMENT[claim.id] || 10;
+  var likes = formatCount(Math.round(eng*1000 + claim.id*173));
+  var comments = formatCount(Math.round(eng*180 + claim.id*37));
+  var board = getBoard(claim.id);
+  var flipped = !!claimFlipped[claim.id];
+
+  // Right after the round ends, cards visibly shuffle into their new order —
+  // staggered by position so contested claims appear to settle into the front
+  // of the deck one after another, not just pop in all at once.
+  var justSorting = justSorted && roundState.ended;
+  var cardCls = "feedcard" + (justSorting ? " justsorted" : "");
+  var styleAttr = justSorting ? ('animation-delay:'+(Math.min(idx,8)*70)+'ms;') : '';
+  var html = '<div class="'+cardCls+'" style="'+styleAttr+'" id="slide-'+claim.id+'">';
+  html += '<div class="cardflip-inner'+(flipped?' flipped':'')+'">';
+
+  // ---- FRONT FACE: the feed card itself, unchanged from before ----
+  html += '<div class="cardface cardface-front" style="background:'+bg+';">';
+  html += '<div class="feedtopscrim"></div><div class="feedbottomscrim"></div>';
+
+  // Rail is decorative/ambient furniture now (poster avatar + the spinning disc) —
+  // everything actionable and story-specific (investigate, case board, agreed/filed
+  // status) moved down into the corner cluster and the vote area below, and Pro Tips
+  // moved up into the persistent header since it isn't tied to any one story.
+  html += '<div class="feedrail">';
+  html += '<div class="railavatar">'+posterInitial(variant)+'</div>';
+  if(roundState.ended && status==="agreed"){
+    html += '<div class="railitem"><span class="railicon">✅</span><span class="raillabel agreed">agreed</span></div>';
+  }
+  html += '<div class="raildisc">🎵</div>';
+  html += '</div>';
+
+  // Corner action cluster — the story's two spokes, always visible together once
+  // it's contested (per Tara: investigate + case board should both be clearly present
+  // on the card, not hidden behind one generic flip icon). Still deliberately quiet —
+  // small glassy circles with a soft pulse, not a loud full-width red CTA — modeled on
+  // flashcard-app / card-game corners, just now two of them side by side.
+  if(roundState.ended && status==="contested" && !board.filed){
+    html += '<div class="flipcluster">';
+    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+')"><div class="flipnub">🔍</div><div class="flipnub-label">dig in</div></div>';
+    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+',\'board\')"><div class="flipnub">🗂️'+(board.board.length>0?('<span class="flipnub-badge">'+board.board.length+'</span>'):'')+'</div><div class="flipnub-label">case</div></div>';
+    html += '</div>';
+  }
+
+  // Everything about the STORY — source, subject, headline, vote — lives in this one
+  // block on the card. Source is tappable: expands to show which platform it's from.
+  html += '<div class="feedbottom">';
+  var srcExpanded = !!sourceExpanded[claim.id];
+  html += '<div class="cardsource" onclick="toggleSource('+claim.id+')">🔗 '+variant.source+' <span class="chev">'+(srcExpanded?'▲':'▼')+'</span></div>';
+  if(srcExpanded) html += '<div class="cardsourceextra">via '+domainFor(claim.sourceUrl)+'</div>';
+  html += '<div class="subjecttag">'+claim.subject+'</div>';
+  // Once a case is filed, the verdict is the single most important thing about this
+  // card — promoted above the headline, not buried after the vote reveal, so it's the
+  // first real information you hit. The gut-check votes still render below (readonly
+  // stoplight + "see who voted"), so seeing both together on the same card IS the
+  // then/now comparison — no separate delta table needed elsewhere.
+  if(roundState.ended && status==="contested" && board.filed){
+    html += '<div class="hubfiled" onclick="openSpoke('+claim.id+',\'board\')"><span class="hubstamp">FILED ✓</span><span class="hubverdict">'+CALL_META[board.teamCall].emoji+' '+CALL_META[board.teamCall].label+'</span></div>';
+  }
+  html += '<div class="headline">'+variant.headline+'</div>';
+  html += '<div class="cardstats"><span>❤️ '+likes+'</span><span>💬 '+comments+'</span></div>';
+
+  if(!roundState.ended){
+    html += '<div class="stoplight">';
+    [["misinfo","red"],["biased","yellow"],["true","green"]].forEach(function(pair){
+      var k = pair[0], colorCls = pair[1];
+      html += '<span class="stoplightopt '+colorCls+(myVote===k?' selected':'')+'" onclick="castVote('+claim.id+',\''+k+'\')">'+CALL_META[k].emoji+'</span>';
+    });
+    html += '</div>';
+  } else {
+    // Round's over — votes reveal, grouped by who called what (Jared's idea:
+    // expand under the buttons rather than a row of avatars). This stays on the
+    // FRONT face — Tara: you don't need to know how others voted while investigating.
+    var v = claimVotesFor(claim);
+    var groups = {misinfo:[], biased:[], "true":[]};
+    PLAYERS.forEach(function(p){
+      var vote = v[p.id];
+      if(vote && groups[vote]) groups[vote].push(p.isYou ? "You" : p.name);
+    });
+    html += '<div class="stoplight readonly">';
+    [["misinfo","red"],["biased","yellow"],["true","green"]].forEach(function(pair){
+      var k = pair[0], colorCls = pair[1];
+      html += '<span class="stoplightopt '+colorCls+(myVote===k?' selected':'')+'"><span class="stoplightcount">'+groups[k].length+'</span></span>';
+    });
+    html += '</div>';
+    var expanded = !!voteExpanded[claim.id];
+    html += '<div class="voteexpand" onclick="toggleVoteExpand('+claim.id+')">'+(expanded?'▴ Hide who voted':'▾ See who voted')+'</div>';
+    if(expanded){
+      html += '<div class="votegroups">';
+      [["misinfo","🚩 Misinfo"],["biased","🤔 Biased"],["true","✅ True"]].forEach(function(pair){
+        var k = pair[0], label = pair[1];
+        html += '<div class="votegrouprow"><span class="vglabel">'+label+'</span><span class="vgnames">'+(groups[k].length ? groups[k].join(", ") : "—")+'</span></div>';
+      });
+      html += '</div>';
+    }
+    if(status==="contested"){
+      // Filed verdict now shows up top (see hubfiled, above the headline) instead of
+      // here — this spot stays reserved for unfiled contested claims, which show
+      // nothing extra: the corner cluster is their investigate/case board trigger.
+    } else {
+      html += '<div class="agreedcta">✅ Table agreed — set aside</div>';
+    }
+  }
+  html += '</div>'; // end feedbottom
+  html += '</div>'; // end cardface-front
+
+  // ---- BACK FACE: inline investigation, only meaningful for contested claims ----
+  html += '<div class="cardface cardface-back">';
+  if(status==="contested") html += renderCardBack(claim, variant);
+  html += '</div>';
+
+  html += '</div>'; // end cardflip-inner
+  html += '</div>'; // end feedcard
+  return html;
+}
+function renderCardBack(claim, variant){
+  // Left unset the first time (no default) so the move-menu shows before any mode
+  // is chosen — see renderMoveMenu below.
+  var mode = cardMode[claim.id];
+  var board = getBoard(claim.id);
+  var html = '<div class="cardback-head">';
+  html += '<span class="cardback-flipclose" onclick="flipCard('+claim.id+')">↩</span>';
+  html += '<div class="cardback-titlewrap"><div class="cardback-subject">'+claim.subject+' · investigating</div><div class="cardback-headline">'+variant.headline+'</div></div>';
+  html += '</div>';
+  html += '<div class="cardback-scroll" id="cardback-scroll-'+claim.id+'">';
+  if(board.filed){
+    // Case closed — always land straight on the (read-only) board/receipt, no menu
+    // or tabs to get lost in. Search/Ask AI aren't reachable post-filing.
+    html += renderClaimBoard(claim);
+  } else if(!mode){
+    // First entry into this story's workspace: an explicit choice of how to dig in,
+    // rather than silently defaulting into Search — this is the "more agency" moment.
+    html += renderMoveMenu(claim);
+  } else {
+    html += '<div class="cardmodetabs">';
+    [["search","🔍"],["ai","🤖"],["background","🕵️"],["board","🗂️"]].forEach(function(pair){
+      var badge = (pair[0]==="board" && board.board.length>0) ? ' ('+board.board.length+')' : '';
+      html += '<div class="cardmodetab'+(mode===pair[0]?' active':'')+'" onclick="setCardMode('+claim.id+',\''+pair[0]+'\')">'+pair[1]+badge+'</div>';
+    });
+    html += '</div>';
+    if(mode==="search") html += renderClaimSearch(claim);
+    else if(mode==="ai") html += renderClaimAI(claim);
+    else if(mode==="background") html += renderClaimBackground(claim);
+    else html += renderClaimBoard(claim);
+  }
+  html += '</div>';
+  return html;
+}
+// The "how do you wanna dig in" move picker — shown once per story, the first time
+// its card is opened. After a move is picked, cardMode is sticky and the small tab
+// bar (above) takes over for switching between Search / Ask AI / Board without
+// having to flip back out and back in — this is what makes one flip cover every
+// spoke, instead of the flip itself trying to double as the mode switcher.
+function renderMoveMenu(claim){
+  // No generic "worth a closer look" kicker — it's a static label that doesn't always
+  // match the actual hook (not every claim's hook is about a number/stat worth
+  // scrutinizing), so it's just the hook text itself now.
+  var html = '<div class="cardhook">'+(claim.hook||"")+'</div>';
+  html += '<div class="moveintro">How do you wanna dig in?</div>';
+  html += '<div class="movegrid">';
+  [
+    ["search","move-search","🔍","Search the web","Pull up what's out there."],
+    ["ai","move-ai","🤖","Ask AI","Get a take, then question it."],
+    ["background","move-bg","🕵️","Background check","Who's really behind this post?"],
+    ["board","move-board","🤝","Compare notes","See what your table's found — and file when ready."]
+  ].forEach(function(m){
+    html += '<div class="movecard '+m[1]+'" onclick="setCardMode('+claim.id+',\''+m[0]+'\')">';
+    html += '<div class="moveicon">'+m[2]+'</div>';
+    html += '<div class="movetitlewrap"><div class="movetitle">'+m[3]+'</div><div class="movedesc">'+m[4]+'</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+function navbarBack(title, backFn){
+  window.__navback = backFn;
+  return '<div class="navbar"><span class="navback" onclick="window.__navback()">‹</span><span class="navtitle">'+title+'</span><span style="width:30px;"></span></div>';
+}
+function renderClaimSearch(claim){
+  var html = "";
+  if(!claim.wired){ return html + '<div class="emptystate">No results yet for this claim.</div>'; }
+  var clips = CLIPS[claim.id].filter(function(c){ return c.source!=="ai" && c.source!=="background"; });
+  var addedCount = clips.filter(function(c){ return clipState[c.id].shared; }).length;
+  html += '<div class="sectionhead">Results · '+addedCount+' added to your case</div>';
+  html += '<div class="groupcard">';
+  clips.forEach(function(c){
+    var s = clipState[c.id];
+    html += '<div class="resultrow">' + renderClipImage(c) + '<div class="resulttext">'+c.text+'</div>' + renderReverseBlock(c);
+    if(!s.revealed){
+      html += '<div class="pillrow">';
+      ["Friend","Influencer","News / institution","Can't tell — bot or AI?"].forEach(function(opt){
+        html += '<span class="pillbtn" onclick="revealClip(\''+c.id+'\',\''+opt.replace(/'/g,"\\'")+'\')">'+opt+'</span>';
+      });
+      html += '</div>';
+    } else if(!s.shared){
+      // No "skip"/reject action anymore — 2026-08-12, Tara's call: players just add
+      // what they want to their case, nothing to explicitly dismiss. Leaving a clip
+      // alone IS the "doesn't hold up" signal now, no button needed for it.
+      html += '<div class="revealtext">'+c.detail+'</div>';
+      html += '<div class="rowctrl"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
+    } else {
+      html += '<div class="resolvedtext"><span>✓ Added to case</span></div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+function revealClip(id, guess){ clipState[id].who = guess; clipState[id].revealed = true; render(); }
+function addToBoard(claimId, clipId){
+  // clipState (revealed/shared/skipped) stays local/per-player on purpose —
+  // Search/Ask AI/Background investigation is meant to be individual (each
+  // player digs into their own copy of the evidence). Only the outcome —
+  // what actually lands on BOARD[claimId].board — is the pooled, synced part.
+  clipState[clipId].shared = true;
+  maybeUnlock(clipId);
+  var b = getBoard(claimId);
+  if(b.board.indexOf(clipId)===-1) b.board.push(clipId);
+  render();
+  syncBoard(claimId);
+}
+// skipClip removed 2026-08-12 — no more explicit reject action, see renderClaimSearch.
+
+function renderClaimAI(claim){
+  var html = '<div class="chatbubble user">Is this true?<br>"'+variantForPlayer(claim,MY_ID).headline+'"</div>';
+  if(!aiRevealed[claim.id]){
+    html += '<div class="chatbubble ai typing"><span class="typingdots">● ● ●</span></div>';
+    setTimeout(function(){
+      aiRevealed[claim.id] = true;
+      if(currentApp==="round1" && claimFlipped[claim.id] && (cardMode[claim.id]||"search")==="ai") render();
+    }, 1100);
+    return html;
+  }
+  var aiClips = (CLIPS[claim.id]||[]).filter(function(c){ return c.source==="ai"; });
+  if(aiClips.length===0) return html + '<div class="chatbubble ai">I don\'t have anything specific on this one yet.</div>';
+  var addedCount = aiClips.filter(function(c){ return clipState[c.id].shared; }).length;
+  html += '<div class="sectionhead">AI response · '+addedCount+' added to your case</div>';
+  aiClips.forEach(function(c){
+    var s = clipState[c.id];
+    html += '<div class="chatbubble ai">'+c.text+'</div>';
+    if(!s.shared){
+      html += '<div class="rowctrl"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
+    } else {
+      html += '<div class="resolvedtext"><span>✓ Added to case</span></div>';
+    }
+  });
+  return html;
+}
+
+// "Who's really behind this post" — a short account snapshot per claim (flags +
+// a one-line note), injected into CLIPS as a source:"background" item so it can be
+// marked as evidence and shows up on the shared board exactly like any other exhibit.
+function renderClaimBackground(claim){
+  var b = claim.background;
+  var clipId = "bg-"+claim.id;
+  if(!b || !clipState[clipId]) return '<div class="emptystate">No background info for this one yet.</div>';
+  var s = clipState[clipId];
+  // A real profile page, not a list of labeled red flags — no "here's what's wrong
+  // with this account" callouts. Whatever's worth noticing (a suspiciously young
+  // account, a bio that undercuts its own authority, a link-in-bio incentive) has to
+  // be read off the profile itself, same as it would on the real platform.
+  var html = '<div class="profilecard">';
+  html += '<div class="profileavatar" style="background:linear-gradient(160deg, hsl('+claim.hue+',55%,42%), hsl('+claim.hue+',55%,22%));">'+b.displayName.charAt(0)+'</div>';
+  html += '<div class="profilename">'+b.displayName+(b.verified?' <span class="profilebadge">✔️</span>':'')+'</div>';
+  html += '<div class="profilehandle">'+b.handle+'</div>';
+  html += '<div class="profilebio">'+b.bio+'</div>';
+  html += '<div class="profilestats">';
+  [["posts",b.posts],["followers",b.followers],["following",b.following]].forEach(function(stat){
+    html += '<div class="profilestat"><span class="num">'+stat[1]+'</span><span class="lbl">'+stat[0]+'</span></div>';
+  });
+  html += '</div>';
+  html += '<div class="profilejoined">📅 '+b.joined+'</div>';
+  html += '</div>';
+  if(!s.shared){
+    html += '<div class="rowctrl" style="margin-top:12px;"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clipId+'\')">+ Add to case</button></div>';
+  } else {
+    html += '<div class="resolvedtext" style="margin-top:12px;"><span>✓ Added to case</span></div>';
+  }
+  return html;
+}
+
+function renderClaimBoard(claim){
+  var b = getBoard(claim.id);
+  var justFiled = b.filed && justFiledClaimId===claim.id;
+  if(justFiled) justFiledClaimId = null;
+  var html = "";
+  if(b.filed) html += '<div class="stamp'+(justFiled?' justfiled':'')+'">FILED ✓</div>';
+  html += '<div class="sectionhead">Evidence ('+b.board.length+')</div>';
+  html += '<div class="groupcard">';
+  // The post itself is always the first exhibit — everything else in this list is
+  // context gathered about it. This also retires the separate "compare everyone's
+  // version" section further down: the post is already right here, no need to repeat
+  // it in a second grid.
+  var postVariant = variantForPlayer(claim, MY_ID);
+  var postEng = BASE_ENGAGEMENT[claim.id] || 10;
+  var postLikes = formatCount(Math.round(postEng*1000 + claim.id*173));
+  var postComments = formatCount(Math.round(postEng*180 + claim.id*37));
+  html += '<div class="resultrow"><span class="exhibitlabel">THE POST</span>';
+  html += '<div class="resulttext" style="margin-top:4px;">'+postVariant.headline+'</div>';
+  html += '<div style="font-size:11.5px; color:var(--ios-label2);">'+postVariant.source+' · ❤️ '+postLikes+' · 💬 '+postComments+'</div></div>';
+  if(b.board.length===0){
+    html += '<div class="resultrow"><span style="color:var(--ios-label2); font-size:13px;">Nothing else pooled yet — go find something in Search or Ask AI and file it here.</span></div>';
+  } else {
+    var allClips = CLIPS[claim.id];
+    b.board.forEach(function(clipId, idx){
+      var clip = allClips.find(function(x){ return x.id===clipId; });
+      var kind = clip.tactic ? (TACTIC_KIND[clip.tactic]||"flag") : "none";
+      var origin = clip.source==="ai" ? "🤖 " : "";
+      // Tactic-name labels ("· Misleading chart") pulled off exhibit rows on 2026-08-12 —
+      // Tara wants Pro Tips content out of the game loop until its best use is figured
+      // out, but kept the top-bar nav link to the standalone library itself.
+      html += '<div class="resultrow"><span class="exhibitlabel">EXHIBIT '+letterFor(idx)+'</span><div class="resulttext" style="margin-top:4px;">'+origin+clip.text+'</div></div>';
+    });
+  }
+  html += '</div>';
+
+  html += '<div class="sectionhead">Table determination</div>';
+  html += '<div class="groupcard">';
+  ["misinfo","biased","true"].forEach(function(v){
+    html += '<div class="radiorow" onclick="setTeamCall('+claim.id+',\''+v+'\')"><span class="radiocircle'+(b.teamCall===v?' selected':'')+'"></span><span>'+CALL_META[v].emoji+' '+CALL_META[v].label.toUpperCase()+'</span></div>';
+  });
+  html += '</div>';
+
+  // Community note (2026-08-12): the table justifying its own call in a sentence or
+  // two, not an authored "correct answer" — same spirit as the confirm checkbox, just
+  // an actual written exercise instead of a click. Required to file, same as teamCall
+  // and confirmed. Uses oninput (direct DOM writes, no render()) rather than re-rendering
+  // on every keystroke — this file has a documented history of full re-renders stealing
+  // focus/cursor position out from under an in-progress interaction (see the Round 1
+  // timer tick comments above), so this follows the same targeted-update pattern. In
+  // this multiplayer build specifically, syncing only fires on blur (onNoteBlur calls
+  // syncBoard), not per keystroke, to avoid hammering Supabase on every character.
+  html += '<div class="sectionhead">Community note</div>';
+  if(!b.filed){
+    html += '<textarea class="communitynote" id="notebox-'+claim.id+'" placeholder="Explain why your table called this the way you did — this gets filed alongside your determination." oninput="onNoteInput('+claim.id+', this.value)" onblur="onNoteBlur('+claim.id+')">'+escapeHtml(b.note||"")+'</textarea>';
+  } else {
+    html += '<div class="groupcard" style="padding:12px 14px; font-size:13.5px; line-height:1.5; color:var(--ios-label);">'+(b.note ? escapeHtml(b.note) : '<span style="color:var(--ios-label3); font-style:italic;">No note was written.</span>')+'</div>';
+  }
+
+  if(!b.filed){
+    html += '<div class="confirmrow" onclick="toggleConfirm('+claim.id+')"><span class="checkbox'+(b.confirmed?' checked':'')+'">'+(b.confirmed?'✓':'')+'</span><span class="confirmtext">I confirm this reflects the table\'s review of the attached evidence.</span></div>';
+    html += '<button class="filebtn" id="filebtn-'+claim.id+'" onclick="fileBoard('+claim.id+')" '+(!b.teamCall||!b.confirmed||!(b.note&&b.note.trim())?'disabled':'')+'>File Case — Stop the Spread</button>';
+  } else {
+    html += '<div class="receiptcard">';
+    html += '<div class="receiptrow"><span>Case number</span><span>'+claimNumber(claim.id)+'</span></div>';
+    html += '<div class="receiptrow"><span>Determination</span><span>'+CALL_META[b.teamCall].label+'</span></div>';
+    html += '<div class="receiptrow"><span>Evidence attached</span><span>'+b.board.length+'</span></div>';
+    html += '<div class="receiptrow"><span>Filed</span><span>'+b.filedAt+'</span></div>';
+    html += '</div>';
+  }
+
+  // No "compare everyone's version" or "vote, then and now" here anymore — the post
+  // is already shown as the first exhibit above, and the then/now comparison (gut-check
+  // votes vs. the team's filed call) now lives on the hub card itself once you flip back,
+  // so this board stays focused on just evidence + the team's single determination.
+  return html;
+}
+function setTeamCall(claimId, v){
+  var b = getBoard(claimId);
+  if(b.filed) return;
+  b.teamCall = (b.teamCall===v) ? null : v;
+  render();
+  syncBoard(claimId);
+}
+function toggleConfirm(claimId){
+  var b = getBoard(claimId);
+  if(b.filed) return;
+  b.confirmed = !b.confirmed;
+  render();
+  syncBoard(claimId);
+}
+// Direct DOM update on every keystroke (no render()) so the textarea never loses
+// focus/cursor position mid-sentence — see the comment in renderClaimBoard.
+function onNoteInput(claimId, value){
+  var b = getBoard(claimId);
+  if(b.filed) return;
+  b.note = value;
+  var btn = document.getElementById("filebtn-"+claimId);
+  if(btn) btn.disabled = !(b.teamCall && b.confirmed && b.note && b.note.trim());
+}
+// Sync (via the real Supabase-backed syncBoard, present in this build) only once the
+// player's done typing, not on every keystroke.
+function onNoteBlur(claimId){
+  if(typeof syncBoard === "function") syncBoard(claimId);
+}
+function fileBoard(claimId){
+  var b = getBoard(claimId);
+  if(!b.teamCall || !b.confirmed || !(b.note && b.note.trim())) return;
+  b.filed = true;
+  justFiledClaimId = claimId;
+  var d = new Date();
+  var h = d.getHours() % 12 || 12;
+  var m = d.getMinutes();
+  b.filedAt = (d.getMonth()+1)+"/"+d.getDate()+"/"+d.getFullYear()+" · "+h+":"+(m<10?"0":"")+m;
+  render();
+  syncBoard(claimId);
+}
+
+// ---------------- SPREAD ----------------
+function spreadStats(){
+  var redHeat = 0, greenHeat = 0, contestedN = 0, agreedN = 0, filedN = 0;
+  CLAIMS.forEach(function(c){
+    var status = claimStatus(c);
+    var b = getBoard(c.id);
+    var h = heat[c.id] || 0;
+    if(status==="contested" && !b.filed){ redHeat += h; contestedN++; }
+    else if(b.filed){ greenHeat += h; filedN++; }
+    else if(status==="agreed"){ greenHeat += h*0.3; agreedN++; }
+  });
+  return {redHeat:redHeat, greenHeat:greenHeat, total:Math.max(1, redHeat+greenHeat), contestedN:contestedN, agreedN:agreedN, filedN:filedN};
+}
+function renderSpread(){
+  var s = spreadStats();
+  var pr = Math.round(100*s.redHeat/s.total);
+  var top = CLAIMS.filter(function(c){ return claimStatus(c)==="contested" && !getBoard(c.id).filed; })
+    .sort(function(a,b){ return (heat[b.id]||0)-(heat[a.id]||0); })[0];
+  var html = navbarBack("The Spread", goHome);
+  html += '<div class="appbody">';
+  html += '<div class="wrow3">';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>CONTESTED</div><div class="wnum" style="color:var(--ios-red);">'+s.contestedN+'</div><div class="wsub">still spreading</div></div>';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>AGREED</div><div class="wnum" style="color:var(--ios-label2);">'+s.agreedN+'</div><div class="wsub">set aside</div></div>';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>FILED</div><div class="wnum" style="color:var(--ios-green);">'+s.filedN+'</div><div class="wsub">contained</div></div>';
+  html += '</div>';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>BALANCE</div><div class="wsub">spreading vs. contained attention</div>';
+  html += '<div class="balancebar"><div class="r" style="width:'+pr+'%"></div><div class="g" style="width:'+(100-pr)+'%"></div></div></div>';
+  if(top){
+    html += '<div class="wtile" style="cursor:pointer;" onclick="openClaim('+top.id+')">';
+    html += '<div class="wtag"><span class="dot"></span>TOP SPREADING RIGHT NOW</div>';
+    html += '<div class="topclaim">'+variantForPlayer(top,MY_ID).headline+'</div>';
+    html += '<div class="wsub">🔥 '+Math.round(heat[top.id]||0)+' heat · tap to investigate</div></div>';
+  }
+  html += '<div style="color:var(--ios-label3); font-size:12px; line-height:1.6; margin-top:6px;">Heat climbs on its own the longer a contested claim sits un-filed — that\'s attention, not accuracy. Filing a case is the only thing that brings it back down. Agreed claims stay quiet in the background.</div>';
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+
+// ---------------- PRO TIPS LIBRARY ----------------
+function findClaimsForTactic(name){
+  var out = [];
+  Object.keys(CLIPS).forEach(function(fid){
+    var has = CLIPS[fid].some(function(c){ return c.tactic===name; });
+    if(has){
+      var c = claimById(Number(fid));
+      if(c && out.indexOf(c.subject)===-1) out.push(c.subject);
+    }
+  });
+  return out;
+}
+// Pro Tips is a reference library, not a reward system — every tactic is visible and
+// readable from the start. `unlockedTactics` still quietly tracks which ones you've
+// personally run into during Search/Ask AI, just for a small "✓ found this" badge —
+// it no longer hides or gates anything.
+var tacticExpanded = {};
+function toggleTactic(name){
+  tacticExpanded[name] = !tacticExpanded[name];
+  render();
+}
+function renderTactics(){
+  var html = navbarBack("Pro Tips", goHome);
+  html += '<div class="appbody">';
+  var foundCount = TACTICS.filter(function(t){ return unlockedTactics[t.name]; }).length;
+  html += '<div class="tacticsintro">The full library — all '+TACTICS.length+' tactics, available anytime. You\'ve personally run into '+foundCount+' of them so far in Search or Ask AI (marked ✓).</div>';
+  [{kind:"flag", label:"🚩 Flag — worth questioning", sub:"Patterns that show up when a claim is being spun, distorted, or can't be checked."},
+   {kind:"hygiene", label:"✅ Hygiene — worth noticing", sub:"Patterns that show a source is doing the work to be checkable."}
+  ].forEach(function(section){
+    var items = TACTICS.filter(function(t){ return t.kind===section.kind; });
+    html += '<div class="sectionhead" style="margin-top:18px;">'+section.label+'</div>';
+    html += '<div class="sectionintro">'+section.sub+'</div>';
+    html += '<div class="tacticgrid">';
+    items.forEach(function(t){
+      var expanded = tacticExpanded[t.name];
+      var found = unlockedTactics[t.name];
+      html += '<div class="tacticcard '+t.kind+'" onclick="toggleTactic(\''+t.name+'\')">';
+      html += '<div class="temoji">'+t.emoji+(found?' <span style="color:var(--ios-green); font-size:13px;">✓</span>':'')+'</div><div class="ttitle">'+t.name+'</div><div class="tdesc">'+t.desc+'</div>';
+      if(!expanded){ html += '<div class="texpand">Expand ↓</div>'; }
+      else { var seenIn = findClaimsForTactic(t.name); html += '<div class="tmeta">'+(seenIn.length ? 'Appears in: '+seenIn.join(', ') : 'Doesn\'t appear in this drop.')+'</div>'; }
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+
+// ---------------- ONBOARDING ----------------
+var ONBOARD_CONTENT = {
+  round1: {
+    kicker:"Round 1", title:"Trust Your Gut",
+    sub:"Call each story before time's up.",
+    rows:[
+      {icon:"🔴", title:"Misinfo", desc:"Made up, false, or misleading."},
+      {icon:"🟡", title:"Biased", desc:"Some truth, but spun or one-sided."},
+      {icon:"🟢", title:"True", desc:"Accurate as far as you can tell."}
+    ]
+  },
+  investigate: {
+    kicker:"Round 2 · Investigate", title:"Flip the Card, Dig Deeper",
+    sub:"Claims your table agreed on get set aside. This one split the room — flip it over to start digging.",
+    rows:[
+      {icon:"🔄", title:"Same story, turned over", desc:"Flip a contested card and Search / Ask AI open right on the back — you never leave the feed."},
+      {icon:"🕵️", title:"Who's behind it?", desc:"An anonymous account and a named expert aren't equally trustworthy — check who's actually talking."},
+      {icon:"🗣️", title:"Bring it to the board", desc:"What you find here feeds into one shared board for this claim — that's where your table actually decides."}
+    ]
+  },
+  board: {
+    kicker:"Stop the Spread", title:"One Shared Board",
+    sub:"Everyone's evidence lands here together. Talk it through, agree on a call, then file it.",
+    rows:[
+      {icon:"🤝", title:"Pool it together", desc:"Evidence from Search and Ask AI collects here regardless of who found it."},
+      {icon:"🎭", title:"See how you were each played", desc:"Once there's evidence on the board, compare everyone's version of this claim side by side — and the specific tactic baked into each one."},
+      {icon:"📮", title:"File when you agree", desc:"Filing is what shifts this claim from spreading to contained on the Spread."}
+    ]
+  },
+  spread: {
+    kicker:"The Spread", title:"Attention, Not Accuracy",
+    sub:"Claims don't grow because they're true — they grow the longer they sit contested.",
+    rows:[
+      {icon:"🔥", title:"Engagement gravity", desc:"Heat climbs on its own for any contested, unfiled claim — that's spread happening in real time."},
+      {icon:"🧯", title:"Filing cools it down", desc:"Once a claim is filed, its heat fades — that's containment."},
+      {icon:"📊", title:"Check back anytime", desc:"The Spread only reflects what's happening below — it never drives it."}
+    ]
+  }
+};
+function onboardKeyFor(){
+  if(currentApp==="round1"){
+    if(!roundState.ended) return "round1";
+    if(!roundState.readyForR2Popup) return null; // wait for the shuffle to settle first
+    // Board now opens inline (a tab on a flipped card) instead of a separate screen,
+    // so its onboarding sheet triggers off that state instead of currentApp.
+    var anyBoardOpen = Object.keys(claimFlipped).some(function(id){
+      return claimFlipped[id] && cardMode[id]==="board";
+    });
+    if(anyBoardOpen) return "board";
+    var hasContested = CLAIMS.some(function(c){ return claimStatus(c)==="contested"; });
+    return hasContested ? "investigate" : null;
+  }
+  if(currentApp==="spread") return "spread";
+  return null;
+}
+function maybeShowOnboard(){
+  var key = onboardKeyFor();
+  pendingOnboard = (key && !seenOnboard[key]) ? key : null;
+  renderOnboard();
+}
+function dismissOnboard(){
+  var wasKey = pendingOnboard;
+  if(pendingOnboard) seenOnboard[pendingOnboard] = true;
+  pendingOnboard = null;
+  renderOnboard();
+  // A clearer hand-off into Round 2: rather than just dropping back into the feed and
+  // hoping players notice a corner nub on their own, open the first contested story
+  // straight to its "how do you wanna dig in" move menu — same agency, guided start.
+  if(wasKey==="investigate" && currentApp==="round1"){
+    var firstContested = CLAIMS.find(function(c){ return claimStatus(c)==="contested" && !getBoard(c.id).filed; });
+    if(firstContested){
+      openSpoke(firstContested.id);
+      setTimeout(function(){
+        var el = document.getElementById("slide-"+firstContested.id);
+        if(el && typeof el.scrollIntoView === "function") el.scrollIntoView({behavior:"smooth", block:"start"});
+      }, 50);
+    }
+  }
+}
+function renderOnboard(){
+  var el = document.getElementById("onboardScrim");
+  if(!pendingOnboard){ el.className = "onboard-scrim"; el.innerHTML = ""; return; }
+  var c = ONBOARD_CONTENT[pendingOnboard];
+  var html = '<div class="onboard-sheet"><div class="onboard-grip"></div>';
+  html += '<div class="onboard-kicker">'+c.kicker+'</div>';
+  html += '<div class="onboard-title">'+c.title+'</div>';
+  html += '<div class="onboard-sub">'+c.sub+'</div>';
+  c.rows.forEach(function(r){
+    html += '<div class="onboard-row"><div class="onboard-icon">'+r.icon+'</div><div><div class="onboard-rowtitle">'+r.title+'</div><div class="onboard-rowdesc">'+r.desc+'</div></div></div>';
+  });
+  html += '<div class="onboard-btn" onclick="dismissOnboard()">Continue</div></div>';
+  el.innerHTML = html;
+  el.className = "onboard-scrim active";
+}
+
+// ---------------- MASTER RENDER ----------------
+function render(){
+  if(currentApp==="lobby"){ renderLobby(); return; }
+  if(currentApp==="round1") renderRound1();
+  else if(currentApp==="spread") renderSpread();
+  else if(currentApp==="tactics") renderTactics();
+  maybeShowOnboard();
+}
+
+// engagement gravity tick
+setInterval(function(){
+  CLAIMS.forEach(function(c){
+    var status = claimStatus(c);
+    var b = getBoard(c.id);
+    var cur = heat[c.id] || 0;
+    if(status==="contested" && !b.filed){ heat[c.id] = Math.min(40, cur + Math.random()*1.6 + 0.4); }
+    else if(b.filed){ heat[c.id] = Math.max(2, cur - 1.2); }
+    else if(status==="agreed"){ heat[c.id] = cur<3 ? 3 : cur; }
+  });
+  // Skip re-rendering while a full-screen sub-moment (Time's Up interstitial, the
+  // per-story reveal) is up — heat isn't shown on either screen, and re-rendering
+  // them just recreates the DOM nodes underneath, which replays their one-shot
+  // entrance animations on a loop instead of letting them settle.
+  var onSubScreen = roundState.showingTimesUp || revealState.active;
+  if(currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) render();
+}, 2200);
+
+function tickClock(){
+  var d = new Date();
+  var h = d.getHours() % 12 || 12;
+  var m = d.getMinutes();
+  document.getElementById("clock").textContent = h + ":" + (m<10?"0":"") + m;
+}
+setInterval(tickClock, 15000);
+tickClock();
+
+render();
+</script>
+</body>
+</html>
