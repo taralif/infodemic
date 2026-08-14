@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INFODEMIC — Multiplayer Lobby (Week 1 test)</title>
+<style>
+  :root{ --bg:#0d0d0f; --bg2:#1c1c1e; --bg3:#2c2c2e; --sep:#38383a; --blue:#0a84ff; --green:#30d158; --red:#ff453a; --label2:rgba(235,235,245,.6); }
+  *{box-sizing:border-box;}
+  body{ margin:0; min-height:100vh; background:var(--bg); color:#fff; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; display:flex; justify-content:center; padding:60px 16px; }
+  .wrap{ width:100%; max-width:420px; }
+  h1{ font-size:22px; font-weight:800; margin-bottom:4px; }
+  .sub{ font-size:13px; color:var(--label2); margin-bottom:28px; line-height:1.5; }
+  .card{ background:var(--bg2); border-radius:16px; padding:20px; margin-bottom:16px; }
+  label{ display:block; font-size:12px; font-weight:700; color:var(--label2); text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; }
+  input{ width:100%; background:var(--bg3); border:1px solid var(--sep); border-radius:10px; padding:12px 14px; color:#fff; font-size:15px; margin-bottom:14px; }
+  input:focus{ outline:2px solid var(--blue); }
+  button{ width:100%; background:var(--blue); color:#fff; border:none; border-radius:10px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; }
+  button:disabled{ opacity:.4; cursor:default; }
+  button.secondary{ background:var(--bg3); }
+  .divider{ text-align:center; color:var(--label2); font-size:12px; margin:18px 0; }
+  .status{ font-size:13px; color:var(--label2); margin-top:10px; line-height:1.5; }
+  .status.error{ color:var(--red); }
+  .roomcode{ font-family:'Space Mono',monospace; font-size:28px; font-weight:800; letter-spacing:2px; color:var(--green); text-align:center; margin:6px 0 16px; }
+  .playerlist{ display:flex; flex-direction:column; gap:8px; }
+  .playerrow{ display:flex; align-items:center; gap:10px; background:var(--bg3); border-radius:10px; padding:10px 12px; }
+  .avatar{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex:0 0 auto; }
+  .pname{ font-size:14px; font-weight:600; }
+  .youtag{ font-size:10px; font-weight:700; color:var(--green); margin-left:auto; }
+  .hidden{ display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Infodemic — Multiplayer Lobby</h1>
+  <div class="sub">Week 1 test: create or join a room and confirm every open tab sees the same live player list. This is infrastructure only — no game screens yet.</div>
+
+  <div class="card" id="setupCard">
+    <label for="nameInput">Your name</label>
+    <input id="nameInput" placeholder="e.g. Tara" autocomplete="off">
+
+    <button id="createBtn">Create a new room</button>
+    <div class="divider">— or —</div>
+    <label for="codeInput">Room code</label>
+    <input id="codeInput" placeholder="e.g. FOX-4213" autocomplete="off" style="text-transform:uppercase;">
+    <button id="joinBtn" class="secondary">Join room</button>
+
+    <div class="status" id="statusMsg"></div>
+  </div>
+
+  <div class="card hidden" id="roomCard">
+    <label>Room code — share this</label>
+    <div class="roomcode" id="roomCodeDisplay"></div>
+    <label>Players in this room</label>
+    <div class="playerlist" id="playerList"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-sync.js"></script>
+<script>
+  var currentCode = null;
+  var currentPlayerId = null;
+
+  function setStatus(msg, isError) {
+    var el = document.getElementById("statusMsg");
+    el.textContent = msg || "";
+    el.className = "status" + (isError ? " error" : "");
+  }
+
+  function renderPlayers(players) {
+    var list = document.getElementById("playerList");
+    list.innerHTML = "";
+    players.forEach(function (p) {
+      var row = document.createElement("div");
+      row.className = "playerrow";
+      row.innerHTML =
+        '<div class="avatar" style="background:' + p.color + ';">' + p.initial + "</div>" +
+        '<div class="pname">' + p.name + "</div>" +
+        (p.id === currentPlayerId ? '<div class="youtag">YOU</div>' : "");
+      list.appendChild(row);
+    });
+  }
+
+  function enterRoom(code, playerId) {
+    currentCode = code;
+    currentPlayerId = playerId;
+    document.getElementById("setupCard").className = "card hidden";
+    document.getElementById("roomCard").className = "card";
+    document.getElementById("roomCodeDisplay").textContent = code;
+
+    InfodemicSync.getPlayers(code).then(renderPlayers);
+    InfodemicSync.subscribeRoom(code, {
+      onPlayersChange: renderPlayers
+    });
+  }
+
+  document.getElementById("createBtn").addEventListener("click", function () {
+    var name = document.getElementById("nameInput").value.trim();
+    if (!name) { setStatus("Enter your name first.", true); return; }
+    setStatus("Creating room…");
+    InfodemicSync.createRoom(name).then(function (result) {
+      setStatus("");
+      enterRoom(result.code, result.player.id);
+    }).catch(function (err) {
+      setStatus(err.message, true);
+    });
+  });
+
+  document.getElementById("joinBtn").addEventListener("click", function () {
+    var name = document.getElementById("nameInput").value.trim();
+    var code = document.getElementById("codeInput").value.trim().toUpperCase();
+    if (!name) { setStatus("Enter your name first.", true); return; }
+    if (!code) { setStatus("Enter a room code.", true); return; }
+    setStatus("Joining room…");
+    InfodemicSync.joinRoom(code, name).then(function (result) {
+      setStatus("");
+      enterRoom(result.code, result.player.id);
+    }).catch(function (err) {
+      setStatus(err.message, true);
+    });
+  });
+</script>
+</body>
+</html>
