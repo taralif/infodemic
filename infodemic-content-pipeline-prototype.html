@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INFODEMIC — Content Pipeline (Teacher Console prototype)</title>
+<style>
+  :root{
+    --bg:#0d0d0f; --grid:#38383a; --panel:#1c1c1e; --panel2:#2c2c2e;
+    --ink:#ffffff; --dim:rgba(235,235,245,.6); --faint:rgba(235,235,245,.3);
+    --green:#30d158; --red:#ff453a; --gold:#ff9f0a; --card:#2c2c2e;
+    --accent:#0a84ff; --blue:#0a84ff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  }
+  header{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+    padding:20px 28px; border-bottom:1px solid var(--grid);
+  }
+  header .brand{font-size:22px; font-weight:800; letter-spacing:3px; color:var(--ink);}
+  header .sub{font-size:10.5px; font-weight:700; color:var(--blue); letter-spacing:1px; text-transform:uppercase; margin-top:6px;}
+  .pull-tag{
+    font-size:11.5px; color:var(--dim); background:var(--panel);
+    border:1px solid var(--grid); border-radius:10px; padding:8px 13px; text-align:right; line-height:1.5;
+  }
+  .pull-tag b{color:var(--green);}
+
+  .strip{
+    margin:0 28px; padding:12px 16px; background:var(--panel2); border:1px solid var(--grid);
+    border-radius:14px; font-size:13.5px; color:var(--dim); line-height:1.5; margin-top:18px;
+  }
+  .strip b{color:var(--ink);}
+
+  main{display:flex; gap:22px; padding:20px 28px 60px; align-items:flex-start;}
+  @media (max-width:980px){ main{flex-direction:column;} }
+
+  .roundcol{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:12px;}
+  .round-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .round-head h2{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--blue); margin:0;}
+  .round-head .count{font-size:12px; color:var(--dim);}
+
+  .story{
+    background:var(--panel); border:1px solid var(--grid); border-radius:18px; padding:16px 18px;
+  }
+  .story .row1{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;}
+  .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;}
+  .chip{
+    font-size:10.5px; font-weight:700; letter-spacing:.3px; text-transform:uppercase;
+    padding:3px 9px; border-radius:8px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
+  }
+  .chip.subject{color:var(--blue); border-color:rgba(10,132,255,.3); background:rgba(10,132,255,.12);}
+  .raw-headline{font-size:17px; font-weight:700; color:var(--ink); line-height:1.35; margin:2px 0 4px;}
+  .src-line{font-size:12px; color:var(--faint);}
+  .story-actions{display:flex; gap:8px; flex:0 0 auto;}
+  .btn{
+    font-size:12.5px; font-weight:700; letter-spacing:.3px;
+    padding:9px 14px; border-radius:10px; border:1px solid var(--grid); background:var(--panel2);
+    color:var(--ink); cursor:pointer; white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--blue);}
+  .btn.primary{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .btn.primary:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--dim);}
+  .btn.danger:hover{border-color:var(--red); color:var(--red);}
+  .btn:disabled{opacity:.4; cursor:default;}
+  .btn.small{padding:6px 10px; font-size:11px;}
+  .btn.big{padding:14px 18px; font-size:14px; width:100%; border-radius:14px;}
+
+  .addback{display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;}
+  .addback-pill{
+    display:flex; align-items:center; gap:8px; background:var(--panel2); border:1px dashed var(--grid);
+    border-radius:16px; padding:6px 8px 6px 12px; font-size:12.5px; color:var(--dim);
+  }
+  .addback-pill button{
+    background:var(--green); color:#04140a; border:none; border-radius:12px; padding:3px 9px;
+    font-size:11px; font-weight:700; cursor:pointer;
+  }
+
+  .empty-note{font-size:12.5px; color:var(--faint); font-style:italic; padding:6px 0 10px;}
+
+  .sidebar{flex:0 0 320px; position:sticky; top:20px; display:flex; flex-direction:column; gap:14px;}
+  .side-box{background:var(--panel); border:1px solid var(--grid); border-radius:18px; padding:16px 18px;}
+  .side-title{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--blue); margin-bottom:10px;}
+  .mixmeter{display:flex; height:8px; border-radius:4px; overflow:hidden; background:var(--panel2); margin-bottom:6px;}
+  .mixmeter div{height:100%;}
+  .mix-flag{background:var(--gold);}
+  .mix-hygiene{background:var(--green);}
+  .mix-empty{background:transparent;}
+  .mixlabels{display:flex; justify-content:space-between; font-size:11px; color:var(--dim); margin-bottom:14px;}
+  .subject-chips{display:flex; flex-wrap:wrap; gap:6px;}
+
+  .publish-box{text-align:center;}
+  .publish-hint{font-size:12px; color:var(--faint); margin-top:10px; line-height:1.5;}
+  .code-display{
+    margin-top:14px; padding:18px; background:var(--panel2); border:1px solid var(--green); border-radius:14px;
+  }
+  .code-display .code-word{
+    font-family:'SF Mono',Menlo,monospace; font-size:30px; font-weight:800; letter-spacing:2px; color:var(--green);
+  }
+  .code-display .code-sub{font-size:12px; color:var(--dim); margin-top:6px; line-height:1.5;}
+
+  .export-panel{margin-top:12px;}
+  .export-link{font-size:12px; color:var(--dim); text-decoration:underline; cursor:pointer; background:none; border:none; padding:0;}
+  textarea.export-out{
+    width:100%; min-height:200px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
+    border-radius:10px; font-family:'SF Mono',Menlo,monospace; font-size:11px; padding:10px; line-height:1.5; margin-top:10px;
+  }
+  .footnote{max-width:1400px; margin:0 auto; padding:0 28px 34px; color:var(--faint); font-size:12.5px; line-height:1.6;}
+
+  .topicpicker{display:flex; gap:22px; padding:16px 28px 0; align-items:flex-start;}
+  @media (max-width:980px){ .topicpicker{flex-direction:column;} }
+  .topicpicker-box{flex:1 1 auto; min-width:0; background:var(--panel); border:1px solid var(--grid); border-radius:18px; padding:16px 18px;}
+  .tp-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;}
+  .tp-title{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--blue);}
+  .tp-sub{font-size:11px; color:var(--dim);}
+  .topic-group{margin-bottom:14px;}
+  .topic-group:last-child{margin-bottom:0;}
+  .topic-group-head{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--dim); margin-bottom:8px;}
+  .tg-icon{font-size:14px;}
+  .topic-chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .topic-chip{
+    font-size:13px; font-weight:700; padding:8px 13px; border-radius:16px;
+    border:1px solid var(--grid); background:var(--panel2); color:var(--dim); cursor:pointer;
+  }
+  .topic-chip:hover:not(:disabled){border-color:var(--blue);}
+  .topic-chip.selected{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .topic-chip:disabled{opacity:.35; cursor:default;}
+  .tp-side{flex:0 0 300px;}
+  .tp-side-item{
+    display:flex; justify-content:space-between; align-items:center; gap:8px; background:var(--panel2);
+    border:1px solid var(--grid); border-radius:10px; padding:8px 10px; margin-bottom:7px; font-size:13px;
+  }
+  .tp-side-name{flex:1 1 auto; color:var(--ink); font-weight:700;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">INFODEMIC</div>
+    <div class="sub">CONTENT PIPELINE — TEACHER CONSOLE (PROTOTYPE)</div>
+  </div>
+  <div class="pull-tag" id="pull-tag"></div>
+</header>
+
+<div class="strip">
+  <b>How this works:</b> pick your topics — the round builds itself, no per-story approving needed. Swap out anything you don't want, then publish. You never choose how a story gets framed; the game's AI personalizes that per player from the pro-tip tactic taxonomy — that's generated at publish time, not something to review here.
+</div>
+
+<section class="topicpicker">
+  <div class="topicpicker-box">
+    <div class="tp-head">
+      <div class="tp-title">Choose topics</div>
+      <div class="tp-sub" id="tp-counter"></div>
+    </div>
+    <div id="tp-groups"></div>
+  </div>
+  <div class="tp-side">
+    <div class="side-box">
+      <div class="side-title">Your topics</div>
+      <div id="tp-side-list"></div>
+      <div class="empty-note" id="tp-empty" style="display:none;">No topics selected — the round below stays empty until you pick at least one. A parent might drop Politics; a teacher might drop Brands. Same tool, different picks.</div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="roundcol">
+    <div class="round-head">
+      <h2>This round</h2>
+      <span class="count" id="round-count"></span>
+    </div>
+    <div id="round-list"></div>
+    <div id="addback-wrap"></div>
+  </div>
+
+  <div class="sidebar">
+    <div class="side-box">
+      <div class="side-title">Round mix</div>
+      <div class="mixmeter" id="mixmeter"></div>
+      <div class="mixlabels"><span id="mix-flag-label">0 flag</span><span id="mix-hygiene-label">0 hygiene</span></div>
+      <div class="subject-chips" id="subject-chips"></div>
+    </div>
+
+    <div class="side-box publish-box">
+      <div class="side-title">Publish</div>
+      <input id="curated-by" placeholder="Your name (optional)" style="width:100%; background:var(--panel2); border:1px solid var(--grid); border-radius:10px; color:var(--ink); font-size:13px; padding:9px 11px; margin-bottom:8px;" autocomplete="off">
+      <select id="context-select" style="width:100%; background:var(--panel2); border:1px solid var(--grid); border-radius:10px; color:var(--ink); font-size:13px; padding:9px 11px; margin-bottom:10px;">
+        <option value="general">General</option>
+        <option value="classroom">Classroom</option>
+        <option value="family">Family</option>
+      </select>
+      <button class="btn primary big" id="publish-btn">Publish this round →</button>
+      <div class="publish-hint" id="publish-hint">Generates one word your whole table or class uses to join — no separate room step.</div>
+      <div class="code-display" id="code-display" style="display:none;"></div>
+      <div class="export-panel">
+        <button class="export-link" id="export-link">View draft for vetting (Markdown) ▾</button>
+        <div id="export-panel-body" style="display:none;">
+          <textarea class="export-out" id="export-out" readonly></textarea>
+          <button class="btn small" id="copy-md-btn" style="margin-top:8px;">Copy Markdown</button>
+        </div>
+      </div>
+      <button class="btn ghost small" id="reset-btn" style="margin-top:10px;">Start a fresh round</button>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="multiplayer/supabase-sync.js"></script>
+
+<div class="footnote"><b>Live-connected as of 8/13/2026:</b> Publish writes a real <code>drops</code> row to the shared Supabase project (the same one the multiplayer lobby uses), and the word it returns is immediately joinable there — enter it in the game itself (<code>infodemic-multiplayer-prototype.html</code>) and a table spins up for real, straight into Round 1 with your real content. What's still mocked: the 10 stories are hand-written data standing in for a NewsData.io free-tier pull (the API recommended for this pipeline — see <code>personalization-data-model-sketch.md</code>), and each story's AI framings — plus, as of 8/14/2026, each story's Round 2 investigation content (hook, poster persona, evidence clips) — are pre-drafted rather than generated live, so we could pressure-test the <i>mechanic</i> before wiring a real key or a live drafting model. 9 of 10 stories carry full Round 2 content now; story 9 stays intentionally unwired as the "not every story needs a flag lens" counterweight, and shows the game's existing empty state for it. The curator's job stays narrowed on purpose: pick topics, optionally swap a story out, publish — nothing about how any story gets framed for any given player, and nothing about approving stories one by one. Matches <code>curation-charter.md</code>'s "AI-drafted, human-vetted" model: publishing here is a first draft, not a ship — Tara's vetting pass (source-checking, freshness, mix quotas, hard exclusions) still applies before anything reaches players. Publish only ever produces the word (the prefix); the number after it is minted for real by whichever player enters that word first at each table, per the sketch's join scheme.</div>
+
+<script>
+// Fallback content — see "Live story source" block below for how this gets
+// replaced by real generate-drop-candidates output once it exists.
+var MOCK_STORIES = [
+  {
+    id:1, subject:"Tech", source:"TechCrunch", date:"Aug 9, 2026",
+    headline:"OpenAI says ChatGPT usage hit an all-time high ahead of its fall product launch",
+    url:"techcrunch.com/2026/08/09/chatgpt-usage-record",
+    hook:"\"Everyone's switched\" is doing a lot of work in that post — worth checking what the actual usage report says and whether anyone else is reporting the same surge.",
+    background:{handle:"@AIHypeDaily", displayName:"AI Hype Daily", bio:"Breaking AI news 24/7 🤖 not affiliated with any company", verified:false, followers:"412K", following:892, posts:6104, joined:"Mar 2023"},
+    clips:[
+      {id:"a", text:"AI Hype Daily's post: \"Everyone's already switched to the new ChatGPT — miss this update and you're behind.\"", who:"Influencer", detail:"412K followers, no data linked, no byline beyond the account itself.", tactic:null},
+      {id:"b", text:"TechCrunch's actual report: usage hit an all-time high, framed around the upcoming fall launch — not a claim that \"everyone\" switched.", who:"News / institution", detail:"Named outlet, dated, links back to OpenAI's own usage numbers.", tactic:"Named, checkable source"},
+      {id:"c", text:"A reply thread pointing out plenty of people still use older AI tools, or none at all.", who:"Friend", detail:"Anecdotal, but a useful check against \"everyone.\"", tactic:null},
+      {id:"d", text:"An account reposting the same \"you're behind\" language with a different app's name swapped in last month.", who:"Can't tell — bot or AI?", detail:"Same phrasing recycled across unrelated launches — a template, not a fact.", tactic:"Unverifiable source"},
+      {id:"ai1", text:"A single usage-record report doesn't establish that \"everyone\" switched — usage highs and universal adoption are different claims.", source:"ai"},
+      {id:"ai2", text:"Worth checking whether the record is measured in total users, active users, or something narrower before treating it as a consensus signal.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"ChatGPT usage just hit an all-time high, a tech outlet reports.",
+       note:"Straight paraphrase, one named outlet, nothing added — a plain, checkable card."},
+      {tactic:"Bandwagon", cat:"flag",
+       claim:"Everyone's already switched to ChatGPT — you're behind if you haven't.",
+       note:"The source is just a usage stat. “Everyone's already switched” and “you're behind” are pressure this card invents, not something reported."}
+    ]
+  },
+  {
+    id:2, subject:"Disaster", source:"NOAA / AP wire", date:"Aug 11, 2026",
+    headline:"NOAA: August 2026 ranks among the hottest on record across the Southeast",
+    url:"apnews.com/2026/08/11/noaa-southeast-heat-record",
+    hook:"This chart's climbing hard right at the edge of the frame — worth checking where it's cropped and what the uncropped version actually shows.",
+    background:{handle:"@ClimateSignal", displayName:"Climate Signal", bio:"Data doesn't lie 📊 independent analysis", verified:false, followers:"88K", following:340, posts:2210, joined:"Jan 2022"},
+    clips:[
+      {id:"a", text:"Climate Signal's chart, cropped tight where the line turns sharply upward, captioned \"this proves it's the hottest ever, anywhere.\"", who:"Can't tell — bot or AI?", detail:"No named source on the chart, and the axis labels are cut off at the crop.", tactic:"Misleading chart", image:"chart-crop", reverseSearch:[{label:"NOAA's full regional dataset", meta:"noaa.gov · published this week", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 9 times this week", color:"#221c12"},{label:"Meteorologist's breakdown", meta:"posted yesterday", color:"#121c22"}]},
+      {id:"b", text:"NOAA's own dataset, uncropped: August 2026 ranks among the hottest on record — for the Southeast specifically, not \"anywhere.\"", who:"News / institution", detail:"A federal agency's public dataset, dated and downloadable.", tactic:"Named, checkable source", image:"chart-full"},
+      {id:"c", text:"AP wire coverage of the same NOAA data, independently confirming the regional framing.", who:"News / institution", detail:"A second, separately reported source lining up with NOAA's own numbers.", tactic:"Named, checkable source"},
+      {id:"ai1", text:"Claims that a single chart proves something is true \"anywhere\" are worth extra scrutiny — regional records and global records are different claims.", source:"ai"},
+      {id:"ai2", text:"NOAA publishes the underlying dataset directly, so a cropped repost isn't the only way to check this.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Independent confirmation", cat:"hygiene",
+       claim:"This August ranks among the Southeast's hottest on record, data confirms.",
+       note:"Two independent sources (NOAA + AP) point the same way — that convergence is what “independent confirmation” means."},
+      {tactic:"Misleading chart", cat:"flag",
+       claim:"This chart proves it's the hottest month ever recorded — anywhere.",
+       note:"Real NOAA data, stretched: “among the hottest on record, one region” becomes “hottest ever, everywhere” by dropping the fine print."}
+    ]
+  },
+  {
+    id:3, subject:"Health", source:"CDC / Reuters Health", date:"Aug 8, 2026",
+    headline:"CDC updates recommended flu vaccine formulation for the 2026–27 season",
+    url:"reuters.com/health/2026/08/08/cdc-flu-vaccine-update",
+    hook:"\"Quietly\" and \"no one's supposed to notice\" are strong words for a routine update — worth checking what the actual advisory process looks like.",
+    background:{handle:"@HealthWatchNow", displayName:"Health Watch Now", bio:"Asking questions the mainstream won't 💉👀", verified:false, followers:"156K", following:1204, posts:3877, joined:"Jun 2021"},
+    clips:[
+      {id:"a", text:"Health Watch Now's post: \"CDC quietly rewrites vaccine rules again — and no one's supposed to notice.\"", who:"Influencer", detail:"156K followers, no link to any CDC document or meeting record.", tactic:null},
+      {id:"b", text:"CDC's own advisory panel meeting notes, publicly posted, recommending this year's flu formulation update.", who:"News / institution", detail:"A named federal panel, meeting on a public, published schedule — not quiet at all.", tactic:"Named, checkable source"},
+      {id:"c", text:"Reuters Health's report on the update, citing the same public meeting.", who:"News / institution", detail:"Independent wire coverage lining up with CDC's own record.", tactic:"Named, checkable source"},
+      {id:"d", text:"A comment thread repeating \"no one's supposed to notice\" with no new information added.", who:"Friend", detail:"Just recirculating the same phrase, not a new source.", tactic:null},
+      {id:"ai1", text:"Annual flu vaccine formulation updates are a routine, publicly documented CDC process — not evidence of anything being hidden.", source:"ai"},
+      {id:"ai2", text:"Words like \"quietly\" and \"no one's supposed to notice\" are worth noticing themselves — they're doing persuasive work, not reporting a new fact.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named expert, own field", cat:"hygiene",
+       claim:"CDC's advisory panel just updated this year's flu shot formula.",
+       note:"Routine annual process, attributed to the body whose actual job this is."},
+      {tactic:"Loaded language", cat:"flag",
+       claim:"CDC quietly rewrites vaccine rules again — no one's supposed to notice.",
+       note:"Same routine annual update; “quietly” and “no one's supposed to notice” imply secrecy the source never claimed."}
+    ]
+  },
+  {
+    id:4, subject:"Sports", source:"Local paper sports desk", date:"Aug 10, 2026",
+    headline:"Eastview High advances to state football semifinal after 21-14 win",
+    url:"localnews.example/sports/2026/08/10/eastview-semifinal",
+    hook:"A semifinal win got turned into a championship claim overnight — worth checking what actually happened on the field.",
+    background:{handle:"@EastviewNationHype", displayName:"Eastview Nation", bio:"#1 fan account 🏈 GO EAGLES", verified:false, followers:"4.1K", following:210, posts:966, joined:"Sep 2024"},
+    clips:[
+      {id:"a", text:"Eastview Nation's post: \"The whole town's already calling it — Eastview's basically state champs.\"", who:"Influencer", detail:"A local fan account, not the team or the paper.", tactic:null},
+      {id:"b", text:"The local paper's sports desk: Eastview won its semifinal 21-14 — one win, one round left.", who:"News / institution", detail:"A named local outlet with a byline, reporting the actual result.", tactic:"Named, checkable source"},
+      {id:"c", text:"A comment from a rival team's fan pointing out the championship game hasn't been played yet.", who:"Friend", detail:"A simple, accurate correction — not everything needs a citation to be true.", tactic:null},
+      {id:"ai1", text:"A semifinal win means one game remains before any championship claim would be accurate.", source:"ai"},
+      {id:"ai2", text:"Local sports hype accounts often round up on wins — worth checking the actual bracket before repeating a title claim.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"Eastview High heads to the state semifinal after a 21-14 win.",
+       note:"Small, true, boring — useful green counterweight so ‘everything's fake’ doesn't win the table."},
+      {tactic:"Bandwagon", cat:"flag",
+       claim:"The whole town's already calling it — Eastview's basically state champs.",
+       note:"Turns a semifinal win into a premature victory claim by leaning on implied town-wide consensus."}
+    ]
+  },
+  {
+    id:5, subject:"Brands", source:"Business wire", date:"Aug 7, 2026",
+    headline:"Sneaker brand Halo Step sued over sourcing claims in its supply chain",
+    url:"businesswire.example/2026/08/07/halo-step-lawsuit",
+    hook:"This creator never mentions being paid — worth checking whether this video is a paid partnership before treating it as her honest opinion.",
+    background:{handle:"@haul_with_jade", displayName:"Jade | Haul Finds", bio:"your fave for honest reviews ✨ not sponsored (usually)", verified:true, followers:"1.2M", following:340, posts:2891, joined:"Feb 2020"},
+    clips:[
+      {id:"a", text:"Jade's haul video calling Halo Step \"ethically made, start to finish\" — no paid-partnership disclosure anywhere in the caption or video.", who:"Influencer", detail:"1.2M followers, verified account, no #ad or #sponsored tag visible.", tactic:"Sponsored content"},
+      {id:"b", text:"A business-wire report naming a specific lawsuit alleging Halo Step misrepresented its supply-chain sourcing.", who:"News / institution", detail:"A filed, checkable legal claim with a named court and date.", tactic:"Named, checkable source"},
+      {id:"c", text:"A separate creator's video disclosing \"#ad — paid partnership with Halo Step\" the same week as Jade's.", who:"Influencer", detail:"Same brand, same week, one account discloses and one doesn't.", tactic:null},
+      {id:"ai1", text:"Undisclosed brand partnerships are a known pattern — a missing #ad tag doesn't confirm one exists, but it's worth checking the account's other posts and FTC disclosure norms.", source:"ai"},
+      {id:"ai2", text:"A pending lawsuit doesn't mean the claims in it are proven — it means they're being formally tested; both things can be true while it's ongoing.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"Sneaker brand Halo Step sued over its supply-chain sourcing claims.",
+       note:"Straight paraphrase of a filed, checkable legal claim."},
+      {tactic:"Sponsored content", cat:"flag",
+       claim:"A creator calls the brand “ethically made” — never mentions she's paid.",
+       note:"Modeled on the real Shein/Celsius/Revolve pattern (Feed Drop #2, card 14): paid promotion presented as an independent opinion."}
+    ]
+  },
+  {
+    id:6, subject:"World", source:"AP wire", date:"Aug 11, 2026",
+    headline:"Wildfire smoke triggers air-quality alerts in three Western states",
+    url:"apnews.com/2026/08/11/wildfire-smoke-air-quality",
+    hook:"\"Officials are staying silent\" is a strong claim about a story where officials are the ones actually issuing the alert — worth checking the timeline.",
+    background:{handle:"@BreakingNowUSA", displayName:"Breaking Now USA", bio:"🚨 breaking news, first 🚨 not affiliated with any network", verified:false, followers:"620K", following:180, posts:9440, joined:"Nov 2019"},
+    clips:[
+      {id:"a", text:"Breaking Now USA's post: \"🚨 BREAKING: toxic air is spreading right now and officials are staying silent.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, posted the same day as the real advisory, riding its attention.", tactic:"Unverifiable source"},
+      {id:"b", text:"AP wire report: air-quality alerts active in three Western states due to wildfire smoke, with agency quotes.", who:"News / institution", detail:"A named wire service, byline and dateline included.", tactic:"Named, checkable source"},
+      {id:"c", text:"NOAA's public heat/air-quality advisory map, covering the same dates and states — the alert itself, published by officials.", who:"News / institution", detail:"A federal agency's own real-time advisory system.", tactic:"Named, checkable source"},
+      {id:"ai1", text:"An active public advisory is the opposite of officials \"staying silent\" — the alert itself is officials speaking.", source:"ai"},
+      {id:"ai2", text:"\"BREAKING\" labels attached to an already-public advisory are often just riding an existing story's attention, not reporting something new.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"Air-quality alerts hit three Western states as wildfire smoke spreads.",
+       note:"Plain confirmed fact, one named wire service."},
+      {tactic:"“Breaking news” as a lever", cat:"flag",
+       claim:"🚨 BREAKING: toxic air is spreading right now and officials are staying silent.",
+       note:"Same real alert; the urgency label and ‘staying silent’ (untrue — the alert is officials speaking) do the persuading, not new facts."}
+    ]
+  },
+  {
+    id:7, subject:"Gaming", source:"Gaming trade press", date:"Aug 9, 2026",
+    headline:"New console's second production run sells out in preorders within an hour",
+    url:"gamingtrade.example/2026/08/09/console-preorders-sold-out",
+    hook:"\"Your only shot\" is a big claim for a console that's restocked before — worth checking what actually happened after past sellouts.",
+    background:{handle:"@ConsoleDropAlerts", displayName:"Console Drop Alerts", bio:"never miss a restock 🎮 (affiliate links in bio)", verified:false, followers:"210K", following:55, posts:5602, joined:"Apr 2021"},
+    clips:[
+      {id:"a", text:"Console Drop Alerts' post: \"Preorder today or you'll never get one — this is your only shot.\"", who:"Influencer", detail:"Affiliate links in bio — this account earns a cut if you buy through it.", tactic:null},
+      {id:"b", text:"Gaming trade press confirms the second production run's preorders sold out within an hour.", who:"News / institution", detail:"A named trade outlet reporting the actual sellout, no urgency framing added.", tactic:"Named, checkable source"},
+      {id:"c", text:"Coverage of the console's first sellout earlier this year, followed by a restock within a month.", who:"News / institution", detail:"The same trade press's own earlier reporting — a pattern, not a one-time event.", tactic:"Named, checkable source"},
+      {id:"ai1", text:"Real scarcity (a sellout) doesn't automatically mean zero future restocks — that's an added claim, not something the sellout itself proves.", source:"ai"},
+      {id:"ai2", text:"Accounts with affiliate links have a financial reason to push urgency — worth weighing that when reading \"only shot\" language.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"The console's second preorder run sold out within an hour.",
+       note:"Straight, checkable claim about real demand."},
+      {tactic:"False dilemma", cat:"flag",
+       claim:"Preorder today or you'll never get one — this is your only shot.",
+       note:"Real scarcity, invented binary: past sellouts were followed by restocks; ‘only shot’ forecloses an option the story doesn't rule out."}
+    ]
+  },
+  {
+    id:8, subject:"Politics", source:"Local news", date:"Aug 6, 2026",
+    headline:"Riverside School District pilots a four-day school week for 2026–27",
+    url:"localnews.example/2026/08/06/riverside-four-day-week",
+    hook:"Pointing at other districts doesn't actually answer what's being asked about this one — worth checking what Riverside's own plan actually says.",
+    background:{handle:"@RiversideParentVoice", displayName:"Riverside Parent Voice", bio:"parent-run, not affiliated with the district", verified:false, followers:"3.4K", following:190, posts:512, joined:"Jan 2025"},
+    clips:[
+      {id:"a", text:"Riverside Parent Voice's reply to a concerned comment: \"Why complain about losing a school day when other districts cut way more?\"", who:"Friend", detail:"Deflects the specific concern raised without addressing it.", tactic:null},
+      {id:"b", text:"Local reporting confirms Riverside School District is piloting a four-day week for 2026–27, with the district's own stated reasoning.", who:"News / institution", detail:"A named local outlet, attributed directly to the district.", tactic:"Named, checkable source"},
+      {id:"c", text:"A district spokesperson's statement addressing the specific concern (instructional hours) raised in the original comment.", who:"News / institution", detail:"A named official responding directly, rather than pointing elsewhere.", tactic:"Named expert, own field"},
+      {id:"ai1", text:"Pointing to a different district's bigger cut doesn't answer a specific question about this district's plan — that's a deflection, not a rebuttal.", source:"ai"},
+      {id:"ai2", text:"Worth checking Riverside's own instructional-hours numbers directly rather than a comparison to an unrelated district.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"Riverside School District is piloting a four-day week next year.",
+       note:"Low-sensitivity local policy story, attributed plainly."},
+      {tactic:"Whataboutism", cat:"flag",
+       claim:"Why complain about losing a school day when other districts cut way more?",
+       note:"Deflects any concern about this specific change by pointing at a worse, unrelated example elsewhere."}
+    ]
+  },
+  {
+    id:9, subject:"Media", source:"Fact-checking nonprofit's annual report", date:"Aug 5, 2026",
+    headline:"Fact-checking nonprofit reports over 1,500 published corrections this year",
+    url:"factchecknonprofit.example/2026-annual-report",
+    lenses:[
+      {tactic:"Independent confirmation", cat:"hygiene",
+       claim:"A fact-checking group logged over 1,500 corrections this year.",
+       note:"The green counterweight card: a whole industry exists to do exactly what this pipeline is teaching. Not every story needs a flag lens — this one doesn't."}
+    ]
+  },
+  {
+    id:10, subject:"Science", source:"Journal study, via Reuters Health", date:"Aug 4, 2026",
+    headline:"Study: short daily walks linked to modest mood improvement",
+    url:"reuters.com/health/2026/08/04/walking-study-mood",
+    hook:"\"Cures anxiety\" is a much bigger claim than \"modest mood improvement\" — worth checking what the actual study found.",
+    background:{handle:"@MindBodyDaily", displayName:"Mind Body Daily", bio:"wellness tips that actually work 🧘", verified:false, followers:"340K", following:410, posts:4120, joined:"Aug 2020"},
+    clips:[
+      {id:"a", text:"Mind Body Daily's post: \"Science says a 5-minute walk cures anxiety.\"", who:"Influencer", detail:"340K followers, no link to the actual study or its authors.", tactic:"Cherry picking"},
+      {id:"b", text:"The peer-reviewed study, via Reuters Health: short daily walks linked to a modest mood improvement, on average, across the group studied.", who:"News / institution", detail:"Keeps the study's own hedge word — \"modest\" — intact, unlike the repost.", tactic:"Named, checkable source"},
+      {id:"c", text:"A clinical psychologist's post explaining the difference between \"modest average improvement\" and \"cures anxiety.\"", who:"News / institution", detail:"A named, credentialed expert speaking in her own field.", tactic:"Named expert, own field"},
+      {id:"ai1", text:"\"Modest improvement, on average\" and \"cures anxiety\" describe very different findings — the second is a much stronger, unsupported claim.", source:"ai"},
+      {id:"ai2", text:"Worth checking whether \"cures\" appears anywhere in the original study — it's a common gap between a headline and the actual data.", source:"ai"}
+    ],
+    lenses:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"A new study links short daily walks to a modest mood boost.",
+       note:"Keeps the study's own hedge word (‘modest’) intact."},
+      {tactic:"Cherry picking", cat:"flag",
+       claim:"Science says a 5-minute walk cures anxiety.",
+       note:"The real study found a modest, average group effect; this reframing keeps the most dramatic possible reading and drops ‘modest’ entirely."}
+    ]
+  }
+];
+
+// STORIES is what the rest of the console actually reads — starts as a copy
+// of the mock set so the console is never blank, then loadStories() (called
+// at init, and again after every refresh) swaps it for real generated
+// content when available. See the "Live story source" block near the bottom.
+var STORIES = MOCK_STORIES.slice();
+var storiesSource = "mock";   // "mock" | "live"
+var storiesPulledAt = null;
+var refreshing = false;
+var refreshError = null;
+
+// ---- Round state — auto-built from selected topics, no per-story approve/skip ----
+var DROP = [];              // current round: {storyId, subject, source, url, headline, variants}
+var removedStoryIds = [];   // curator explicitly took these out — don't auto re-add
+var publishedCode = null;
+
+// ---- Topic selection (curator pre-filter, drives what auto-builds into the round) ----
+var TOPIC_GROUPS = [
+  {group:"News & world", icon:"📰", topics:["World","Politics","Disaster"]},
+  {group:"Health & science", icon:"🧪", topics:["Health","Science"]},
+  {group:"Tech & media", icon:"💻", topics:["Tech","Media","Gaming"]},
+  {group:"Life & culture", icon:"🎽", topics:["Sports","Brands"]}
+];
+var TOPIC_CAP = 8;
+var selectedTopics = ["Tech","Health","Sports","Science","Media","World"];
+
+function toggleTopic(t){
+  var idx = selectedTopics.indexOf(t);
+  if (idx !== -1){ selectedTopics.splice(idx,1); }
+  else {
+    if (selectedTopics.length >= TOPIC_CAP) return;
+    selectedTopics.push(t);
+  }
+  autoBuildRound();
+  renderTopicPicker(); renderRound(); renderSidebar();
+}
+function renderTopicPicker(){
+  var groupsEl = document.getElementById("tp-groups"); groupsEl.innerHTML = "";
+  TOPIC_GROUPS.forEach(function(g){
+    var gEl = document.createElement("div"); gEl.className = "topic-group";
+    var head = document.createElement("div"); head.className = "topic-group-head";
+    head.innerHTML = '<span class="tg-icon">'+g.icon+'</span><span>'+g.group+'</span>';
+    gEl.appendChild(head);
+    var row = document.createElement("div"); row.className = "topic-chip-row";
+    g.topics.forEach(function(t){
+      var sel = selectedTopics.indexOf(t) !== -1;
+      var chip = document.createElement("button");
+      chip.className = "topic-chip" + (sel ? " selected" : "");
+      chip.textContent = sel ? (t + " ✕") : t;
+      chip.disabled = !sel && selectedTopics.length >= TOPIC_CAP;
+      chip.onclick = function(){ toggleTopic(t); };
+      row.appendChild(chip);
+    });
+    gEl.appendChild(row);
+    groupsEl.appendChild(gEl);
+  });
+
+  document.getElementById("tp-counter").textContent = selectedTopics.length + " / " + TOPIC_CAP + " selected";
+
+  var sideList = document.getElementById("tp-side-list"); sideList.innerHTML = "";
+  document.getElementById("tp-empty").style.display = selectedTopics.length === 0 ? "block" : "none";
+  selectedTopics.forEach(function(t){
+    var item = document.createElement("div"); item.className = "tp-side-item";
+    var left = document.createElement("span"); left.className = "tp-side-name"; left.textContent = t;
+    item.appendChild(left);
+    var rm = document.createElement("button"); rm.className = "btn small ghost"; rm.textContent = "✕"; rm.title = "Remove topic";
+    rm.onclick = function(){ toggleTopic(t); };
+    item.appendChild(rm);
+    sideList.appendChild(item);
+  });
+}
+
+// ---- Auto-build: the whole point — curator never approves stories one by one ----
+function autoBuildRound(){
+  selectedTopics.forEach(function(topic){
+    var already = DROP.some(function(d){ return d.subject === topic; });
+    if (already) return;
+    var story = STORIES.filter(function(s){ return s.subject === topic && removedStoryIds.indexOf(s.id) === -1; })[0];
+    if (story) DROP.push(cardFromStory(story));
+  });
+  DROP = DROP.filter(function(d){ return selectedTopics.indexOf(d.subject) !== -1; });
+}
+function cardFromStory(story){
+  return { storyId: story.id, subject: story.subject, source: story.source, url: story.url,
+           headline: story.headline, variants: story.lenses,
+           hook: story.hook || null, background: story.background || null, clips: story.clips || [] };
+}
+
+function renderRound(){
+  var list = document.getElementById("round-list"); list.innerHTML = "";
+  document.getElementById("round-count").textContent = DROP.length + " stor" + (DROP.length===1?"y":"ies") + " · builds itself as you pick topics";
+
+  if (DROP.length === 0){
+    var e = document.createElement("div"); e.className = "empty-note";
+    e.textContent = "Pick at least one topic above — the round fills in automatically.";
+    list.appendChild(e);
+  }
+
+  DROP.forEach(function(d){
+    var card = document.createElement("div"); card.className = "story";
+    var row1 = document.createElement("div"); row1.className = "row1";
+    var left = document.createElement("div");
+    var meta = document.createElement("div"); meta.className = "meta";
+    meta.innerHTML = '<span class="chip subject">'+d.subject+'</span><span class="chip">'+d.source+'</span>';
+    left.appendChild(meta);
+    var h = document.createElement("div"); h.className = "raw-headline"; h.textContent = d.headline;
+    left.appendChild(h);
+    var src = document.createElement("div"); src.className = "src-line"; src.textContent = d.url + " (as pulled — not player-facing)";
+    left.appendChild(src);
+    row1.appendChild(left);
+
+    var actions = document.createElement("div"); actions.className = "story-actions";
+    var rm = document.createElement("button"); rm.className="btn ghost small danger"; rm.textContent="Remove";
+    rm.onclick = function(){
+      removedStoryIds.push(d.storyId);
+      DROP = DROP.filter(function(x){ return x.storyId !== d.storyId; });
+      renderRound(); renderSidebar();
+    };
+    actions.appendChild(rm);
+    row1.appendChild(actions);
+    card.appendChild(row1);
+
+    list.appendChild(card);
+  });
+
+  // Add-back: topics selected but currently missing a card (explicitly removed, or none exists)
+  var addWrap = document.getElementById("addback-wrap"); addWrap.innerHTML = "";
+  var missing = selectedTopics.filter(function(t){ return !DROP.some(function(d){ return d.subject === t; }); });
+  if (missing.length){
+    var label = document.createElement("div"); label.className = "empty-note"; label.style.padding = "2px 0 6px";
+    label.textContent = "Not in this round:";
+    addWrap.appendChild(label);
+    var row = document.createElement("div"); row.className = "addback";
+    missing.forEach(function(t){
+      var story = STORIES.filter(function(s){ return s.subject === t; })[0];
+      var pill = document.createElement("span"); pill.className = "addback-pill";
+      pill.textContent = t + (story ? "" : " (no candidate pulled)") + " ";
+      if (story){
+        var addBtn = document.createElement("button"); addBtn.textContent = "+ Add back";
+        addBtn.onclick = function(){
+          removedStoryIds = removedStoryIds.filter(function(id){ return id !== story.id; });
+          autoBuildRound(); renderRound(); renderSidebar();
+        };
+        pill.appendChild(addBtn);
+      }
+      row.appendChild(pill);
+    });
+    addWrap.appendChild(row);
+  }
+}
+
+function renderSidebar(){
+  var flagN = 0, hygN = 0;
+  DROP.forEach(function(d){ d.variants.forEach(function(v){ if (v.cat==="flag") flagN++; else hygN++; }); });
+  var total = flagN + hygN;
+
+  var meter = document.getElementById("mixmeter"); meter.innerHTML = "";
+  if (total === 0){
+    var e = document.createElement("div"); e.className="mix-empty"; e.style.width="100%"; meter.appendChild(e);
+  } else {
+    var fEl = document.createElement("div"); fEl.className="mix-flag"; fEl.style.width=(100*flagN/total)+"%"; meter.appendChild(fEl);
+    var hEl = document.createElement("div"); hEl.className="mix-hygiene"; hEl.style.width=(100*hygN/total)+"%"; meter.appendChild(hEl);
+  }
+  document.getElementById("mix-flag-label").textContent = flagN + " flag";
+  document.getElementById("mix-hygiene-label").textContent = hygN + " hygiene";
+
+  var subjCounts = {};
+  DROP.forEach(function(d){ subjCounts[d.subject] = (subjCounts[d.subject]||0)+1; });
+  var chipsEl = document.getElementById("subject-chips"); chipsEl.innerHTML = "";
+  Object.keys(subjCounts).forEach(function(s){
+    var c = document.createElement("span"); c.className="chip subject"; c.textContent = s+" ×"+subjCounts[s];
+    chipsEl.appendChild(c);
+  });
+  if (Object.keys(subjCounts).length === 0){
+    var nc = document.createElement("span"); nc.className="chip"; nc.textContent="empty round";
+    chipsEl.appendChild(nc);
+  }
+
+  document.getElementById("publish-btn").disabled = DROP.length === 0;
+}
+
+// ---- Publish: writes a real drops row via InfodemicSync (multiplayer/supabase-sync.js) ----
+// The word (code_prefix) is all Publish produces — the number half only gets
+// minted for real once a player enters that word at the join screen. See
+// personalization-data-model-sketch.md.
+function cardsForPublish(){
+  return DROP.map(function(d){
+    return {
+      id: d.storyId, subject: d.subject, source: d.source, sourceUrl: d.url, headline: d.headline,
+      variants: d.variants.map(function(v){ return { tactic: v.tactic, cat: v.cat, claim: v.claim, note: v.note }; }),
+      // Round 2 investigation content — hook, poster persona, and evidence clips —
+      // generated alongside the headline framings above. A card with no hook/clips
+      // (see story 9's "not every story needs a flag lens" counterweight) publishes
+      // with none of this, and the game shows its existing empty state for it.
+      hook: d.hook || null,
+      background: d.background || null,
+      clips: d.clips || []
+    };
+  });
+}
+
+function buildExport(){
+  var flagN = 0, hygN = 0;
+  DROP.forEach(function(d){ d.variants.forEach(function(v){ if (v.cat==="flag") flagN++; else hygN++; }); });
+  var lines = [];
+  lines.push("# Feed Drop — pipeline draft, DRAFT FOR VETTING");
+  lines.push("*Topics selected: " + (selectedTopics.length ? selectedTopics.join(", ") : "(none)") + "*");
+  if (publishedCode) lines.push("*Published code: " + publishedCode + "*");
+  lines.push("*Pulled from mock news feed 2026-08-12 · " + DROP.length + " stories · " + flagN + " flag-lens / " + hygN + " hygiene-lens variants, AI-personalized per player*");
+  lines.push("");
+  lines.push("| # | Subject | AI-personalized framings (curator did not choose these) |");
+  lines.push("|---|---|---|");
+  DROP.forEach(function(d, i){
+    var vtext = d.variants.map(function(v){ return "**["+v.tactic+"]** " + v.claim.replace(/\|/g,"/"); }).join("<br>");
+    lines.push("| "+(i+1)+" | "+d.subject+" | "+vtext+" |");
+  });
+  lines.push("");
+  lines.push("## Vetting checklist (per curation-charter.md — still required before this ships)");
+  lines.push("☐ Click through every source below ☐ Confirm freshness ☐ Paraphrases don't copy source text ☐ No named private individuals ☐ Age-appropriate ☐ Mix quotas checked against a full drop, not just this sample");
+  lines.push("");
+  lines.push("## Sources (audit trail)");
+  DROP.forEach(function(d){ lines.push("- " + d.subject + " — " + d.source + " — " + d.url); });
+  return lines.join("\n");
+}
+
+document.getElementById("publish-btn").addEventListener("click", function(){
+  if (DROP.length === 0) return;
+  var btn = this;
+  var disp = document.getElementById("code-display");
+  btn.disabled = true; btn.textContent = "Publishing…";
+  disp.style.display = "none";
+
+  var curatedBy = document.getElementById("curated-by").value.trim() || null;
+  var context = document.getElementById("context-select").value;
+
+  InfodemicSync.createDrop({
+    title: "Round · " + new Date().toLocaleDateString(),
+    curated_by: curatedBy,
+    context: context,
+    topics_selected: selectedTopics,
+    cards: cardsForPublish()
+  }).then(function(drop){
+    publishedCode = drop.code_prefix;
+    btn.disabled = false; btn.textContent = "Publish this round →";
+    disp.style.display = "block";
+    disp.innerHTML =
+      '<div class="code-word">'+publishedCode+'</div>' +
+      '<div class="code-sub">This is live in Supabase. Say the word — <b>'+publishedCode+'</b> — to your table or class. Each table\'s first player types just this word (in the lobby\'s join screen) and gets their own table number automatically; everyone else at that table types the full code they\'re given. A second table typing the same word gets a different table, same content.</div>' +
+      '<button class="btn small" id="copy-code-btn" style="margin-top:10px;">Copy word</button>';
+    document.getElementById("copy-code-btn").addEventListener("click", function(){
+      try{ navigator.clipboard.writeText(publishedCode); }catch(e){}
+      this.textContent = "Copied ✓";
+    });
+  }).catch(function(err){
+    btn.disabled = false; btn.textContent = "Publish this round →";
+    disp.style.display = "block";
+    disp.innerHTML = '<div style="color:var(--red); font-size:13px; line-height:1.5;">Publish failed: ' + err.message + '</div>';
+  });
+});
+
+document.getElementById("export-link").addEventListener("click", function(){
+  var body = document.getElementById("export-panel-body");
+  var opening = body.style.display !== "block";
+  body.style.display = opening ? "block" : "none";
+  this.textContent = "View draft for vetting (Markdown) " + (opening ? "▲" : "▾");
+  if (opening) document.getElementById("export-out").value = buildExport();
+});
+
+// ---- Live story source: generate-drop-candidates Edge Function output ----
+// MOCK_STORIES stays as a fallback so the console is never blank — before
+// the first "Refresh from news" run (or if a refresh fails outright),
+// STORIES is just MOCK_STORIES. Once real candidates exist in
+// story_candidates, they fully replace the mock set (not merged with it).
+function rowToStory(row){
+  return {
+    id: row.id, subject: row.subject, source: row.source, date: row.date,
+    headline: row.headline, url: row.url, lenses: row.variants || [],
+    hook: row.hook || null, background: row.background || null, clips: row.clips || []
+  };
+}
+function loadStories(){
+  return InfodemicSync.getStoryCandidates().then(function(rows){
+    if (rows && rows.length){
+      STORIES = rows.map(rowToStory);
+      storiesSource = "live";
+      storiesPulledAt = rows[0].pulled_at || new Date().toISOString();
+    } else {
+      STORIES = MOCK_STORIES.slice();
+      storiesSource = "mock";
+      storiesPulledAt = null;
+    }
+  }).catch(function(err){
+    console.error("loadStories failed, falling back to mock data:", err);
+    STORIES = MOCK_STORIES.slice();
+    storiesSource = "mock";
+    storiesPulledAt = null;
+  });
+}
+function renderPullTag(){
+  var el = document.getElementById("pull-tag");
+  var html = storiesSource === "live"
+    ? "Source: <b>NewsData.io + Claude-generated</b> (" + STORIES.length + " candidates)<br>Pulled: " + (storiesPulledAt ? new Date(storiesPulledAt).toLocaleString() : "just now")
+    : "Source: <b>mock news feed</b> (stands in for NewsData.io free tier)<br>" + STORIES.length + " candidates";
+  html += '<div style="margin-top:8px;"><button class="btn small' + (refreshing ? '' : ' primary') + '" id="refresh-stories-btn"' + (refreshing ? ' disabled' : '') + '>' +
+    (refreshing ? "Pulling + generating… (can take a minute)" : "Refresh from news →") + '</button></div>';
+  if (refreshError) html += '<div style="color:var(--red); margin-top:6px; max-width:260px;">' + refreshError + '</div>';
+  el.innerHTML = html;
+  var btn = document.getElementById("refresh-stories-btn");
+  if (btn) btn.onclick = doRefreshStories;
+}
+// Pulling fresh candidates makes the old set's story ids meaningless (mock
+// ids don't exist in the live set and vice versa), so a refresh always
+// starts the round over — same as hitting "Start a fresh round" — rather
+// than trying to carry over a DROP built against a story set that's gone.
+function doRefreshStories(){
+  if (refreshing) return;
+  refreshing = true; refreshError = null; renderPullTag();
+  InfodemicSync.refreshStoryCandidates().then(function(result){
+    if (result.errors && result.errors.length){
+      console.warn("Story generation had partial failures:", result.errors);
+      refreshError = result.errors.length + " topic(s) didn't come through (" +
+        result.errors.map(function(e){ return e.subject; }).join(", ") + ") — showing whatever did generate.";
+    }
+    if (!result.inserted){
+      refreshing = false;
+      refreshError = refreshError || "Refresh failed — no candidates were generated. Check that both API key secrets are set on the Edge Function.";
+      renderPullTag();
+      return;
+    }
+    return loadStories().then(function(){
+      DROP = []; removedStoryIds = []; publishedCode = null;
+      document.getElementById("code-display").style.display = "none";
+      autoBuildRound(); renderTopicPicker(); renderRound(); renderSidebar();
+      refreshing = false;
+      renderPullTag();
+    });
+  }).catch(function(err){
+    refreshing = false;
+    refreshError = err.message || "Refresh failed.";
+    renderPullTag();
+  });
+}
+
+document.getElementById("copy-md-btn").addEventListener("click", function(){
+  var out = document.getElementById("export-out");
+  out.select();
+  try{ navigator.clipboard.writeText(out.value); }catch(e){ document.execCommand("copy"); }
+  var btn = document.getElementById("copy-md-btn");
+  var orig = btn.textContent; btn.textContent = "Copied ✓";
+  setTimeout(function(){ btn.textContent = orig; }, 1400);
+});
+
+document.getElementById("reset-btn").addEventListener("click", function(){
+  DROP = []; removedStoryIds = []; publishedCode = null;
+  document.getElementById("code-display").style.display = "none";
+  document.getElementById("export-panel-body").style.display = "none";
+  document.getElementById("export-link").textContent = "View draft for vetting (Markdown) ▾";
+  autoBuildRound();
+  renderRound(); renderSidebar();
+  // topic selections deliberately persist — that's a curator setting, not part of a single round
+});
+
+renderPullTag();
+renderTopicPicker();
+autoBuildRound();
+renderRound();
+renderSidebar();
+// Check for already-cached live candidates on load (e.g. someone else
+// refreshed earlier today) — if found, swap them in and rebuild the round;
+// if the console starts on the mock set, it just stays there until someone
+// clicks Refresh.
+loadStories().then(function(){
+  renderPullTag();
+  if (storiesSource === "live"){
+    DROP = []; removedStoryIds = [];
+    autoBuildRound(); renderTopicPicker(); renderRound(); renderSidebar();
+  }
+});
+</script>
+</body>
+</html>

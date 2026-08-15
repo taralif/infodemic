@@ -167,12 +167,18 @@
      card's own scrollable back face (see .cardback-scroll below). */
   .feedcard{
     scroll-snap-align:start; scroll-snap-stop:normal; height:74vh; min-height:500px; max-height:620px;
-    position:relative; margin-bottom:18px; box-shadow:0 14px 34px rgba(0,0,0,.45); perspective:1600px;
+    position:relative; margin-bottom:18px; box-shadow:0 14px 34px rgba(0,0,0,.45);
+    perspective:1600px; -webkit-perspective:1600px;
   }
-  /* ---------- CARD FLIP (front = feed card, back = inline investigation) ---------- */
+  /* ---------- CARD FLIP (front = feed card, back = inline investigation) ----------
+     Mobile bug (Tara, 8/14): front stayed visible through the back and the back was
+     unreadable. Root cause was missing -webkit- prefixes on perspective/transform-style
+     — iOS Safari needs both prefixed or it doesn't build proper 3D space, so
+     backface-visibility:hidden on the back face never fully kicks in and the two faces
+     render composited on top of each other instead of as opposite sides of one card. */
   .cardflip-inner{
     position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.15,.2,1);
-    transform-style:preserve-3d;
+    transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
   }
   .cardflip-inner.flipped{ transform:rotateY(180deg); }
   .cardface{
@@ -584,7 +590,7 @@ Multiplayer wiring (Week 2) on top of the hub-and-spoke rebuild: create or join 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="../supabase-sync.js"></script>
+<script src="multiplayer/supabase-sync.js"></script>
 <script>
 // ---------------- DATA ----------------
 // PLAYERS is no longer a fixed cast — it's populated from whoever has actually
@@ -605,84 +611,228 @@ var CALL_META = {
   "true":{emoji:"✅", label:"True"}
 };
 
-var CLAIMS = [
-  {id:1, subject:"Tech", hue:195, sourceUrl:"tiktok.com/@ecofactsdaily/video/74123", wired:true,
-    hook:"It's got a scary specific number attached — but where does that stat actually trace back to, and is anyone else reporting it the same way?",
-    background:{handle:"@EcoFactsDaily", displayName:"Eco Facts Daily",
-      bio:"🌍 daily AI + climate facts | not a scientist, just online a lot | 🔁 always sharing, rarely sourcing",
-      verified:false, followers:"3.8M", following:"12", posts:"9,204", joined:"Joined Sep 2019"},
-    npcVotes:{maya:"misinfo", diego:"true", priya:"biased"},
+// DEFAULT_DROP_CARDS is the "no code? just start a room" deck — same shape
+// a teacher's published drop takes (see cardsForPublish() in
+// infodemic-content-pipeline-prototype.html), and in fact the exact same
+// 10 stories as that console's MOCK_STORIES fallback, so there's one
+// canonical default content set instead of two. Real, dated, sourced news
+// (paraphrased, cited) rather than the old hand-invented placeholder posts
+// this replaced. Runs through mapDropCardsToClaims() below, same as any
+// real teacher-published drop — see the var CLAIMS = ... line further down.
+// Story 9 (Media) ships with no hook/background/clips on purpose — not
+// every story needs a flag lens, and it exercises the game's existing
+// "unwired" empty state, same as it does in the teacher console.
+var DEFAULT_DROP_CARDS = [
+  {
+    id:1, subject:"Tech", source:"TechCrunch", date:"Aug 9, 2026",
+    headline:"OpenAI says ChatGPT usage hit an all-time high ahead of its fall product launch",
+    url:"techcrunch.com/2026/08/09/chatgpt-usage-record",
+    hook:"\"Everyone's switched\" is doing a lot of work in that post — worth checking what the actual usage report says and whether anyone else is reporting the same surge.",
+    background:{handle:"@AIHypeDaily", displayName:"AI Hype Daily", bio:"Breaking AI news 24/7 🤖 not affiliated with any company", verified:false, followers:"412K", following:892, posts:6104, joined:"Mar 2023"},
+    clips:[
+      {id:"a", text:"AI Hype Daily's post: \"Everyone's already switched to the new ChatGPT — miss this update and you're behind.\"", who:"Influencer", detail:"412K followers, no data linked, no byline beyond the account itself.", tactic:null},
+      {id:"b", text:"TechCrunch's actual report: usage hit an all-time high, framed around the upcoming fall launch — not a claim that \"everyone\" switched.", who:"News / institution", detail:"Named outlet, dated, links back to OpenAI's own usage numbers.", tactic:"Named, checkable source"},
+      {id:"c", text:"A reply thread pointing out plenty of people still use older AI tools, or none at all.", who:"Friend", detail:"Anecdotal, but a useful check against \"everyone.\"", tactic:null},
+      {id:"d", text:"An account reposting the same \"you're behind\" language with a different app's name swapped in last month.", who:"Can't tell — bot or AI?", detail:"Same phrasing recycled across unrelated launches — a template, not a fact.", tactic:"Unverifiable source"},
+      {id:"ai1", text:"A single usage-record report doesn't establish that \"everyone\" switched — usage highs and universal adoption are different claims.", source:"ai"},
+      {id:"ai2", text:"Worth checking whether the record is measured in total users, active users, or something narrower before treating it as a consensus signal.", source:"ai"}
+    ],
     variants:[
-      {headline:"Every question you ask ChatGPT wastes a full bottle of water.", source:"@EcoFactsDaily · 3.8M followers", tactic:"Loaded language"},
-      {headline:"Data centers behind AI chatbots are straining local water supplies, one study finds.", source:"@TechWatchDaily", tactic:"Cherry picking"},
-      {headline:"New study puts real numbers on AI's water footprint — smaller than you'd think per question.", source:"@ScienceQuick", tactic:null}
-    ]},
-  {id:2, subject:"Science", hue:150, sourceUrl:"tiktok.com/@climaterealtalk/video/74556", wired:true,
-    hook:"A chart moving fast doesn't mean it's the full picture — worth seeing where this version of the data comes from and how other people are reading it.",
-    background:{handle:"@ClimateRealTalk", displayName:"Climate Real Talk",
-      bio:"just asking questions 🌡️ | tired of the mainstream climate narrative | RT ≠ endorsement",
-      verified:false, followers:"412K", following:"1,840", posts:"22,910", joined:"Joined Jan 2021"},
-    npcVotes:{maya:"misinfo", diego:"biased", priya:"misinfo"},
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"A tech-industry outlet reports ChatGPT usage hit an all-time high this week, ahead of a planned fall product launch.",
+       note:"Straight paraphrase, one named outlet, nothing added — a plain, checkable card."},
+      {tactic:"Bandwagon", cat:"flag",
+       claim:"Everyone's already switched to the new ChatGPT — miss this update and you're behind.",
+       note:"The source is just a usage stat. “Everyone's already switched” and “you're behind” are pressure this card invents, not something reported."}
+    ]
+  },
+  {
+    id:2, subject:"Disaster", source:"NOAA / AP wire", date:"Aug 11, 2026",
+    headline:"NOAA: August 2026 ranks among the hottest on record across the Southeast",
+    url:"apnews.com/2026/08/11/noaa-southeast-heat-record",
+    hook:"This chart's climbing hard right at the edge of the frame — worth checking where it's cropped and what the uncropped version actually shows.",
+    background:{handle:"@ClimateSignal", displayName:"Climate Signal", bio:"Data doesn't lie 📊 independent analysis", verified:false, followers:"88K", following:340, posts:2210, joined:"Jan 2022"},
+    clips:[
+      {id:"a", text:"Climate Signal's chart, cropped tight where the line turns sharply upward, captioned \"this proves it's the hottest ever, anywhere.\"", who:"Can't tell — bot or AI?", detail:"No named source on the chart, and the axis labels are cut off at the crop.", tactic:"Misleading chart", image:"chart-crop", reverseSearch:[{label:"NOAA's full regional dataset", meta:"noaa.gov · published this week", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 9 times this week", color:"#221c12"},{label:"Meteorologist's breakdown", meta:"posted yesterday", color:"#121c22"}]},
+      {id:"b", text:"NOAA's own dataset, uncropped: August 2026 ranks among the hottest on record — for the Southeast specifically, not \"anywhere.\"", who:"News / institution", detail:"A federal agency's public dataset, dated and downloadable.", tactic:"Named, checkable source", image:"chart-full"},
+      {id:"c", text:"AP wire coverage of the same NOAA data, independently confirming the regional framing.", who:"News / institution", detail:"A second, separately reported source lining up with NOAA's own numbers.", tactic:"Named, checkable source"},
+      {id:"ai1", text:"Claims that a single chart proves something is true \"anywhere\" are worth extra scrutiny — regional records and global records are different claims.", source:"ai"},
+      {id:"ai2", text:"NOAA publishes the underlying dataset directly, so a cropped repost isn't the only way to check this.", source:"ai"}
+    ],
     variants:[
-      {headline:"This chart proves scientists are wrong about climate change.", source:"@ClimateRealTalk", tactic:"Misleading chart"},
-      {headline:"Temperatures cooled last decade — so what's with the panic?", source:"@SkepticSightings", tactic:"Cherry picking"},
-      {headline:"A closer look at the viral \"cooling\" chart everyone's sharing.", source:"@FactCheckDaily", tactic:"Named, checkable source"}
-    ]},
-  {id:3, subject:"Sports", hue:30, sourceUrl:"instagram.com/worldcupuncut/p/c9x2k", wired:true,
-    hook:"Something about this framing feels curated — worth looking at the original photo and what other angles turned up.",
-    background:{handle:"@WorldCupUncut", displayName:"World Cup Uncut",
-      bio:"breaking down the moments everyone's talking about ⚽️👀",
-      verified:false, followers:"89K", following:"340", posts:"612", joined:"Joined 2 weeks ago"},
-    npcVotes:{maya:"biased", diego:"biased", priya:"biased"},
+      {tactic:"Independent confirmation", cat:"hygiene",
+       claim:"Federal weather data and wire reporting agree: this August ranks among the hottest on record in the Southeast.",
+       note:"Two independent sources (NOAA + AP) point the same way — that convergence is what “independent confirmation” means."},
+      {tactic:"Misleading chart", cat:"flag",
+       claim:"This chart proves this is the hottest month ever recorded — anywhere.",
+       note:"Real NOAA data, stretched: “among the hottest on record, one region” becomes “hottest ever, everywhere” by dropping the fine print."}
+    ]
+  },
+  {
+    id:3, subject:"Health", source:"CDC / Reuters Health", date:"Aug 8, 2026",
+    headline:"CDC updates recommended flu vaccine formulation for the 2026–27 season",
+    url:"reuters.com/health/2026/08/08/cdc-flu-vaccine-update",
+    hook:"\"Quietly\" and \"no one's supposed to notice\" are strong words for a routine update — worth checking what the actual advisory process looks like.",
+    background:{handle:"@HealthWatchNow", displayName:"Health Watch Now", bio:"Asking questions the mainstream won't 💉👀", verified:false, followers:"156K", following:1204, posts:3877, joined:"Jun 2021"},
+    clips:[
+      {id:"a", text:"Health Watch Now's post: \"CDC quietly rewrites vaccine rules again — and no one's supposed to notice.\"", who:"Influencer", detail:"156K followers, no link to any CDC document or meeting record.", tactic:null},
+      {id:"b", text:"CDC's own advisory panel meeting notes, publicly posted, recommending this year's flu formulation update.", who:"News / institution", detail:"A named federal panel, meeting on a public, published schedule — not quiet at all.", tactic:"Named, checkable source"},
+      {id:"c", text:"Reuters Health's report on the update, citing the same public meeting.", who:"News / institution", detail:"Independent wire coverage lining up with CDC's own record.", tactic:"Named, checkable source"},
+      {id:"d", text:"A comment thread repeating \"no one's supposed to notice\" with no new information added.", who:"Friend", detail:"Just recirculating the same phrase, not a new source.", tactic:null},
+      {id:"ai1", text:"Annual flu vaccine formulation updates are a routine, publicly documented CDC process — not evidence of anything being hidden.", source:"ai"},
+      {id:"ai2", text:"Words like \"quietly\" and \"no one's supposed to notice\" are worth noticing themselves — they're doing persuasive work, not reporting a new fact.", source:"ai"}
+    ],
     variants:[
-      {headline:"World Cup victory photos are missing one very specific person.", source:"@WorldCupUncut", tactic:"Selective framing"},
-      {headline:"Fans notice a suspicious gap in the championship photo.", source:"@SportsDrama24", tactic:"Loaded language"},
-      {headline:"Why this celebration photo looks different from every angle.", source:"@GameDayInsider", tactic:"Selective framing"}
-    ]},
-  {id:4, subject:"Health", hue:340, sourceUrl:"instagram.com/wellnesswithmara/p/c8m1q", wired:true,
-    hook:"Personal stories spread fast and feel convincing — worth checking what the confirmed data actually says, and who else is weighing in.",
-    background:{handle:"@WellnessWithMara", displayName:"Mara ✨ Wellness",
-      bio:"holistic mama of 3 🌿 sharing what the doctors won't tell you | not medical advice",
-      verified:false, followers:"620K", following:"980", posts:"3,140", joined:"Joined Apr 2018"},
-    npcVotes:{maya:"misinfo", diego:"true", priya:"true"},
+      {tactic:"Named expert, own field", cat:"hygiene",
+       claim:"CDC's own vaccine advisory panel, staying inside its area of expertise, updated this year's flu shot formulation.",
+       note:"Routine annual process, attributed to the body whose actual job this is."},
+      {tactic:"Loaded language", cat:"flag",
+       claim:"CDC quietly rewrites vaccine rules again — and no one's supposed to notice.",
+       note:"Same routine annual update; “quietly” and “no one's supposed to notice” imply secrecy the source never claimed."}
+    ]
+  },
+  {
+    id:4, subject:"Sports", source:"Local paper sports desk", date:"Aug 10, 2026",
+    headline:"Eastview High advances to state football semifinal after 21-14 win",
+    url:"localnews.example/sports/2026/08/10/eastview-semifinal",
+    hook:"A semifinal win got turned into a championship claim overnight — worth checking what actually happened on the field.",
+    background:{handle:"@EastviewNationHype", displayName:"Eastview Nation", bio:"#1 fan account 🏈 GO EAGLES", verified:false, followers:"4.1K", following:210, posts:966, joined:"Sep 2024"},
+    clips:[
+      {id:"a", text:"Eastview Nation's post: \"The whole town's already calling it — Eastview's basically state champs.\"", who:"Influencer", detail:"A local fan account, not the team or the paper.", tactic:null},
+      {id:"b", text:"The local paper's sports desk: Eastview won its semifinal 21-14 — one win, one round left.", who:"News / institution", detail:"A named local outlet with a byline, reporting the actual result.", tactic:"Named, checkable source"},
+      {id:"c", text:"A comment from a rival team's fan pointing out the championship game hasn't been played yet.", who:"Friend", detail:"A simple, accurate correction — not everything needs a citation to be true.", tactic:null},
+      {id:"ai1", text:"A semifinal win means one game remains before any championship claim would be accurate.", source:"ai"},
+      {id:"ai2", text:"Local sports hype accounts often round up on wins — worth checking the actual bracket before repeating a title claim.", source:"ai"}
+    ],
     variants:[
-      {headline:"The measles vaccine is riskier than measles itself.", source:"@WellnessWithMara", tactic:"Loaded language"},
-      {headline:"Parents are sharing vaccine reaction stories the news won't cover.", source:"@ParentVoices", tactic:"Unverifiable source"},
-      {headline:"What the CDC's own data says about MMR vaccine safety.", source:"@HealthLineFacts", tactic:"Named, checkable source"}
-    ]},
-  {id:5, subject:"Politics", hue:0, sourceUrl:"x.com/breakingpoliticsnow/status/19834", wired:true,
-    hook:"\"Breaking\" is doing a lot of work in that caption — worth checking when this clip is actually from and who's saying what about it.",
-    background:{handle:"@BreakingPoliticsNow", displayName:"Breaking Politics Now",
-      bio:"🚨 breaking news, first | anonymous team | tips welcome",
-      verified:false, followers:"1.1M", following:"4", posts:"48,302", joined:"Joined Nov 2016"},
-    npcVotes:{maya:"misinfo", diego:"misinfo", priya:"true"},
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"The local paper's sports desk confirms Eastview High is headed to the state semifinal after a 21-14 win.",
+       note:"Small, true, boring — useful green counterweight so ‘everything's fake’ doesn't win the table."},
+      {tactic:"Bandwagon", cat:"flag",
+       claim:"The whole town's already calling it — Eastview's basically state champs.",
+       note:"Turns a semifinal win into a premature victory claim by leaning on implied town-wide consensus."}
+    ]
+  },
+  {
+    id:5, subject:"Brands", source:"Business wire", date:"Aug 7, 2026",
+    headline:"Sneaker brand Halo Step sued over sourcing claims in its supply chain",
+    url:"businesswire.example/2026/08/07/halo-step-lawsuit",
+    hook:"This creator never mentions being paid — worth checking whether this video is a paid partnership before treating it as her honest opinion.",
+    background:{handle:"@haul_with_jade", displayName:"Jade | Haul Finds", bio:"your fave for honest reviews ✨ not sponsored (usually)", verified:true, followers:"1.2M", following:340, posts:2891, joined:"Feb 2020"},
+    clips:[
+      {id:"a", text:"Jade's haul video calling Halo Step \"ethically made, start to finish\" — no paid-partnership disclosure anywhere in the caption or video.", who:"Influencer", detail:"1.2M followers, verified account, no #ad or #sponsored tag visible.", tactic:"Sponsored content"},
+      {id:"b", text:"A business-wire report naming a specific lawsuit alleging Halo Step misrepresented its supply-chain sourcing.", who:"News / institution", detail:"A filed, checkable legal claim with a named court and date.", tactic:"Named, checkable source"},
+      {id:"c", text:"A separate creator's video disclosing \"#ad — paid partnership with Halo Step\" the same week as Jade's.", who:"Influencer", detail:"Same brand, same week, one account discloses and one doesn't.", tactic:null},
+      {id:"ai1", text:"Undisclosed brand partnerships are a known pattern — a missing #ad tag doesn't confirm one exists, but it's worth checking the account's other posts and FTC disclosure norms.", source:"ai"},
+      {id:"ai2", text:"A pending lawsuit doesn't mean the claims in it are proven — it means they're being formally tested; both things can be true while it's ongoing.", source:"ai"}
+    ],
     variants:[
-      {headline:"BREAKING: video shows a senator collapsing getting into a car.", source:"@BreakingPoliticsNow", tactic:"Old footage, new label"},
-      {headline:"This \"breaking\" senator video is older than you think.", source:"@PoliticsWatchdog", tactic:"Named, checkable source"},
-      {headline:"Senator's team stays silent as this clip goes viral again.", source:"@CapitolBuzz", tactic:"Loaded language"}
-    ]},
-  {id:6, subject:"Disaster", hue:25, sourceUrl:"nbcnews.com/news/us-news/heat-wave-alerts", wired:true,
-    hook:"Numbers like this move fast during a crisis — worth checking who's actually behind the figure and whether other outlets are lining up.",
-    background:{handle:"@NBCNews", displayName:"NBC News",
-      bio:"Breaking news, contextualized. Tips: nbcnews.com/tips",
-      verified:true, followers:"12.4M", following:"1,204", posts:"891,204", joined:"Joined Mar 2007"},
-    npcVotes:{maya:"true", diego:"true", priya:"true"},
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"A business-wire report names a specific lawsuit alleging a sneaker brand misrepresented its supply-chain sourcing.",
+       note:"Straight paraphrase of a filed, checkable legal claim."},
+      {tactic:"Sponsored content", cat:"flag",
+       claim:"A creator's haul video calls the same brand “ethically made, start to finish” — no mention she's a paid partner.",
+       note:"Modeled on the real Shein/Celsius/Revolve pattern (Feed Drop #2, card 14): paid promotion presented as an independent opinion."}
+    ]
+  },
+  {
+    id:6, subject:"World", source:"AP wire", date:"Aug 11, 2026",
+    headline:"Wildfire smoke triggers air-quality alerts in three Western states",
+    url:"apnews.com/2026/08/11/wildfire-smoke-air-quality",
+    hook:"\"Officials are staying silent\" is a strong claim about a story where officials are the ones actually issuing the alert — worth checking the timeline.",
+    background:{handle:"@BreakingNowUSA", displayName:"Breaking Now USA", bio:"🚨 breaking news, first 🚨 not affiliated with any network", verified:false, followers:"620K", following:180, posts:9440, joined:"Nov 2019"},
+    clips:[
+      {id:"a", text:"Breaking Now USA's post: \"🚨 BREAKING: toxic air is spreading right now and officials are staying silent.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, posted the same day as the real advisory, riding its attention.", tactic:"Unverifiable source"},
+      {id:"b", text:"AP wire report: air-quality alerts active in three Western states due to wildfire smoke, with agency quotes.", who:"News / institution", detail:"A named wire service, byline and dateline included.", tactic:"Named, checkable source"},
+      {id:"c", text:"NOAA's public heat/air-quality advisory map, covering the same dates and states — the alert itself, published by officials.", who:"News / institution", detail:"A federal agency's own real-time advisory system.", tactic:"Named, checkable source"},
+      {id:"ai1", text:"An active public advisory is the opposite of officials \"staying silent\" — the alert itself is officials speaking.", source:"ai"},
+      {id:"ai2", text:"\"BREAKING\" labels attached to an already-public advisory are often just riding an existing story's attention, not reporting something new.", source:"ai"}
+    ],
     variants:[
-      {headline:"Wire reporting: a heat wave has pushed 50M+ people under heat alerts.", source:"NBC News", tactic:"Named, checkable source"},
-      {headline:"50 million under heat alerts as wildfires spread — full coverage.", source:"NBC News · via @WireDailyClips", tactic:"Named, checkable source"},
-      {headline:"Record heat alerts issued — here's what forecasters are saying.", source:"NBC News · via @LocalWeatherNow", tactic:"Named, checkable source"}
-    ]},
-  {id:7, subject:"Brands", hue:270, sourceUrl:"tiktok.com/@dailyhaul_finds/video/74998", wired:true,
-    hook:"One claim, one headline — worth seeing what the actual lawsuit says and how other coverage is framing it.",
-    background:{handle:"@dailyhaul_finds", displayName:"Daily Haul Finds",
-      bio:"your fav products, dupes + drama 🛍️ | shop my finds below 🔗",
-      verified:false, followers:"2.2M", following:"612", posts:"5,430", joined:"Joined Jun 2020"},
-    npcVotes:{maya:"misinfo", diego:"biased", priya:"true"},
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"Wire reporting confirms air-quality alerts are active in three Western states due to wildfire smoke.",
+       note:"Plain confirmed fact, one named wire service."},
+      {tactic:"“Breaking news” as a lever", cat:"flag",
+       claim:"🚨 BREAKING: toxic air is spreading right now and officials are staying silent.",
+       note:"Same real alert; the urgency label and ‘staying silent’ (untrue — the alert is officials speaking) do the persuading, not new facts."}
+    ]
+  },
+  {
+    id:7, subject:"Gaming", source:"Gaming trade press", date:"Aug 9, 2026",
+    headline:"New console's second production run sells out in preorders within an hour",
+    url:"gamingtrade.example/2026/08/09/console-preorders-sold-out",
+    hook:"\"Your only shot\" is a big claim for a console that's restocked before — worth checking what actually happened after past sellouts.",
+    background:{handle:"@ConsoleDropAlerts", displayName:"Console Drop Alerts", bio:"never miss a restock 🎮 (affiliate links in bio)", verified:false, followers:"210K", following:55, posts:5602, joined:"Apr 2021"},
+    clips:[
+      {id:"a", text:"Console Drop Alerts' post: \"Preorder today or you'll never get one — this is your only shot.\"", who:"Influencer", detail:"Affiliate links in bio — this account earns a cut if you buy through it.", tactic:null},
+      {id:"b", text:"Gaming trade press confirms the second production run's preorders sold out within an hour.", who:"News / institution", detail:"A named trade outlet reporting the actual sellout, no urgency framing added.", tactic:"Named, checkable source"},
+      {id:"c", text:"Coverage of the console's first sellout earlier this year, followed by a restock within a month.", who:"News / institution", detail:"The same trade press's own earlier reporting — a pattern, not a one-time event.", tactic:"Named, checkable source"},
+      {id:"ai1", text:"Real scarcity (a sellout) doesn't automatically mean zero future restocks — that's an added claim, not something the sellout itself proves.", source:"ai"},
+      {id:"ai2", text:"Accounts with affiliate links have a financial reason to push urgency — worth weighing that when reading \"only shot\" language.", source:"ai"}
+    ],
     variants:[
-      {headline:"A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.", source:"@dailyhaul_finds", tactic:"Cherry picking"},
-      {headline:"Is your skincare routine hiding a cancer risk? What the lawsuit claims.", source:"@BeautyAlertsDaily", tactic:"Loaded language"},
-      {headline:"One lab test, one lawsuit — here's the fuller picture on the skincare claim.", source:"@ConsumerCheckNow", tactic:"Named, checkable source"}
-    ]}
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"Gaming trade press confirms the console's second preorder run sold out within an hour.",
+       note:"Straight, checkable claim about real demand."},
+      {tactic:"False dilemma", cat:"flag",
+       claim:"Preorder today or you'll never get one — this is your only shot.",
+       note:"Real scarcity, invented binary: past sellouts were followed by restocks; ‘only shot’ forecloses an option the story doesn't rule out."}
+    ]
+  },
+  {
+    id:8, subject:"Politics", source:"Local news", date:"Aug 6, 2026",
+    headline:"Riverside School District pilots a four-day school week for 2026–27",
+    url:"localnews.example/2026/08/06/riverside-four-day-week",
+    hook:"Pointing at other districts doesn't actually answer what's being asked about this one — worth checking what Riverside's own plan actually says.",
+    background:{handle:"@RiversideParentVoice", displayName:"Riverside Parent Voice", bio:"parent-run, not affiliated with the district", verified:false, followers:"3.4K", following:190, posts:512, joined:"Jan 2025"},
+    clips:[
+      {id:"a", text:"Riverside Parent Voice's reply to a concerned comment: \"Why complain about losing a school day when other districts cut way more?\"", who:"Friend", detail:"Deflects the specific concern raised without addressing it.", tactic:null},
+      {id:"b", text:"Local reporting confirms Riverside School District is piloting a four-day week for 2026–27, with the district's own stated reasoning.", who:"News / institution", detail:"A named local outlet, attributed directly to the district.", tactic:"Named, checkable source"},
+      {id:"c", text:"A district spokesperson's statement addressing the specific concern (instructional hours) raised in the original comment.", who:"News / institution", detail:"A named official responding directly, rather than pointing elsewhere.", tactic:"Named expert, own field"},
+      {id:"ai1", text:"Pointing to a different district's bigger cut doesn't answer a specific question about this district's plan — that's a deflection, not a rebuttal.", source:"ai"},
+      {id:"ai2", text:"Worth checking Riverside's own instructional-hours numbers directly rather than a comparison to an unrelated district.", source:"ai"}
+    ],
+    variants:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"Local reporting confirms Riverside School District is piloting a four-day week this coming year.",
+       note:"Low-sensitivity local policy story, attributed plainly."},
+      {tactic:"Whataboutism", cat:"flag",
+       claim:"Why complain about losing a school day when other districts cut way more?",
+       note:"Deflects any concern about this specific change by pointing at a worse, unrelated example elsewhere."}
+    ]
+  },
+  {
+    id:9, subject:"Media", source:"Fact-checking nonprofit's annual report", date:"Aug 5, 2026",
+    headline:"Fact-checking nonprofit reports over 1,500 published corrections this year",
+    url:"factchecknonprofit.example/2026-annual-report",
+    variants:[
+      {tactic:"Independent confirmation", cat:"hygiene",
+       claim:"A fact-checking group's annual report counts over 1,500 corrections published this year alone.",
+       note:"The green counterweight card: a whole industry exists to do exactly what this pipeline is teaching. Not every story needs a flag lens — this one doesn't."}
+    ]
+  },
+  {
+    id:10, subject:"Science", source:"Journal study, via Reuters Health", date:"Aug 4, 2026",
+    headline:"Study: short daily walks linked to modest mood improvement",
+    url:"reuters.com/health/2026/08/04/walking-study-mood",
+    hook:"\"Cures anxiety\" is a much bigger claim than \"modest mood improvement\" — worth checking what the actual study found.",
+    background:{handle:"@MindBodyDaily", displayName:"Mind Body Daily", bio:"wellness tips that actually work 🧘", verified:false, followers:"340K", following:410, posts:4120, joined:"Aug 2020"},
+    clips:[
+      {id:"a", text:"Mind Body Daily's post: \"Science says a 5-minute walk cures anxiety.\"", who:"Influencer", detail:"340K followers, no link to the actual study or its authors.", tactic:"Cherry picking"},
+      {id:"b", text:"The peer-reviewed study, via Reuters Health: short daily walks linked to a modest mood improvement, on average, across the group studied.", who:"News / institution", detail:"Keeps the study's own hedge word — \"modest\" — intact, unlike the repost.", tactic:"Named, checkable source"},
+      {id:"c", text:"A clinical psychologist's post explaining the difference between \"modest average improvement\" and \"cures anxiety.\"", who:"News / institution", detail:"A named, credentialed expert speaking in her own field.", tactic:"Named expert, own field"},
+      {id:"ai1", text:"\"Modest improvement, on average\" and \"cures anxiety\" describe very different findings — the second is a much stronger, unsupported claim.", source:"ai"},
+      {id:"ai2", text:"Worth checking whether \"cures\" appears anywhere in the original study — it's a common gap between a headline and the actual data.", source:"ai"}
+    ],
+    variants:[
+      {tactic:"Named checkable source", cat:"hygiene",
+       claim:"A peer-reviewed study, reported by a named health outlet, links short daily walks to a modest mood improvement.",
+       note:"Keeps the study's own hedge word (‘modest’) intact."},
+      {tactic:"Cherry picking", cat:"flag",
+       claim:"Science says a 5-minute walk cures anxiety.",
+       note:"The real study found a modest, average group effect; this reframing keeps the most dramatic possible reading and drops ‘modest’ entirely."}
+    ]
+  }
 ];
 function domainFor(url){ return url.split("/")[0]; }
 function claimById(id){ return CLAIMS.find(function(c){ return c.id===id; }); }
@@ -723,63 +873,12 @@ var TACTICS = [
 var PROTIP_COPY = {}, TACTIC_KIND = {}, TACTIC_EMOJI = {};
 TACTICS.forEach(function(t){ PROTIP_COPY[t.name]=t.desc; TACTIC_KIND[t.name]=t.kind; TACTIC_EMOJI[t.name]=t.emoji; });
 
-var CLIPS = {
-  1: [
-    {id:"1a", text:"A wellness account says every ChatGPT question drains a full water bottle.", who:"Influencer", detail:"3.8M followers, no citation linked in bio or caption.", tactic:null},
-    {id:"1b", text:"The original 2023 UC Riverside study: about 500ml per 10–50-question session.", who:"News / institution", detail:"A named university study — the paper itself is public and checkable.", tactic:"Named, checkable source"},
-    {id:"1c", text:"A Reddit thread calling the water claim \"basically made up.\"", who:"Can't tell — bot or AI?", detail:"Account created two weeks ago, no other posts.", tactic:"Unverifiable source"},
-    {id:"1d", text:"A research institute's note: large data centers draw millions of gallons a day, concentrated in a few regions.", who:"News / institution", detail:"A named research organization's public report.", tactic:"Named, checkable source"},
-    {id:"1ai1", text:"Individual ChatGPT queries use a negligible amount of water — about 0.0001 liters per question. Comparisons to a full bottle are a well-known internet exaggeration.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
-    {id:"1ai2", text:"Large AI data centers do use meaningful water for cooling at scale — the real debate is per-query impact versus aggregate infrastructure impact.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
-  ],
-  4: [
-    {id:"4a", text:"A parent's post: \"my toddler had a bad reaction within a day of the MMR shot.\"", who:"Friend", detail:"A personal account, no medical background listed — one family's story, not a study.", tactic:null},
-    {id:"4b", text:"HHS statement: the MMR vaccine contains \"millions of DNA fragments.\"", who:"News / institution", detail:"An official statement — official doesn't mean stake-free; this office has taken a public position.", tactic:null},
-    {id:"4c", text:"\"This vaccine is more dangerous than the disease itself,\" says a wellness creator.", who:"Influencer", detail:"610k followers, no medical credentials listed anywhere on the profile.", tactic:null},
-    {id:"4d", text:"An anonymous account reposts vaccine-injury numbers with no source attached.", who:"Can't tell — bot or AI?", detail:"No posting history further back than three days ago.", tactic:null},
-    {id:"4e", text:"CDC vaccine safety monitoring data, updated this year.", who:"News / institution", detail:"A federal health agency's own public dataset — named, dated, checkable yourself.", tactic:"Named, checkable source"},
-    {id:"4f", text:"A Stanford infectious-disease doctor's op-ed rebutting the DNA-fragment claim.", who:"News / institution", detail:"A named, credentialed doctor writing in her own field, under her real name.", tactic:"Named expert, own field"},
-    {id:"4g", text:"The original viral chart placing vaccine side effects next to measles death rates.", who:"Can't tell — bot or AI?", detail:"No named source on the original post — traced only by its chart style.", tactic:"Misleading chart", image:"bar-misleading", reverseSearch:[{label:"Original CDC safety chart", meta:"cdc.gov · published last year", color:"#12221a"},{label:"Same comparison, earlier repost", meta:"posted 8 months ago", color:"#221c12"},{label:"Fact-check breakdown", meta:"posted 1 day ago", color:"#121c22"}]},
-    {id:"4ai1", text:"This is a sensitive health topic — I'd point you to CDC and WHO vaccine safety monitoring data rather than a single anecdotal report or opinion piece.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"4ai2", text:"I can't independently confirm the details of any one post's claims. Cross-checking with a named medical source is the more reliable path here.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
-  ],
-  2: [
-    {id:"2a", text:"A viral chart claims satellite data disproves the climate models entirely.", who:"Can't tell — bot or AI?", detail:"No named source, and the y-axis is cropped right where the trend turns upward.", tactic:"Misleading chart", image:"chart-crop", reverseSearch:[{label:"Original NASA chart", meta:"nasa.gov · 14 months ago", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 6 times this week", color:"#221c12"},{label:"Meteorologist's rebuttal thread", meta:"posted 2 days ago", color:"#121c22"}]},
-    {id:"2b", text:"NASA's public global temperature dataset, plotted without the crop.", who:"News / institution", detail:"NASA's own published dataset — publicly downloadable and checkable.", tactic:"Named, checkable source", image:"chart-full"},
-    {id:"2c", text:"A climate scientist's video walking through exactly what's wrong with the cropped chart.", who:"News / institution", detail:"A named, credentialed researcher explaining the distortion in her own field.", tactic:"Named expert, own field"},
-    {id:"2d", text:"A comment thread just reposting the same chart image with a new caption.", who:"Friend", detail:"A regular commenter adding nothing new to check — same chart, recirculated.", tactic:null},
-    {id:"2ai1", text:"I can't verify a specific chart without seeing the original source and axis labels. Claims that a single chart \"disproves\" broad scientific consensus deserve extra scrutiny.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"2ai2", text:"NASA and NOAA both publish raw temperature datasets you can check directly, rather than relying on a chart shared secondhand.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
-  ],
-  3: [
-    {id:"3a", text:"FIFA's official victory photo, cropped tight at one edge of the frame.", who:"News / institution", detail:"A sports wire photo — the crop is visible if you compare it to the wire's original file.", tactic:"Selective framing", image:"photo-crop", reverseSearch:[{label:"FIFA press feed, uncropped", meta:"fifa.com · same day", color:"#12221a"},{label:"Broadcast footage, wide shot", meta:"official broadcast · same day", color:"#221c12"},{label:"Recropped repost", meta:"posted 3 hours later", color:"#121c22"}]},
-    {id:"3b", text:"Spain's federation photo of the same moment, from a different angle.", who:"News / institution", detail:"A separate photographer's shot, not edited — he'd already stepped out of frame.", tactic:"Named, checkable source", image:"photo-full"},
-    {id:"3c", text:"A fan account claims both photos were \"obviously doctored\" by the federations.", who:"Can't tell — bot or AI?", detail:"Anonymous fan account, no sourcing beyond the claim itself.", tactic:"Unverifiable source"},
-    {id:"3ai1", text:"Based on available reporting, both photos are unedited and simply show different camera angles of the same celebration — there's no evidence of selective cropping.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
-    {id:"3ai2", text:"If you want to verify further, reverse-searching both images can usually surface their original, uncropped versions.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
-  ],
-  5: [
-    {id:"5a", text:"A fact-checking outlet's frame-by-frame comparison shows the clip is spliced from unrelated footage.", who:"News / institution", detail:"A named outlet's own visual analysis, with the source clip identified.", tactic:"Named, checkable source"},
-    {id:"5b", text:"The account that posted it has no activity before this week.", who:"Can't tell — bot or AI?", detail:"Account created six days ago, this is its first viral post.", tactic:null},
-    {id:"5c", text:"The original, unedited footage the clip was spliced from.", who:"News / institution", detail:"Matches a real but unrelated public event from months earlier.", tactic:"Named, checkable source"},
-    {id:"5ai1", text:"Videos can be edited or taken out of context. Without frame-level analysis or the original source, I can't confirm whether this clip is authentic.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"5ai2", text:"Accounts with little posting history before a viral moment are worth extra scrutiny — that's a common pattern with manufactured \"breaking news.\"", who:"AI assistant", detail:null, tactic:null, source:"ai"}
-  ],
-  6: [
-    {id:"6a", text:"NBC's wire report: 50M+ people under heat alerts, wildfires burning.", who:"News / institution", detail:"Standard wire service reporting, with a byline and dateline.", tactic:"Named, checkable source"},
-    {id:"6b", text:"A companion post blaming the heat wave on \"weather manipulation.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, appeared the same day as the real story, riding its attention.", tactic:"Unverifiable source"},
-    {id:"6c", text:"NOAA's public heat advisory map covering the same dates.", who:"News / institution", detail:"A federal agency's own public advisory system — checkable in real time.", tactic:"Named, checkable source"},
-    {id:"6ai1", text:"Multiple wire services are reporting this heat wave with specific figures — independent, named coverage like that is a good reliability signal.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"6ai2", text:"Claims attributing the heat wave to \"weather manipulation\" aren't supported by any research I'm aware of.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
-  ],
-  7: [
-    {id:"7a", text:"An independent lab's test claims to have found a cancer-linked chemical in the brand's products.", who:"News / institution", detail:"One lab's test, cited in the court filings — a real data point, not the whole picture.", tactic:"Cherry picking"},
-    {id:"7b", text:"The FDA's own broader review found different results across most products tested.", who:"News / institution", detail:"A federal review with a wider sample than the lawsuit's single lab.", tactic:"Named, checkable source"},
-    {id:"7c", text:"A comment thread claiming \"everyone already knows this brand is toxic.\"", who:"Friend", detail:"An anecdotal thread with no data cited, just repeated assertion.", tactic:null},
-    {id:"7ai1", text:"Yes — this has been confirmed. The FDA issued a nationwide recall of the product line after the lab results were verified.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
-    {id:"7ai2", text:"Class-action lawsuits like this typically take months or years to resolve, so it's worth checking the case status directly rather than relying on secondhand summaries.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
-  ]
-};
+// CLIPS used to be hand-authored per fictional claim id here. Now it's
+// populated entirely by mapDropCardsToClaims() (from each DEFAULT_DROP_CARDS
+// story's own clips[]) and by wireInvestigationData() (which injects each
+// claim's background as a synthetic clip) — same path a real teacher-published
+// drop already went through. See "var CLAIMS = mapDropCardsToClaims(...)" below.
+var CLIPS = {};
 
 // ---------------- STATE ----------------
 var currentApp = "lobby";      // lobby | round1 | spread | tactics
@@ -807,25 +906,66 @@ var justFiledClaimId = null;
 // one is injected as a regular entry into CLIPS[claimId] (source:"background") —
 // that way findClipById/addToBoard/skipClip/clipState/the board's exhibit list all
 // just work on it for free, same as any Search or Ask AI result.
-CLAIMS.forEach(function(claim){
-  if(!claim.background) return;
-  if(!CLIPS[claim.id]) CLIPS[claim.id] = [];
-  var b = claim.background;
-  CLIPS[claim.id].push({
-    id: "bg-"+claim.id,
-    source: "background",
-    // Used only for the board's exhibit-list summary line — the actual profile
-    // rendering (renderClaimBackground) reads claim.background directly.
-    text: b.displayName+" ("+b.handle+") — "+b.followers+" followers · "+b.joined,
-    detail: null,
-    tactic: null
-  });
-});
-
 var clipState = {};
-Object.keys(CLIPS).forEach(function(id){
-  CLIPS[id].forEach(function(c){ clipState[c.id] = {revealed: (c.source==="ai"||c.source==="background"), who:null, shared:false, skipped:false}; });
-});
+// Shared by the baked-in default drop (called once below, via
+// mapDropCardsToClaims(DEFAULT_DROP_CARDS)) AND by pipeline-sourced claims
+// loaded later at room-join time (see loadDropForRoom) — same "inject
+// background as a CLIPS entry, seed clipState" logic either way, just
+// re-runnable per newly-added claim instead of a one-shot loop.
+function wireInvestigationData(claimsArr){
+  claimsArr.forEach(function(claim){
+    if(!claim.background) return;
+    if(!CLIPS[claim.id]) CLIPS[claim.id] = [];
+    var already = CLIPS[claim.id].some(function(c){ return c.id === "bg-"+claim.id; });
+    if(!already){
+      var b = claim.background;
+      CLIPS[claim.id].push({
+        id: "bg-"+claim.id,
+        source: "background",
+        // Used only for the board's exhibit-list summary line — the actual profile
+        // rendering (renderClaimBackground) reads claim.background directly.
+        text: b.displayName+" ("+b.handle+") — "+b.followers+" followers · "+b.joined,
+        detail: null,
+        tactic: null
+      });
+    }
+  });
+  Object.keys(CLIPS).forEach(function(id){
+    CLIPS[id].forEach(function(c){
+      if(!clipState[c.id]) clipState[c.id] = {revealed: (c.source==="ai"||c.source==="background"), who:null, shared:false, skipped:false};
+    });
+  });
+}
+// Built the same way a real teacher-published drop is (mapDropCardsToClaims,
+// then wireInvestigationData) — the default deck is just a drop that's baked
+// in rather than fetched from Supabase at join time. This keeps the page
+// playable instantly and offline; loadDefaultDeckFromLive() below then tries
+// to upgrade it to the live-generated story_candidates before anyone joins.
+var CLAIMS = mapDropCardsToClaims(DEFAULT_DROP_CARDS);
+wireInvestigationData(CLAIMS);
+// Swaps the baked-in default deck for the live story_candidates table — the
+// same content the teacher console's "Refresh from news" button generates
+// (real NewsData.io headlines + Claude-drafted framings), so "no code? just
+// start a room" and the teacher console draw from one shared source instead
+// of two copies that can drift apart. Guarded on roomCode still being null:
+// once a join is underway, loadDropForRoom() (further down) is the sole
+// owner of CLAIMS, whether it lands on a real published drop or falls
+// through to "whatever CLAIMS already was" — this must not race that.
+// Fails silently to the baked-in DEFAULT_DROP_CARDS deck on any error or an
+// empty table; the page should never depend on this succeeding to be playable.
+function loadDefaultDeckFromLive(){
+  InfodemicSync.getStoryCandidates().then(function(rows){
+    if(roomCode) return;
+    if(rows && rows.length){
+      CLAIMS = mapDropCardsToClaims(rows);
+      wireInvestigationData(CLAIMS);
+      render();
+    }
+  }).catch(function(err){
+    console.warn("loadDefaultDeckFromLive failed, staying on baked-in default deck:", err);
+  });
+}
+loadDefaultDeckFromLive();
 var reverseOpen = {};
 var aiRevealed = {};
 var unlockedTactics = {};
@@ -886,17 +1026,21 @@ function renderLobby(){
   if(!roomCode){
     html += '<div class="r1startbadge">INFODEMIC</div>';
     html += '<div class="r1starttitle">Join the Table</div>';
-    html += '<div class="r1startsub">Enter your name, then create a new room or join one with a code from someone at your table.</div>';
+    html += '<div class="r1startsub">Enter your name and a code. A word like <b>OTTER</b> from a published drop starts your table; a full code like <b>OTTER-4213</b> joins one already running.</div>';
     html += '<input class="lobbyinput" id="lobbyName" placeholder="Your name">';
-    html += '<div class="lobbybtn" onclick="doCreateRoom()">Create a new room</div>';
+    html += '<input class="lobbyinput" id="lobbyCode" placeholder="Code — e.g. OTTER or OTTER-4213" style="text-transform:uppercase;">';
+    html += '<div class="lobbybtn" onclick="doEnterCode()">Go</div>';
     html += '<div class="lobbydivider">— or —</div>';
-    html += '<input class="lobbyinput" id="lobbyCode" placeholder="Room code, e.g. FOX-4213" style="text-transform:uppercase;">';
-    html += '<div class="lobbybtn lobbybtnsecondary" onclick="doJoinRoom()">Join room</div>';
+    html += '<div class="lobbybtn lobbybtnsecondary" onclick="doCreateRoom()">No code? Just start a room</div>';
     if(lobbyStatus.msg) html += '<div class="lobbystatus'+(lobbyStatus.error?' error':'')+'">'+lobbyStatus.msg+'</div>';
   } else {
     html += '<div class="r1startbadge">ROOM CODE — SHARE THIS</div>';
     html += '<div class="lobbyroomcode">'+roomCode+'</div>';
-    html += '<div class="r1startsub">Waiting for your table to join — everyone needs this code.</div>';
+    if(currentDropTitle){
+      html += '<div class="r1startsub">Playing: <b>'+currentDropTitle+'</b> ('+CLAIMS.length+' cards). Waiting for your table to join — everyone needs this code.</div>';
+    } else {
+      html += '<div class="r1startsub">No drop attached — playing the default deck. Waiting for your table to join — everyone needs this code.</div>';
+    }
     html += '<div class="lobbyplayerlist">';
     PLAYERS.forEach(function(p){
       html += '<div class="lobbyplayerrow"><span class="lobbyavatar" style="background:'+p.color+';">'+p.initial+'</span><span>'+p.name+(p.isYou?' (you)':'')+'</span></div>';
@@ -907,6 +1051,9 @@ function renderLobby(){
   html += '</div>';
   document.getElementById("screenArea").innerHTML = html;
 }
+// Ad hoc fallback only now — the primary path is doEnterCode() below. Kept
+// under its own function/button ("No code? Just start a room") rather than
+// removed, matching the standalone lobby's same choice.
 function doCreateRoom(){
   var name = document.getElementById("lobbyName").value.trim();
   if(!name){ lobbyStatus = {msg:"Enter your name first.", error:true}; render(); return; }
@@ -917,13 +1064,16 @@ function doCreateRoom(){
     lobbyStatus = {msg:err.message, error:true}; render();
   });
 }
-function doJoinRoom(){
+// The one real path: a bare drop word mints a fresh table, a full code joins
+// an existing one. Replaces the old separate doCreateRoom/doJoinRoom split
+// for the primary "I have a code" flow. See enterCode() in supabase-sync.js.
+function doEnterCode(){
   var name = document.getElementById("lobbyName").value.trim();
-  var code = document.getElementById("lobbyCode").value.trim().toUpperCase();
+  var code = document.getElementById("lobbyCode").value.trim();
   if(!name){ lobbyStatus = {msg:"Enter your name first.", error:true}; render(); return; }
-  if(!code){ lobbyStatus = {msg:"Enter a room code.", error:true}; render(); return; }
-  lobbyStatus = {msg:"Joining room…", error:false}; render();
-  InfodemicSync.joinRoom(code, name).then(function(result){
+  if(!code){ lobbyStatus = {msg:"Enter a code.", error:true}; render(); return; }
+  lobbyStatus = {msg: /^[A-Za-z]+-\d+$/.test(code) ? "Joining…" : "Looking up that drop…", error:false}; render();
+  InfodemicSync.enterCode(code, name).then(function(result){
     onJoinedRoom(result.code, result.player.id);
   }).catch(function(err){
     lobbyStatus = {msg:err.message, error:true}; render();
@@ -940,7 +1090,76 @@ function onJoinedRoom(code, playerId){
     onPlayersChange: applyPlayers,
     onStateChange: applyRemoteState
   });
+  loadDropForRoom(code);
   render();
+}
+
+// ---- Loading a published drop's real cards into the actual Feed ----
+// This is the piece that was missing: everything up to here proved the room/
+// drop plumbing works, but Round 1 still read the hardcoded CLAIMS array
+// regardless of which drop a room was attached to. Swap CLAIMS wholesale
+// (safe: it's a top-level `var`, and every render path reads it live, not a
+// snapshot taken at load) if — and only if — this room has a real drop.
+// Ad hoc rooms (no drop_id) keep the original hand-authored deck untouched.
+var currentDropTitle = null;
+var HUE_PALETTE = [195,150,30,340,0,25,270,210,60,320];
+function hueForSubject(subject, idx){
+  var h = 0;
+  for(var i=0;i<subject.length;i++) h += subject.charCodeAt(i);
+  return HUE_PALETTE[(h+idx) % HUE_PALETTE.length];
+}
+// Pipeline cards -> the game's CLAIMS shape. subject, hue, sourceUrl, and
+// variants come from the drop as before. As of 8/14/2026 the pipeline also
+// generates Round 2 content (hook, poster background, evidence clips) per
+// card, so `wired` now reflects whether THIS card actually has that content —
+// most will; a card published with no hook/clips (the curator console's own
+// "not every story needs a flag lens" counterweight) stays wired:false and
+// falls through to the game's existing empty-state handling, same as before.
+function mapDropCardsToClaims(cards){
+  return cards.map(function(c, idx){
+    var claimId = 9000 + idx;
+    var mappedClips = (c.clips||[]).map(function(cl){
+      return {
+        id: claimId + "-" + cl.id, source: cl.source, text: cl.text, who: cl.who,
+        detail: cl.detail, tactic: cl.tactic, image: cl.image, reverseSearch: cl.reverseSearch
+      };
+    });
+    // Always set CLIPS[claimId], even to [] — renderClaimSearch does an
+    // unguarded CLIPS[claim.id].filter(...) for any wired claim, so this has
+    // to exist before wired can safely be true.
+    CLIPS[claimId] = mappedClips;
+    return {
+      id: claimId,
+      subject: c.subject,
+      hue: hueForSubject(c.subject || "", idx),
+      sourceUrl: c.sourceUrl || c.url || "",
+      wired: !!(c.hook && mappedClips.length),
+      hook: c.hook || "",
+      background: c.background || null,
+      variants: (c.variants||[]).map(function(v){
+        return { headline: v.claim, source: c.source || "Source", tactic: v.tactic || null };
+      })
+    };
+  });
+}
+function loadDropForRoom(code){
+  InfodemicSync.getDropForRoom(code).then(function(drop){
+    if(drop && drop.cards && drop.cards.length){
+      CLAIMS = mapDropCardsToClaims(drop.cards);
+      // CLIPS[claim.id] for each card is already populated by the map above —
+      // this call only needs to inject each claim's background as a CLIPS
+      // entry and seed clipState, same as the hardcoded deck gets at page load.
+      wireInvestigationData(CLAIMS);
+      currentDropTitle = drop.title;
+    } else {
+      currentDropTitle = null;
+      // CLAIMS stays whatever it already was (the original hardcoded deck) —
+      // no drop means no override.
+    }
+    render();
+  }).catch(function(err){
+    console.error("loadDropForRoom failed", err);
+  });
 }
 function applyPlayers(rows){
   PLAYERS = rows.map(function(r){
@@ -1911,6 +2130,22 @@ function tickClock(){
 }
 setInterval(tickClock, 15000);
 tickClock();
+
+// Auto-join from a ?code=&name= URL, so the standalone lobby's "Play the
+// real game" link can hand off straight into a joined room instead of
+// making people retype the code here.
+(function autoJoinFromURL(){
+  var params = new URLSearchParams(window.location.search);
+  var code = (params.get("code")||"").trim();
+  var name = (params.get("name")||"").trim();
+  if(!code || !name) return;
+  lobbyStatus = {msg:"Joining…", error:false};
+  InfodemicSync.enterCode(code, name).then(function(result){
+    onJoinedRoom(result.code, result.player.id);
+  }).catch(function(err){
+    lobbyStatus = {msg:err.message, error:true}; render();
+  });
+})();
 
 render();
 </script>
