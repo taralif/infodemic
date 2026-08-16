@@ -941,6 +941,13 @@ function wireInvestigationData(claimsArr){
 // in rather than fetched from Supabase at join time. This keeps the page
 // playable instantly and offline; loadDefaultDeckFromLive() below then tries
 // to upgrade it to the live-generated story_candidates before anyone joins.
+// Declared here (not down by hueForSubject/mapDropCardsToClaims, where it
+// conceptually belongs) because this is a `var`, not a function declaration:
+// only the declaration hoists, not the assignment. mapDropCardsToClaims()
+// runs immediately below, so HUE_PALETTE has to already hold its value by
+// this point or hueForSubject() crashes on HUE_PALETTE.length being read
+// off `undefined`.
+var HUE_PALETTE = [195,150,30,340,0,25,270,210,60,320];
 var CLAIMS = mapDropCardsToClaims(DEFAULT_DROP_CARDS);
 wireInvestigationData(CLAIMS);
 // Swaps the baked-in default deck for the live story_candidates table — the
@@ -1102,7 +1109,6 @@ function onJoinedRoom(code, playerId){
 // snapshot taken at load) if — and only if — this room has a real drop.
 // Ad hoc rooms (no drop_id) keep the original hand-authored deck untouched.
 var currentDropTitle = null;
-var HUE_PALETTE = [195,150,30,340,0,25,270,210,60,320];
 function hueForSubject(subject, idx){
   var h = 0;
   for(var i=0;i<subject.length;i++) h += subject.charCodeAt(i);
