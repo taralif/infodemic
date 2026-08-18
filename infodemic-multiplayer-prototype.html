@@ -45,26 +45,60 @@
   }
   .screen-area{position:absolute; inset:0; overflow:hidden; background:var(--ios-bg);}
 
-  /* ---------- CONTEXTUAL ONBOARDING SHEET ---------- */
+  /* ---------- ONBOARDING: full-screen jackbox-style tour ----------
+     Redesigned 8/18/2026 — was a bottom sheet with three text rows per gate, which
+     playtested as easy to skim past without registering (see the mockup discussion
+     with Tara). Now a full-screen, near-opaque takeover, one idea per screen, tap
+     either half to step back/forward. See renderOnboard()/onboardTapZone() in JS. */
   .onboard-scrim{
-    position:absolute; inset:0; z-index:57; display:flex; align-items:flex-end; justify-content:center;
+    position:absolute; inset:0; z-index:57; display:flex; align-items:center; justify-content:center;
     background:rgba(0,0,0,0); opacity:0; pointer-events:none; transition:opacity .25s ease, background .25s ease;
   }
-  .onboard-scrim.active{ opacity:1; pointer-events:auto; background:rgba(0,0,0,.55); }
-  .onboard-sheet{
-    width:100%; background:var(--ios-bg2); border-radius:38px 38px 0 0; padding:14px 26px 34px;
-    transform:translateY(100%); transition:transform .32s cubic-bezier(.22,1,.36,1); box-shadow:0 -10px 40px rgba(0,0,0,.5);
+  .onboard-scrim.active{ opacity:1; pointer-events:auto; background:rgba(0,0,0,.94); }
+  .onboard-full{ width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 30px; text-align:center; cursor:pointer; }
+  .onboard-kicker{ font-size:12.5px; font-weight:700; color:var(--ios-blue); text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }
+  .onboard-big{ font-size:64px; margin-bottom:22px; }
+  .onboard-title{ font-size:26px; font-weight:800; margin-bottom:10px; line-height:1.2; }
+  .onboard-sub{ font-size:15px; color:var(--ios-label2); line-height:1.4; }
+  .onboard-cta{ margin-top:32px; cursor:default; }
+  .onboard-btn{ background:var(--ios-blue); color:#fff; text-align:center; font-size:16px; font-weight:600; padding:13px 28px; border-radius:14px; cursor:pointer; }
+  .onboard-waiting{ font-size:13.5px; color:var(--ios-label2); }
+  .onboard-dots{ position:absolute; bottom:44px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
+  .onboard-dot{ width:6px; height:6px; border-radius:3px; background:rgba(255,255,255,.3); }
+  .onboard-dot.active{ background:#fff; }
+  /* Onboarding "mock" screens (8/18/2026, Investigate only, per Tara): a small
+     recreation of the actual UI element being taught, instead of a generic emoji —
+     literally what you'll see and tap, not an abstraction of it. Reuses real colors
+     (--ios-blue/-green/-bg3/-cardback) so it reads as "this app," not clip art. */
+  .onboardmock{ margin-bottom:22px; position:relative; }
+  .onboardmock-card{
+    width:180px; height:112px; background:var(--ios-cardback); border-radius:20px;
+    border:1px solid rgba(255,255,255,.15); box-shadow:0 14px 30px rgba(0,0,0,.4);
+    position:relative;
   }
-  .onboard-scrim.active .onboard-sheet{ transform:translateY(0); }
-  .onboard-grip{ width:36px; height:5px; border-radius:3px; background:var(--ios-sep); margin:0 auto 18px; }
-  .onboard-kicker{ font-size:12.5px; font-weight:700; color:var(--ios-blue); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; text-align:center; }
-  .onboard-title{ font-size:22px; font-weight:800; text-align:center; margin-bottom:8px; line-height:1.2; }
-  .onboard-sub{ font-size:13.5px; color:var(--ios-label2); text-align:center; line-height:1.4; margin-bottom:22px; padding:0 8px; }
-  .onboard-row{ display:flex; gap:14px; align-items:flex-start; margin-bottom:18px; }
-  .onboard-icon{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; background:var(--ios-bg3); }
-  .onboard-rowtitle{ font-size:14.5px; font-weight:700; margin-bottom:2px; }
-  .onboard-rowdesc{ font-size:12.5px; color:var(--ios-label2); line-height:1.4; }
-  .onboard-btn{ margin-top:6px; background:var(--ios-blue); color:#fff; text-align:center; font-size:16px; font-weight:600; padding:13px; border-radius:14px; cursor:pointer; }
+  .onboardmock-flipcluster{ position:absolute; right:12px; bottom:12px; display:flex; gap:10px; }
+  .onboardmock-nub{
+    width:34px; height:34px; border-radius:50%; background:rgba(20,20,22,.55); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-size:15px;
+    position:relative;
+  }
+  .onboardmock-nub::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35);
+    animation:flippulse 2.4s ease-out infinite;
+  }
+  .onboardmock-tap{ position:absolute; font-size:22px; right:44px; bottom:-6px; animation:onboardtapbounce 1.4s ease-in-out infinite; }
+  @keyframes onboardtapbounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+  .onboardmock-tabs{ display:flex; gap:10px; }
+  .onboardmock-tab{ font-size:14px; font-weight:700; padding:11px 18px; border-radius:13px; background:var(--ios-bg3); color:var(--ios-label2); }
+  .onboardmock-tab.active{ background:var(--ios-blue); color:#fff; }
+  .onboardmock-source{
+    display:inline-flex; align-items:center; gap:7px; font-size:16px; font-weight:700; color:#fff;
+    background:rgba(255,255,255,.14); border-radius:999px; padding:11px 18px;
+  }
+  .onboardmock-chev{ opacity:.65; font-size:12px; }
+  .onboardmock-evidbtn{ background:var(--ios-green); color:#04140a; font-size:15px; font-weight:800; padding:13px 22px; border-radius:12px; }
+  .onboardmock-flow{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .onboardmock-arrow{ font-size:16px; color:var(--ios-label3); }
 
   /* ---------- APP NAV / BODY ---------- */
   .navbar{
@@ -179,8 +213,17 @@
   .cardflip-inner{
     position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.15,.2,1);
     transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
+    /* iPad playtest bug (8/16/2026): back face still showed the front's content on
+       iPad Safari despite the -webkit- prefixes added for the 8/14 mobile fix (see
+       comment above). Forcing this onto its own GPU layer is the standard fix for
+       iPadOS Safari failing to isolate a 3D transform context inside a scroll-snap
+       container — translateZ(0) plus will-change nudges it there reliably where the
+       prefixes alone didn't. Flagging: I can't test actual iPadOS Safari from here,
+       so this needs a real device re-check, not just a code read. */
+    -webkit-transform:translateZ(0); transform:translateZ(0) rotateY(0deg);
+    will-change:transform;
   }
-  .cardflip-inner.flipped{ transform:rotateY(180deg); }
+  .cardflip-inner.flipped{ transform:translateZ(0) rotateY(180deg); -webkit-transform:translateZ(0) rotateY(180deg); }
   .cardface{
     position:absolute; inset:0; border-radius:26px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
     border:1px solid rgba(255,255,255,.07);
@@ -199,7 +242,13 @@
   .cardback-head{
     display:flex; align-items:flex-start; gap:10px; padding:14px 16px 12px; border-bottom:0.5px solid var(--ios-sep); flex:0 0 auto;
   }
-  .cardback-flipclose{ font-size:21px; color:var(--ios-blue); cursor:pointer; flex:0 0 auto; width:24px; line-height:1; margin-top:1px; }
+  /* Playtest note (8/16/2026): this was the only way back to the feed from an open
+     card and nobody spotted it — the front's flipnub gets a pulsing ring (see
+     .flipnub::after above) but this got no equivalent treatment. Same pulse
+     language, just a scale-breathe on the glyph itself since there's no room for
+     a separate ring badge in the header row. */
+  .cardback-flipclose{ font-size:21px; color:var(--ios-blue); cursor:pointer; flex:0 0 auto; width:24px; line-height:1; margin-top:1px; display:inline-block; animation:flipclosepulse 2.4s ease-in-out infinite; }
+  @keyframes flipclosepulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.22);} }
   .cardback-titlewrap{ min-width:0; flex:1; }
   .cardback-subject{ font-size:10px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:3px; }
   .cardback-headline{ font-size:15px; font-weight:700; line-height:1.35; }
@@ -255,6 +304,8 @@
   /* Two nubs side by side — investigate + case board are both story-specific spokes
      that should be visible together on the card, not just one generic flip icon. */
   .flipcluster{ position:absolute; right:14px; bottom:16px; z-index:22; display:flex; gap:12px; }
+  .flipcluster.locked .flipnub{ opacity:.45; }
+  .flipcluster.locked .flipnub::after{ display:none; }
   .flipnub-badge{
     position:absolute; top:-3px; right:-3px; background:var(--ios-green); color:#04140a; font-size:9px; font-weight:800;
     border-radius:999px; padding:1px 5px; border:1.5px solid #141416;
@@ -409,7 +460,8 @@
   .lobbydivider{text-align:center; color:var(--ios-label3); font-size:12px; margin:14px 0;}
   .lobbystatus{font-size:13px; color:var(--ios-label2); margin-top:10px;}
   .lobbystatus.error{color:var(--ios-red);}
-  .lobbyroomcode{font-family:'Space Mono',monospace; font-size:30px; font-weight:800; letter-spacing:2px; color:var(--ios-green); margin:8px 0 20px;}
+  .lobbycodelabel{font-size:11px; font-weight:700; letter-spacing:.8px; color:var(--ios-label3); text-transform:uppercase; margin:18px 0 4px;}
+  .lobbyroomcode{font-family:'Space Mono',monospace; font-size:30px; font-weight:800; letter-spacing:2px; color:var(--ios-green); margin:0 0 20px;}
   .lobbyplayerlist{display:flex; flex-direction:column; gap:8px; width:100%; margin-bottom:22px;}
   .lobbyplayerrow{display:flex; align-items:center; gap:10px; background:var(--ios-bg2); border-radius:10px; padding:10px 14px; font-size:14px; font-weight:600;}
   .lobbyavatar{width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#04140a; flex:0 0 auto;}
@@ -451,6 +503,7 @@
 
   .sectionhead{font-size:12.5px; font-weight:600; color:var(--ios-label2); text-transform:uppercase; letter-spacing:.4px; margin:16px 4px 6px;}
   .sectionhead:first-child{margin-top:0;}
+  .requiredmark{color:var(--ios-orange); font-weight:800;}
   .groupcard{background:var(--ios-bg2); border-radius:12px; overflow:hidden;}
   .resultrow{padding:12px 14px; border-bottom:0.5px solid var(--ios-sep);}
   .resultrow:last-child{border-bottom:none;}
@@ -941,6 +994,13 @@ function wireInvestigationData(claimsArr){
 // in rather than fetched from Supabase at join time. This keeps the page
 // playable instantly and offline; loadDefaultDeckFromLive() below then tries
 // to upgrade it to the live-generated story_candidates before anyone joins.
+// Declared here (not down by hueForSubject/mapDropCardsToClaims, where it
+// conceptually belongs) because this is a `var`, not a function declaration:
+// only the declaration hoists, not the assignment. mapDropCardsToClaims()
+// runs immediately below, so HUE_PALETTE has to already hold its value by
+// this point or hueForSubject() crashes on HUE_PALETTE.length being read
+// off `undefined`.
+var HUE_PALETTE = [195,150,30,340,0,25,270,210,60,320];
 var CLAIMS = mapDropCardsToClaims(DEFAULT_DROP_CARDS);
 wireInvestigationData(CLAIMS);
 // Swaps the baked-in default deck for the live story_candidates table — the
@@ -971,10 +1031,35 @@ var aiRevealed = {};
 var unlockedTactics = {};
 var seenOnboard = {round1:false, investigate:false, board:false, spread:false};
 var pendingOnboard = null;
+// Jackbox-style redesign (8/18/2026, per playtest): full-screen one-idea-at-a-time
+// tour instead of a bottom sheet with three text rows. onboardScreenIdx tracks
+// which screen within the current tour is showing. onboardReady is the synced
+// (via room state, same pattern as claimVotes/board) map of key -> [playerIds who
+// have hit "I'm ready" on that tour's last screen] — see isTeamReady/onboardMarkReady
+// below. Only round1/investigate/board are team-gated; spread stays a per-player,
+// ungated, first-visit tour (see onboardKeyFor) since there's no team action it's
+// protecting, unlike the other three.
+var onboardScreenIdx = 0;
+var onboardReady = {};
 var voteExpanded = {};
 function toggleVoteExpand(claimId){ voteExpanded[claimId] = !voteExpanded[claimId]; render(); }
 var sourceExpanded = {};
 function toggleSource(claimId){ sourceExpanded[claimId] = !sourceExpanded[claimId]; render(); }
+// Playtest note (8/18/2026): tapping the source used to just expand a "via
+// domain.com" line inline — now, once investigation's actually open on this claim,
+// it's a shortcut straight into the Background check tab (same destination as the
+// "Who said it?" onboarding screen teaches). Falls back to the old toggle for
+// claims that don't have an investigation to jump into yet (still voting, agreed,
+// or filed) — same scope as when the flipcluster corner nubs show at all.
+function handleSourceTap(claimId){
+  var claim = claimById(claimId);
+  var board = getBoard(claimId);
+  if(roundState.ended && claimStatus(claim)==="contested" && !board.filed && seenOnboard.investigate){
+    openSpoke(claimId, "background");
+  } else {
+    toggleSource(claimId);
+  }
+}
 
 function findClipById(id){
   var found = null;
@@ -1027,6 +1112,11 @@ function renderLobby(){
     html += '<div class="r1startbadge">INFODEMIC</div>';
     html += '<div class="r1starttitle">Join the Table</div>';
     html += '<div class="r1startsub">Enter your name and a code. A word like <b>OTTER</b> from a published drop starts your table; a full code like <b>OTTER-4213</b> joins one already running.</div>';
+    // Playtest note (8/16/2026): "must play with 2-4 players" wasn't stated anywhere
+    // before people were already mid-lobby, so surface it right at entry. Not
+    // code-enforced (no min/max check in enterGame()) — this is a stated
+    // expectation, not a hard block. Flagging in case Tara wants it enforced too.
+    html += '<div class="r1startsub" style="margin-top:-10px; color:var(--ios-label2); font-weight:600;">Requires 2–4 players per table.</div>';
     html += '<input class="lobbyinput" id="lobbyName" placeholder="Your name">';
     html += '<input class="lobbyinput" id="lobbyCode" placeholder="Code — e.g. OTTER or OTTER-4213" style="text-transform:uppercase;">';
     html += '<div class="lobbybtn" onclick="doEnterCode()">Go</div>';
@@ -1034,7 +1124,12 @@ function renderLobby(){
     html += '<div class="lobbybtn lobbybtnsecondary" onclick="doCreateRoom()">No code? Just start a room</div>';
     if(lobbyStatus.msg) html += '<div class="lobbystatus'+(lobbyStatus.error?' error':'')+'">'+lobbyStatus.msg+'</div>';
   } else {
-    html += '<div class="r1startbadge">ROOM CODE — SHARE THIS</div>';
+    // Playtest note (8/18/2026): once you'd actually joined a room, the game's own
+    // name disappeared entirely — straight to a room code with no branding. Mirrored
+    // to infodemic-hub-spoke-prototype.html's simulated lobby too.
+    html += '<div class="r1startbadge">YOUR TABLE</div>';
+    html += '<div class="r1starttitle">INFODEMIC</div>';
+    html += '<div class="lobbycodelabel">ROOM CODE — SHARE THIS</div>';
     html += '<div class="lobbyroomcode">'+roomCode+'</div>';
     if(currentDropTitle){
       html += '<div class="r1startsub">Playing: <b>'+currentDropTitle+'</b> ('+CLAIMS.length+' cards). Waiting for your table to join — everyone needs this code.</div>';
@@ -1102,7 +1197,6 @@ function onJoinedRoom(code, playerId){
 // snapshot taken at load) if — and only if — this room has a real drop.
 // Ad hoc rooms (no drop_id) keep the original hand-authored deck untouched.
 var currentDropTitle = null;
-var HUE_PALETTE = [195,150,30,340,0,25,270,210,60,320];
 function hueForSubject(subject, idx){
   var h = 0;
   for(var i=0;i<subject.length;i++) h += subject.charCodeAt(i);
@@ -1136,8 +1230,14 @@ function mapDropCardsToClaims(cards){
       wired: !!(c.hook && mappedClips.length),
       hook: c.hook || "",
       background: c.background || null,
+      // Playtest note (8/18/2026): the front card's source pill used to always show
+      // c.source (the underlying outlet, e.g. "TechCrunch") regardless of variant,
+      // while Background Check always examines c.background (a specific account,
+      // e.g. "@AIHypeDaily") — two different names for what's supposed to read as
+      // the same post. Background's handle now wins whenever one exists, since
+      // that's the account Background Check actually opens on.
       variants: (c.variants||[]).map(function(v){
-        return { headline: v.claim, source: c.source || "Source", tactic: v.tactic || null };
+        return { headline: v.claim, source: (c.background && c.background.handle) || c.source || "Source", tactic: v.tactic || null };
       })
     };
   });
@@ -1180,6 +1280,15 @@ function applyRemoteState(state){
     Object.keys(state.board).forEach(function(cid){ BOARD[cid] = state.board[cid]; });
   }
   if(state.roundState && state.roundState.startedAt) adoptSharedStart(state.roundState.startedAt);
+  // Onboarding ready-state (see onboardMarkReady) — a 4th synced field, beyond the
+  // three documented above, so another player's "I'm ready" tap can close out a
+  // teamGated tour on THIS client too, not just theirs.
+  if(state.onboardReady){
+    onboardReady = state.onboardReady;
+    if(pendingOnboard && ONBOARD_CONTENT[pendingOnboard].teamGated && isTeamReady(pendingOnboard) && !seenOnboard[pendingOnboard]){
+      finalizeOnboard(pendingOnboard);
+    }
+  }
   if(currentApp!=="lobby") render();
 }
 function enterGame(){
@@ -1300,11 +1409,16 @@ function castVote(claimId, call){
   // keeps the gut-check moving instead of making players manually scroll each time.
   if(claimVotes[claimId][MY_ID] !== null) scrollToNextCard(claimId);
 }
+// scrollAnimUntil guards the engagement-gravity tick above from rebuilding the
+// feed mid-scroll (see that tick's comment) — 700ms comfortably covers a
+// smooth scrollIntoView over a typical one-card gap.
+var scrollAnimUntil = 0;
 function scrollToNextCard(claimId){
   var current = document.getElementById("slide-"+claimId);
   if(!current || !current.nextElementSibling) return;
   var next = current.nextElementSibling;
   if(typeof next.scrollIntoView === "function"){
+    scrollAnimUntil = Date.now() + 700;
     next.scrollIntoView({behavior:"smooth", block:"start"});
   }
 }
@@ -1351,6 +1465,7 @@ function openApp(name){ currentApp = name; render(); }
 function flipCard(claimId){
   var claim = claimById(claimId);
   if(claimStatus(claim)!=="contested") return;
+  if(!seenOnboard.investigate) return; // whole table clears the Investigate tour before anyone can flip a card open
   claimFlipped[claimId] = !claimFlipped[claimId];
   render();
 }
@@ -1362,6 +1477,7 @@ function flipCard(claimId){
 function openSpoke(claimId, mode){
   var claim = claimById(claimId);
   if(claimStatus(claim)!=="contested") return;
+  if(!seenOnboard.investigate) return; // same gate as flipCard — finalizeOnboard() flips this true before its own hand-off call
   claimFlipped[claimId] = true;
   if(mode) cardMode[claimId] = mode;
   render();
@@ -1369,13 +1485,19 @@ function openSpoke(claimId, mode){
 function setCardMode(claimId, mode){ cardMode[claimId] = mode; render(); }
 
 // ---------------- ROUND 1 RENDER ("For You" immersive feed) ----------------
+// The onboarding tour (see maybeShowOnboard/ONBOARD_CONTENT) covers this screen
+// immediately on entry and now owns starting the round — its last screen's
+// "I'm ready" IS the start action once the whole table's tapped it (see
+// finalizeOnboard). No separate start button here anymore: that button was "whoever
+// taps first, starts for everyone" with no visibility into who was actually ready,
+// which is exactly the "feels like you can play without your team" gap from the
+// 8/16 playtest. This screen is only what's faintly visible behind the tour scrim.
 function renderRound1Start(){
   var html = '<div class="r1start">';
   html += '<div class="r1startbadge">ROUND 1</div>';
   html += '<div class="r1starttitle">Gut Check</div>';
   html += '<div class="r1startsub">'+CLAIMS.length+' stories, one shared 60-second clock. Red, yellow, or green — go with your gut on each one before time runs out.</div>';
-  html += '<div class="r1startbtn" onclick="beginRound1()">▶ Start Round 1</div>';
-  html += '<div class="r1starthint">Everyone at the table starts together — tap when your group is ready.</div>';
+  html += '<div class="r1starthint">Getting your table ready…</div>';
   html += '</div>';
   document.getElementById("screenArea").innerHTML = html;
 }
@@ -1554,9 +1676,10 @@ function renderFeedCard(claim, justSorted, idx){
   // small glassy circles with a soft pulse, not a loud full-width red CTA — modeled on
   // flashcard-app / card-game corners, just now two of them side by side.
   if(roundState.ended && status==="contested" && !board.filed){
-    html += '<div class="flipcluster">';
-    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+')"><div class="flipnub">🔍</div><div class="flipnub-label">dig in</div></div>';
-    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+',\'board\')"><div class="flipnub">🗂️'+(board.board.length>0?('<span class="flipnub-badge">'+board.board.length+'</span>'):'')+'</div><div class="flipnub-label">case</div></div>';
+    var invLocked = !seenOnboard.investigate;
+    html += '<div class="flipcluster'+(invLocked?' locked':'')+'">';
+    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+')"><div class="flipnub">'+(invLocked?'🔒':'🔍')+'</div><div class="flipnub-label">'+(invLocked?'wait':'dig in')+'</div></div>';
+    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+',\'board\')"><div class="flipnub">'+(invLocked?'🔒':('🗂️'+(board.board.length>0?('<span class="flipnub-badge">'+board.board.length+'</span>'):'')))+'</div><div class="flipnub-label">'+(invLocked?'wait':'case')+'</div></div>';
     html += '</div>';
   }
 
@@ -1564,7 +1687,7 @@ function renderFeedCard(claim, justSorted, idx){
   // block on the card. Source is tappable: expands to show which platform it's from.
   html += '<div class="feedbottom">';
   var srcExpanded = !!sourceExpanded[claim.id];
-  html += '<div class="cardsource" onclick="toggleSource('+claim.id+')">🔗 '+variant.source+' <span class="chev">'+(srcExpanded?'▲':'▼')+'</span></div>';
+  html += '<div class="cardsource" onclick="handleSourceTap('+claim.id+')">🔗 '+variant.source+' <span class="chev">'+(srcExpanded?'▲':'▼')+'</span></div>';
   if(srcExpanded) html += '<div class="cardsourceextra">via '+domainFor(claim.sourceUrl)+'</div>';
   html += '<div class="subjecttag">'+claim.subject+'</div>';
   // Once a case is filed, the verdict is the single most important thing about this
@@ -1848,7 +1971,10 @@ function renderClaimBoard(claim){
   // timer tick comments above), so this follows the same targeted-update pattern. In
   // this multiplayer build specifically, syncing only fires on blur (onNoteBlur calls
   // syncBoard), not per keystroke, to avoid hammering Supabase on every character.
-  html += '<div class="sectionhead">Community note</div>';
+  // Playtest note (8/16/2026): players didn't realize this was required to file —
+  // asterisk matches the filebtn's existing disabled-until-note gating below, just
+  // finally surfaced as a visible signal instead of a silent disabled button.
+  html += '<div class="sectionhead">Community note <span class="requiredmark">*</span></div>';
   if(!b.filed){
     html += '<textarea class="communitynote" id="notebox-'+claim.id+'" placeholder="Explain why your table called this the way you did — this gets filed alongside your determination." oninput="onNoteInput('+claim.id+', this.value)" onblur="onNoteBlur('+claim.id+')">'+escapeHtml(b.note||"")+'</textarea>';
   } else {
@@ -2001,74 +2127,133 @@ function renderTactics(){
 }
 
 // ---------------- ONBOARDING ----------------
+// Jackbox-style redesign (8/18/2026): full-screen, one-idea-per-screen tours,
+// replacing the old bottom-sheet-with-three-text-rows version. Only round1 and
+// investigate are teamGated — the whole table has to hit "I'm ready" on the last
+// screen before anyone can proceed (see isTeamReady/onboardMarkReady/finalizeOnboard
+// below), which is what actually gates round1's start and flipping a contested card
+// open. investigate fires as soon as round1 ends with a contested claim on the
+// table. board's tour is NOT teamGated (reversed 8/18/2026, same day as the first
+// pass — Tara didn't want it blocking anyone or making players wait on teammates,
+// so it dismisses per-player like spread while everyone keeps clipping evidence
+// freely) — it does still wait to trigger until some claim's board actually has
+// evidence on it (BOARD_TOUR_EVIDENCE_THRESHOLD, see onboardKeyFor), just doesn't
+// gate anything once it's shown. spread stays ungated and per-player too (first
+// time a player taps that nav icon) since there's no team action it's protecting.
 var ONBOARD_CONTENT = {
-  round1: {
-    kicker:"Round 1", title:"Trust Your Gut",
-    sub:"Call each story before time's up.",
-    rows:[
-      {icon:"🔴", title:"Misinfo", desc:"Made up, false, or misleading."},
-      {icon:"🟡", title:"Biased", desc:"Some truth, but spun or one-sided."},
-      {icon:"🟢", title:"True", desc:"Accurate as far as you can tell."}
-    ]
-  },
-  investigate: {
-    kicker:"Round 2 · Investigate", title:"Flip the Card, Dig Deeper",
-    sub:"Claims your table agreed on get set aside. This one split the room — flip it over to start digging.",
-    rows:[
-      {icon:"🔄", title:"Same story, turned over", desc:"Flip a contested card and Search / Ask AI open right on the back — you never leave the feed."},
-      {icon:"🕵️", title:"Who's behind it?", desc:"An anonymous account and a named expert aren't equally trustworthy — check who's actually talking."},
-      {icon:"🗣️", title:"Bring it to the board", desc:"What you find here feeds into one shared board for this claim — that's where your table actually decides."}
-    ]
-  },
-  board: {
-    kicker:"Stop the Spread", title:"One Shared Board",
-    sub:"Everyone's evidence lands here together. Talk it through, agree on a call, then file it.",
-    rows:[
-      {icon:"🤝", title:"Pool it together", desc:"Evidence from Search and Ask AI collects here regardless of who found it."},
-      {icon:"🎭", title:"See how you were each played", desc:"Once there's evidence on the board, compare everyone's version of this claim side by side — and the specific tactic baked into each one."},
-      {icon:"📮", title:"File when you agree", desc:"Filing is what shifts this claim from spreading to contained on the Spread."}
-    ]
-  },
-  spread: {
-    kicker:"The Spread", title:"Attention, Not Accuracy",
-    sub:"Claims don't grow because they're true — they grow the longer they sit contested.",
-    rows:[
-      {icon:"🔥", title:"Engagement gravity", desc:"Heat climbs on its own for any contested, unfiled claim — that's spread happening in real time."},
-      {icon:"🧯", title:"Filing cools it down", desc:"Once a claim is filed, its heat fades — that's containment."},
-      {icon:"📊", title:"Check back anytime", desc:"The Spread only reflects what's happening below — it never drives it."}
-    ]
-  }
+  round1: {teamGated:true, screens:[
+    {kicker:"ROUND 1", big:"🎯", title:"Trust your gut", sub:"60 seconds. Call every story."},
+    {big:"🔴", title:"Misinfo", sub:"Made up or false"},
+    {big:"🟡", title:"Biased", sub:"Spun, one-sided"},
+    {big:"🟢", title:"True", sub:"Checks out"}
+  ]},
+  investigate: {teamGated:true, screens:[
+    // 8/18/2026 revision, per Tara: the why (title) was landing, the how (sub) wasn't —
+    // each sub now names the literal tap, matching real UI copy where one exists
+    // (e.g. "+ Add to case" is the actual button label on each clip). Same-day
+    // follow-up: `mock` replaces the generic emoji with a small recreation of the
+    // actual UI being described — see the .onboardmock-* CSS block and renderOnboard().
+    {kicker:"ROUND 2", big:"🔄", title:"Investigate", sub:"Tap a card to flip it open",
+      mock:'<div class="onboardmock"><div class="onboardmock-card"><div class="onboardmock-flipcluster"><div class="onboardmock-nub">🔍</div><div class="onboardmock-nub">🗂️</div></div><div class="onboardmock-tap">👆</div></div></div>'},
+    {big:"🔍", title:"Dive deeper", sub:"Tap Search or Ask AI on the card",
+      mock:'<div class="onboardmock"><div class="onboardmock-tabs"><div class="onboardmock-tab active">🔍 Search</div><div class="onboardmock-tab">✨ Ask AI</div></div></div>'},
+    // Tapping the source pill now jumps straight into Background check (see
+    // handleSourceTap) instead of just expanding the domain inline.
+    // Shows both ends of the tap now: the source pill you tap, and the Background
+    // tab it actually lands you on — not just the trigger on its own.
+    {big:"🕵️", title:"Who said it?", sub:"Tap the source — opens background check",
+      mock:'<div class="onboardmock"><div class="onboardmock-flow"><div style="position:relative;"><div class="onboardmock-source">🔗 @AIHypeDaily <span class="onboardmock-chev">▼</span></div><div class="onboardmock-tap" style="right:-6px; bottom:-16px;">👆</div></div><div class="onboardmock-arrow">↓</div><div class="onboardmock-tabs"><div class="onboardmock-tab active">🕵️ Background</div></div></div></div>'},
+    {big:"🗂️", title:"File your evidence", sub:"Tap + Add to case on what holds up",
+      mock:'<div class="onboardmock"><div class="onboardmock-evidbtn">+ Add to case</div></div>'}
+  ]},
+  // Not teamGated (8/18/2026, per Tara — reversed from the first pass): shouldn't
+  // block anything or make anyone wait on teammates. Dismisses per-player with
+  // "Got it," same as spread, while everyone keeps clipping evidence freely.
+  board: {teamGated:false, screens:[
+    {kicker:"STOP THE SPREAD", big:"🗂️", title:"One shared board", sub:"Talk it through, agree, file it"},
+    {big:"🤝", title:"Pool it", sub:"Everyone's evidence, one place"},
+    {big:"🎭", title:"Compare versions", sub:"See how each of you got played"},
+    {big:"📝", title:"Write the note", sub:"Explain your call — required to file"},
+    {big:"📮", title:"File to win", sub:"Agreeing files the case"}
+  ]},
+  spread: {teamGated:false, screens:[
+    {kicker:"THE SPREAD", big:"📊", title:"Attention ≠ accuracy", sub:"It grows the longer it sits contested"},
+    {big:"🔥", title:"Heat climbs", sub:"On its own, while it's unfiled"},
+    {big:"🧯", title:"Filing cools it", sub:"Contained, not just correct"},
+    {big:"👀", title:"Check anytime", sub:"It reflects — it never drives"}
+  ]}
 };
+// Board's tour used to auto-chain right after investigate's, both up front before
+// anyone had gathered anything (8/18/2026, first pass). Revised same day, per Tara:
+// "one shared board" only means something once there's an actual case sitting in
+// front of you — so it now waits until some claim's board has real evidence on it.
+var BOARD_TOUR_EVIDENCE_THRESHOLD = 4;
 function onboardKeyFor(){
   if(currentApp==="round1"){
-    if(!roundState.ended) return "round1";
+    if(!roundState.started) return seenOnboard.round1 ? null : "round1";
+    if(!roundState.ended) return null;
     if(!roundState.readyForR2Popup) return null; // wait for the shuffle to settle first
-    // Board now opens inline (a tab on a flipped card) instead of a separate screen,
-    // so its onboarding sheet triggers off that state instead of currentApp.
-    var anyBoardOpen = Object.keys(claimFlipped).some(function(id){
-      return claimFlipped[id] && cardMode[id]==="board";
-    });
-    if(anyBoardOpen) return "board";
     var hasContested = CLAIMS.some(function(c){ return claimStatus(c)==="contested"; });
-    return hasContested ? "investigate" : null;
+    if(!hasContested) return null;
+    if(!seenOnboard.investigate) return "investigate";
+    if(!seenOnboard.board){
+      var caseReady = CLAIMS.some(function(c){ return getBoard(c.id).board.length >= BOARD_TOUR_EVIDENCE_THRESHOLD; });
+      return caseReady ? "board" : null;
+    }
+    return null;
   }
-  if(currentApp==="spread") return "spread";
+  if(currentApp==="spread") return seenOnboard.spread ? null : "spread";
   return null;
 }
 function maybeShowOnboard(){
   var key = onboardKeyFor();
-  pendingOnboard = (key && !seenOnboard[key]) ? key : null;
+  if(key !== pendingOnboard) onboardScreenIdx = 0;
+  pendingOnboard = key;
   renderOnboard();
 }
-function dismissOnboard(){
-  var wasKey = pendingOnboard;
-  if(pendingOnboard) seenOnboard[pendingOnboard] = true;
+// Whether every current player has hit "I'm ready" on this tour's last screen.
+function isTeamReady(key){
+  var ready = onboardReady[key] || [];
+  if(!PLAYERS.length) return ready.indexOf(MY_ID) !== -1;
+  return PLAYERS.every(function(p){ return ready.indexOf(p.id) !== -1; });
+}
+// Marks this player ready on a teamGated tour and syncs it (same read-modify-write
+// pattern as syncVote/syncBoard). Once the whole table's in, finalizeOnboard() runs
+// for whoever's client notices it happen — either the local player closing the loop
+// on their own tap, or a realtime update from the last other player (see
+// applyRemoteState below).
+function onboardMarkReady(key){
+  if((onboardReady[key]||[]).indexOf(MY_ID) !== -1) return;
+  if(!roomCode){
+    onboardReady[key] = (onboardReady[key]||[]).concat([MY_ID]);
+    if(isTeamReady(key)) finalizeOnboard(key); else render();
+    return;
+  }
+  InfodemicSync.updateRoomState(roomCode, function(state){
+    state.onboardReady = state.onboardReady || {};
+    state.onboardReady[key] = state.onboardReady[key] || [];
+    if(state.onboardReady[key].indexOf(MY_ID)===-1) state.onboardReady[key].push(MY_ID);
+    return state;
+  }).then(function(state){
+    onboardReady = state.onboardReady || onboardReady;
+    if(isTeamReady(key)) finalizeOnboard(key); else render();
+  }).catch(function(e){ console.error("onboard ready sync failed", e); });
+}
+// Closes out a tour once it's actually allowed to close — immediately for an
+// ungated tour (spread's "Got it"), or once the whole team's ready for a gated one.
+// This is also literally what unlocks the thing the tour was gating: starting
+// round1, flipping contested cards, and filing a board all check seenOnboard
+// directly (see beginRound1/flipCard/openSpoke/fileBoard) rather than duplicating
+// the ready-check in three places.
+function finalizeOnboard(key){
+  seenOnboard[key] = true;
   pendingOnboard = null;
-  renderOnboard();
+  onboardScreenIdx = 0;
+  if(key==="round1" && !roundState.started) beginRound1();
   // A clearer hand-off into Round 2: rather than just dropping back into the feed and
   // hoping players notice a corner nub on their own, open the first contested story
   // straight to its "how do you wanna dig in" move menu — same agency, guided start.
-  if(wasKey==="investigate" && currentApp==="round1"){
+  if(key==="investigate" && currentApp==="round1"){
     var firstContested = CLAIMS.find(function(c){ return claimStatus(c)==="contested" && !getBoard(c.id).filed; });
     if(firstContested){
       openSpoke(firstContested.id);
@@ -2078,19 +2263,63 @@ function dismissOnboard(){
       }, 50);
     }
   }
+  // Full render(), not just maybeShowOnboard() — closing board's tour, for instance,
+  // has to redraw the feed itself (unlock the flipcluster lock icons / filebtn label)
+  // not just the onboard scrim, and this is the only render call in that path when
+  // this client is the one whose own "ready" tap completed the team (as opposed to
+  // hearing about it via applyRemoteState, which already renders separately).
+  // render() calls maybeShowOnboard() itself at its end, which is what notices once
+  // the board tour's own trigger condition (enough evidence gathered) is met.
+  render();
+}
+function onboardNext(){
+  if(!pendingOnboard) return;
+  var gate = ONBOARD_CONTENT[pendingOnboard];
+  var isLast = onboardScreenIdx === gate.screens.length - 1;
+  if(!isLast){ onboardScreenIdx++; renderOnboard(); return; }
+  if(gate.teamGated) onboardMarkReady(pendingOnboard);
+  else finalizeOnboard(pendingOnboard);
+}
+function onboardPrev(){
+  if(!pendingOnboard) return;
+  if(onboardScreenIdx > 0){ onboardScreenIdx--; renderOnboard(); }
+}
+function onboardTapZone(e){
+  var rect = e.currentTarget.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  if(x < rect.width/2) onboardPrev(); else onboardNext();
 }
 function renderOnboard(){
   var el = document.getElementById("onboardScrim");
   if(!pendingOnboard){ el.className = "onboard-scrim"; el.innerHTML = ""; return; }
-  var c = ONBOARD_CONTENT[pendingOnboard];
-  var html = '<div class="onboard-sheet"><div class="onboard-grip"></div>';
-  html += '<div class="onboard-kicker">'+c.kicker+'</div>';
-  html += '<div class="onboard-title">'+c.title+'</div>';
-  html += '<div class="onboard-sub">'+c.sub+'</div>';
-  c.rows.forEach(function(r){
-    html += '<div class="onboard-row"><div class="onboard-icon">'+r.icon+'</div><div><div class="onboard-rowtitle">'+r.title+'</div><div class="onboard-rowdesc">'+r.desc+'</div></div></div>';
+  var gate = ONBOARD_CONTENT[pendingOnboard];
+  var s = gate.screens[onboardScreenIdx];
+  var isLast = onboardScreenIdx === gate.screens.length - 1;
+  var html = '<div class="onboard-full" onclick="onboardTapZone(event)">';
+  if(s.kicker) html += '<div class="onboard-kicker">'+s.kicker+'</div>';
+  html += s.mock ? s.mock : ('<div class="onboard-big">'+s.big+'</div>');
+  html += '<div class="onboard-title">'+s.title+'</div>';
+  html += '<div class="onboard-sub">'+s.sub+'</div>';
+  if(isLast){
+    html += '<div class="onboard-cta" onclick="event.stopPropagation();">';
+    if(gate.teamGated){
+      var already = (onboardReady[pendingOnboard]||[]).indexOf(MY_ID) !== -1;
+      if(!already){
+        html += '<div class="onboard-btn" onclick="onboardMarkReady(\''+pendingOnboard+'\')">I\'m ready</div>';
+      } else {
+        var waitingNames = PLAYERS.filter(function(p){ return (onboardReady[pendingOnboard]||[]).indexOf(p.id)===-1; }).map(function(p){ return p.name; });
+        html += '<div class="onboard-waiting">'+(waitingNames.length ? 'Waiting on '+waitingNames.join(", ") : 'Everyone\'s ready — starting…')+'</div>';
+      }
+    } else {
+      html += '<div class="onboard-btn" onclick="onboardNext()">Got it</div>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="onboard-dots">';
+  gate.screens.forEach(function(_, i){
+    html += '<div class="onboard-dot'+(i===onboardScreenIdx?' active':'')+'"></div>';
   });
-  html += '<div class="onboard-btn" onclick="dismissOnboard()">Continue</div></div>';
+  html += '</div></div>';
   el.innerHTML = html;
   el.className = "onboard-scrim active";
 }
@@ -2119,7 +2348,20 @@ setInterval(function(){
   // them just recreates the DOM nodes underneath, which replays their one-shot
   // entrance animations on a loop instead of letting them settle.
   var onSubScreen = roundState.showingTimesUp || revealState.active;
-  if(currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) render();
+  // Playtest bug (8/16/2026): the community note textarea only took a couple
+  // characters before input stopped registering. Root cause was this same tick —
+  // rebuilding the whole feed's innerHTML every 2.2s destroys and recreates the
+  // textarea DOM node, which drops focus entirely (unlike the countdown badge,
+  // there was no targeted-update path for it). Same failure class as the vote
+  // buttons in startTicking() above, just on a longer interval so it read as
+  // "loses input" instead of "takes several taps." Skip the tick while either
+  // the note box has focus or a scrollToNextCard() animation is still in flight
+  // (see scrollAnimUntil below — same rebuild-mid-animation issue was also
+  // cutting off the gut-check's card-to-card scroll).
+  var typingInNote = document.activeElement && document.activeElement.classList &&
+    document.activeElement.classList.contains("communitynote");
+  var scrollingCards = Date.now() < scrollAnimUntil;
+  if((currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) && !typingInNote && !scrollingCards) render();
 }, 2200);
 
 function tickClock(){

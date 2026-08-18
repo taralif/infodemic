@@ -185,6 +185,14 @@ var InfodemicSync = (function () {
   function enterCode(input, name) {
     var raw = (input || "").trim().toUpperCase();
     if (!raw) return Promise.reject(new Error("Enter a code first."));
+    // Playtest note (8/16/2026): players typing on a phone keyboard kept skipping
+    // the dash (e.g. "OTTER4213"), which fell through to the drop-prefix lookup
+    // below and failed. Re-insert it before the full-code check so the dash is
+    // optional on input either way.
+    if (raw.indexOf("-") === -1) {
+      var dashless = raw.match(/^([A-Z]+)(\d+)$/);
+      if (dashless) raw = dashless[1] + "-" + dashless[2];
+    }
     var isFullCode = /^[A-Z]+-\d+$/.test(raw);
     if (isFullCode) {
       return joinRoom(raw, name).then(function (result) {

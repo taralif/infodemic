@@ -45,26 +45,62 @@
   }
   .screen-area{position:absolute; inset:0; overflow:hidden; background:var(--ios-bg);}
 
-  /* ---------- CONTEXTUAL ONBOARDING SHEET ---------- */
+  /* ---------- ONBOARDING: full-screen jackbox-style tour ----------
+     Redesigned 8/18/2026, mirrored from infodemic-multiplayer-prototype.html — was
+     a bottom sheet with three text rows per gate, which playtested as easy to skim
+     past without registering. Now a full-screen, near-opaque takeover, one idea per
+     screen, tap either half to step back/forward. See renderOnboard()/
+     onboardTapZone() in JS. */
   .onboard-scrim{
-    position:absolute; inset:0; z-index:57; display:flex; align-items:flex-end; justify-content:center;
+    position:absolute; inset:0; z-index:57; display:flex; align-items:center; justify-content:center;
     background:rgba(0,0,0,0); opacity:0; pointer-events:none; transition:opacity .25s ease, background .25s ease;
   }
-  .onboard-scrim.active{ opacity:1; pointer-events:auto; background:rgba(0,0,0,.55); }
-  .onboard-sheet{
-    width:100%; background:var(--ios-bg2); border-radius:38px 38px 0 0; padding:14px 26px 34px;
-    transform:translateY(100%); transition:transform .32s cubic-bezier(.22,1,.36,1); box-shadow:0 -10px 40px rgba(0,0,0,.5);
+  .onboard-scrim.active{ opacity:1; pointer-events:auto; background:rgba(0,0,0,.94); }
+  .onboard-full{ width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 30px; text-align:center; cursor:pointer; }
+  .onboard-kicker{ font-size:12.5px; font-weight:700; color:var(--ios-blue); text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }
+  .onboard-big{ font-size:64px; margin-bottom:22px; }
+  .onboard-title{ font-size:26px; font-weight:800; margin-bottom:10px; line-height:1.2; }
+  .onboard-sub{ font-size:15px; color:var(--ios-label2); line-height:1.4; }
+  .onboard-cta{ margin-top:32px; cursor:default; }
+  .onboard-btn{ background:var(--ios-blue); color:#fff; text-align:center; font-size:16px; font-weight:600; padding:13px 28px; border-radius:14px; cursor:pointer; }
+  .onboard-waiting{ font-size:13.5px; color:var(--ios-label2); }
+  .onboard-dots{ position:absolute; bottom:44px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
+  .onboard-dot{ width:6px; height:6px; border-radius:3px; background:rgba(255,255,255,.3); }
+  .onboard-dot.active{ background:#fff; }
+  /* Onboarding "mock" screens (8/18/2026, Investigate only, per Tara, mirrored from
+     infodemic-multiplayer-prototype.html): a small recreation of the actual UI
+     element being taught, instead of a generic emoji — literally what you'll see
+     and tap, not an abstraction of it. Reuses real colors so it reads as "this
+     app," not clip art. */
+  .onboardmock{ margin-bottom:22px; position:relative; }
+  .onboardmock-card{
+    width:180px; height:112px; background:var(--ios-cardback); border-radius:20px;
+    border:1px solid rgba(255,255,255,.15); box-shadow:0 14px 30px rgba(0,0,0,.4);
+    position:relative;
   }
-  .onboard-scrim.active .onboard-sheet{ transform:translateY(0); }
-  .onboard-grip{ width:36px; height:5px; border-radius:3px; background:var(--ios-sep); margin:0 auto 18px; }
-  .onboard-kicker{ font-size:12.5px; font-weight:700; color:var(--ios-blue); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; text-align:center; }
-  .onboard-title{ font-size:22px; font-weight:800; text-align:center; margin-bottom:8px; line-height:1.2; }
-  .onboard-sub{ font-size:13.5px; color:var(--ios-label2); text-align:center; line-height:1.4; margin-bottom:22px; padding:0 8px; }
-  .onboard-row{ display:flex; gap:14px; align-items:flex-start; margin-bottom:18px; }
-  .onboard-icon{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; background:var(--ios-bg3); }
-  .onboard-rowtitle{ font-size:14.5px; font-weight:700; margin-bottom:2px; }
-  .onboard-rowdesc{ font-size:12.5px; color:var(--ios-label2); line-height:1.4; }
-  .onboard-btn{ margin-top:6px; background:var(--ios-blue); color:#fff; text-align:center; font-size:16px; font-weight:600; padding:13px; border-radius:14px; cursor:pointer; }
+  .onboardmock-flipcluster{ position:absolute; right:12px; bottom:12px; display:flex; gap:10px; }
+  .onboardmock-nub{
+    width:34px; height:34px; border-radius:50%; background:rgba(20,20,22,.55); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-size:15px;
+    position:relative;
+  }
+  .onboardmock-nub::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35);
+    animation:flippulse 2.4s ease-out infinite;
+  }
+  .onboardmock-tap{ position:absolute; font-size:22px; right:44px; bottom:-6px; animation:onboardtapbounce 1.4s ease-in-out infinite; }
+  @keyframes onboardtapbounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+  .onboardmock-tabs{ display:flex; gap:10px; }
+  .onboardmock-tab{ font-size:14px; font-weight:700; padding:11px 18px; border-radius:13px; background:var(--ios-bg3); color:var(--ios-label2); }
+  .onboardmock-tab.active{ background:var(--ios-blue); color:#fff; }
+  .onboardmock-source{
+    display:inline-flex; align-items:center; gap:7px; font-size:16px; font-weight:700; color:#fff;
+    background:rgba(255,255,255,.14); border-radius:999px; padding:11px 18px;
+  }
+  .onboardmock-chev{ opacity:.65; font-size:12px; }
+  .onboardmock-evidbtn{ background:var(--ios-green); color:#04140a; font-size:15px; font-weight:800; padding:13px 22px; border-radius:12px; }
+  .onboardmock-flow{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .onboardmock-arrow{ font-size:16px; color:var(--ios-label3); }
 
   /* ---------- APP NAV / BODY ---------- */
   .navbar{
@@ -172,9 +208,16 @@
   /* ---------- CARD FLIP (front = feed card, back = inline investigation) ---------- */
   .cardflip-inner{
     position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.15,.2,1);
-    transform-style:preserve-3d;
+    transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
+    /* iPad playtest bug (8/16/2026, mirrored from infodemic-multiplayer-prototype.html):
+       back face still showed the front's content on iPad Safari. Forcing this onto its
+       own GPU layer is the standard fix for iPadOS Safari failing to isolate a 3D
+       transform context inside a scroll-snap container. Not verified on a real iPad
+       from here — needs a device recheck. */
+    -webkit-transform:translateZ(0); transform:translateZ(0) rotateY(0deg);
+    will-change:transform;
   }
-  .cardflip-inner.flipped{ transform:rotateY(180deg); }
+  .cardflip-inner.flipped{ transform:translateZ(0) rotateY(180deg); -webkit-transform:translateZ(0) rotateY(180deg); }
   .cardface{
     position:absolute; inset:0; border-radius:26px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
     border:1px solid rgba(255,255,255,.07);
@@ -193,7 +236,8 @@
   .cardback-head{
     display:flex; align-items:flex-start; gap:10px; padding:14px 16px 12px; border-bottom:0.5px solid var(--ios-sep); flex:0 0 auto;
   }
-  .cardback-flipclose{ font-size:21px; color:var(--ios-blue); cursor:pointer; flex:0 0 auto; width:24px; line-height:1; margin-top:1px; }
+  .cardback-flipclose{ font-size:21px; color:var(--ios-blue); cursor:pointer; flex:0 0 auto; width:24px; line-height:1; margin-top:1px; display:inline-block; animation:flipclosepulse 2.4s ease-in-out infinite; }
+  @keyframes flipclosepulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.22);} }
   .cardback-titlewrap{ min-width:0; flex:1; }
   .cardback-subject{ font-size:10px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:3px; }
   .cardback-headline{ font-size:15px; font-weight:700; line-height:1.35; }
@@ -249,6 +293,8 @@
   /* Two nubs side by side — investigate + case board are both story-specific spokes
      that should be visible together on the card, not just one generic flip icon. */
   .flipcluster{ position:absolute; right:14px; bottom:16px; z-index:22; display:flex; gap:12px; }
+  .flipcluster.locked .flipnub{ opacity:.45; }
+  .flipcluster.locked .flipnub::after{ display:none; }
   .flipnub-badge{
     position:absolute; top:-3px; right:-3px; background:var(--ios-green); color:#04140a; font-size:9px; font-weight:800;
     border-radius:999px; padding:1px 5px; border:1.5px solid #141416;
@@ -394,6 +440,14 @@
   .r1startsub{font-size:14px; color:var(--ios-label2); line-height:1.55; margin-bottom:30px;}
   .r1startbtn{background:var(--ios-green); color:#04140a; font-size:17px; font-weight:800; padding:16px 34px; border-radius:16px; cursor:pointer; box-shadow:0 8px 24px rgba(48,209,88,.3);}
   .r1starthint{font-size:12px; color:var(--ios-label3); margin-top:18px; line-height:1.5;}
+  /* ---------- SIMULATED LOBBY (8/18/2026) ---------- */
+  .lobbycodelabel{font-size:11px; font-weight:700; letter-spacing:.8px; color:var(--ios-label3); text-transform:uppercase; margin:18px 0 4px;}
+  .lobbyroomcode{font-family:'Space Mono',monospace; font-size:30px; font-weight:800; letter-spacing:2px; color:var(--ios-green); margin:0 0 20px;}
+  .lobbyplayerlist{display:flex; flex-direction:column; gap:8px; width:100%; margin-bottom:6px;}
+  .lobbyplayerrow{display:flex; align-items:center; gap:10px; background:var(--ios-bg2); border-radius:10px; padding:10px 14px; font-size:14px; font-weight:600; transition:opacity .3s ease;}
+  .lobbyplayerrow.pending{opacity:.4;}
+  .lobbyavatar{width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#04140a; flex:0 0 auto;}
+  .lobbypending{margin-left:auto; font-size:11px; color:var(--ios-label3); font-weight:600;}
 
   /* "Time's Up" interstitial between the round ending and the shuffle reveal */
   .r1timesup{
@@ -431,6 +485,7 @@
   .modetab .badge{position:absolute; top:-5px; right:-5px; background:var(--ios-green); color:#04140a; font-size:9px; font-weight:800; border-radius:999px; padding:1px 5px;}
 
   .sectionhead{font-size:12.5px; font-weight:600; color:var(--ios-label2); text-transform:uppercase; letter-spacing:.4px; margin:16px 4px 6px;}
+  .requiredmark{color:var(--ios-orange); font-weight:800;}
   .sectionhead:first-child{margin-top:0;}
   .groupcard{background:var(--ios-bg2); border-radius:12px; overflow:hidden;}
   .resultrow{padding:12px 14px; border-bottom:0.5px solid var(--ios-sep);}
@@ -578,91 +633,192 @@ var PLAYERS = [
   {id:"diego", name:"Diego", initial:"D", color:"#ff9f5a"},
   {id:"priya", name:"Priya", initial:"P", color:"#c583ff"}
 ];
+// ---------------- SIMULATED LOBBY ----------------
+// Auto-playing, no typing/tapping required — see the 8/18/2026 decision in
+// [[infodemic-onboarding-team-gate-rebuild]]-style memory: this file's whole value
+// is being instantly playable, so the lobby is a felt beat, not a gate. Room code is
+// cosmetic (nothing to actually join), and the three simulated teammates "arrive"
+// on a stagger before auto-advancing into Round 1 — same stagger pattern used for
+// the onboarding ready-gate's NPC simulation further down.
+var LOBBY_CODE_WORDS = ["OTTER","FOX","OWL","IVY","JAY","KOI","RAY","SKY","WOLF","HAWK"];
+function generateLobbyCode(){
+  var word = LOBBY_CODE_WORDS[Math.floor(Math.random()*LOBBY_CODE_WORDS.length)];
+  var digits = String(Math.floor(1000+Math.random()*9000));
+  return word+"-"+digits;
+}
+function initLobby(){
+  lobbyCode = generateLobbyCode();
+  PLAYERS.filter(function(p){ return !p.isYou; }).forEach(function(p, i){
+    setTimeout(function(){
+      lobbyJoined.push(p.id);
+      if(currentApp==="lobby") render();
+      if(lobbyJoined.length===PLAYERS.length && !lobbyStarted){
+        lobbyStarted = true;
+        setTimeout(function(){ currentApp = "round1"; render(); }, 650);
+      }
+    }, 550 + i*650 + Math.random()*400);
+  });
+}
+function renderLobby(){
+  var allIn = lobbyJoined.length === PLAYERS.length;
+  var html = '<div class="r1start">';
+  // Playtest note (8/18/2026): the lobby jumped straight to a room code with no
+  // game branding — didn't read as "this is INFODEMIC" at a glance. Title leads now.
+  html += '<div class="r1startbadge">YOUR TABLE</div>';
+  html += '<div class="r1starttitle">INFODEMIC</div>';
+  html += '<div class="lobbycodelabel">ROOM CODE — SHARE THIS</div>';
+  html += '<div class="lobbyroomcode">'+lobbyCode+'</div>';
+  html += '<div class="r1startsub">'+(allIn ? "Everyone\'s in — starting…" : "Waiting for your table to join…")+'</div>';
+  html += '<div class="lobbyplayerlist">';
+  PLAYERS.forEach(function(p){
+    var joined = lobbyJoined.indexOf(p.id) !== -1;
+    html += '<div class="lobbyplayerrow'+(joined?'':' pending')+'">';
+    html += '<span class="lobbyavatar" style="background:'+p.color+';">'+p.initial+'</span>';
+    html += '<span>'+(p.isYou?'You':p.name)+'</span>';
+    if(!joined) html += '<span class="lobbypending">joining…</span>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
 var CALL_META = {
   misinfo:{emoji:"🚩", label:"Misinfo"},
   biased:{emoji:"🤔", label:"Biased"},
   "true":{emoji:"✅", label:"True"}
 };
 
+// Playtest note (8/18/2026): background used to be one fixed object per claim, but
+// each variant already names its OWN distinct account in `source` — the game's
+// "different feeds" twist (variantForPlayer picks a different variant per player).
+// Background Check always read the single claim-level object regardless, so
+// whichever variant you actually landed on, the profile you got often belonged to
+// someone else entirely. Fixed by moving `background` onto each variant — Tara's
+// call: "it should be the source for whatever account that user sees on the main
+// card." `source` is no longer hand-typed per variant (that's what drifted out of
+// sync in the first place) — see the normalization loop right after this array,
+// which derives it from `background.handle` so the two can't disagree again.
 var CLAIMS = [
   {id:1, subject:"Tech", hue:195, sourceUrl:"tiktok.com/@ecofactsdaily/video/74123", wired:true,
     hook:"It's got a scary specific number attached — but where does that stat actually trace back to, and is anyone else reporting it the same way?",
-    background:{handle:"@EcoFactsDaily", displayName:"Eco Facts Daily",
-      bio:"🌍 daily AI + climate facts | not a scientist, just online a lot | 🔁 always sharing, rarely sourcing",
-      verified:false, followers:"3.8M", following:"12", posts:"9,204", joined:"Joined Sep 2019"},
     npcVotes:{maya:"misinfo", diego:"true", priya:"biased"},
     variants:[
-      {headline:"Every question you ask ChatGPT wastes a full bottle of water.", source:"@EcoFactsDaily · 3.8M followers", tactic:"Loaded language"},
-      {headline:"Data centers behind AI chatbots are straining local water supplies, one study finds.", source:"@TechWatchDaily", tactic:"Cherry picking"},
-      {headline:"New study puts real numbers on AI's water footprint — smaller than you'd think per question.", source:"@ScienceQuick", tactic:null}
+      {headline:"Every question you ask ChatGPT wastes a full bottle of water.", tactic:"Loaded language",
+        background:{handle:"@EcoFactsDaily", displayName:"Eco Facts Daily",
+          bio:"🌍 daily AI + climate facts | not a scientist, just online a lot | 🔁 always sharing, rarely sourcing",
+          verified:false, followers:"3.8M", following:"12", posts:"9,204", joined:"Joined Sep 2019"}},
+      {headline:"Data centers behind AI chatbots are straining local water supplies, one study finds.", tactic:"Cherry picking",
+        background:{handle:"@TechWatchDaily", displayName:"Tech Watch Daily",
+          bio:"🖥️ AI industry news & trends, daily | not affiliated with any lab or company",
+          verified:false, followers:"186K", following:"340", posts:"4,510", joined:"Joined Feb 2022"}},
+      {headline:"New study puts real numbers on AI's water footprint — smaller than you'd think per question.", tactic:null,
+        background:{handle:"@ScienceQuick", displayName:"Science Quick",
+          bio:"📚 science news, summarized fast | links to the actual paper every time",
+          verified:true, followers:"540K", following:"210", posts:"7,802", joined:"Joined Nov 2018"}}
     ]},
   {id:2, subject:"Science", hue:150, sourceUrl:"tiktok.com/@climaterealtalk/video/74556", wired:true,
     hook:"A chart moving fast doesn't mean it's the full picture — worth seeing where this version of the data comes from and how other people are reading it.",
-    background:{handle:"@ClimateRealTalk", displayName:"Climate Real Talk",
-      bio:"just asking questions 🌡️ | tired of the mainstream climate narrative | RT ≠ endorsement",
-      verified:false, followers:"412K", following:"1,840", posts:"22,910", joined:"Joined Jan 2021"},
     npcVotes:{maya:"misinfo", diego:"biased", priya:"misinfo"},
     variants:[
-      {headline:"This chart proves scientists are wrong about climate change.", source:"@ClimateRealTalk", tactic:"Misleading chart"},
-      {headline:"Temperatures cooled last decade — so what's with the panic?", source:"@SkepticSightings", tactic:"Cherry picking"},
-      {headline:"A closer look at the viral \"cooling\" chart everyone's sharing.", source:"@FactCheckDaily", tactic:"Named, checkable source"}
+      {headline:"This chart proves scientists are wrong about climate change.", tactic:"Misleading chart",
+        background:{handle:"@ClimateRealTalk", displayName:"Climate Real Talk",
+          bio:"just asking questions 🌡️ | tired of the mainstream climate narrative | RT ≠ endorsement",
+          verified:false, followers:"412K", following:"1,840", posts:"22,910", joined:"Joined Jan 2021"}},
+      {headline:"Temperatures cooled last decade — so what's with the panic?", tactic:"Cherry picking",
+        background:{handle:"@SkepticSightings", displayName:"Skeptic Sightings",
+          bio:"🌡️ questioning the climate consensus, one data point at a time",
+          verified:false, followers:"98K", following:"620", posts:"3,204", joined:"Joined Jun 2020"}},
+      {headline:"A closer look at the viral \"cooling\" chart everyone's sharing.", tactic:"Named, checkable source",
+        background:{handle:"@FactCheckDaily", displayName:"Fact Check Daily",
+          bio:"✅ fact-checking viral claims, sources linked every time",
+          verified:true, followers:"780K", following:"180", posts:"5,940", joined:"Joined Mar 2019"}}
     ]},
   {id:3, subject:"Sports", hue:30, sourceUrl:"instagram.com/worldcupuncut/p/c9x2k", wired:true,
     hook:"Something about this framing feels curated — worth looking at the original photo and what other angles turned up.",
-    background:{handle:"@WorldCupUncut", displayName:"World Cup Uncut",
-      bio:"breaking down the moments everyone's talking about ⚽️👀",
-      verified:false, followers:"89K", following:"340", posts:"612", joined:"Joined 2 weeks ago"},
     npcVotes:{maya:"biased", diego:"biased", priya:"biased"},
     variants:[
-      {headline:"World Cup victory photos are missing one very specific person.", source:"@WorldCupUncut", tactic:"Selective framing"},
-      {headline:"Fans notice a suspicious gap in the championship photo.", source:"@SportsDrama24", tactic:"Loaded language"},
-      {headline:"Why this celebration photo looks different from every angle.", source:"@GameDayInsider", tactic:"Selective framing"}
+      {headline:"World Cup victory photos are missing one very specific person.", tactic:"Selective framing",
+        background:{handle:"@WorldCupUncut", displayName:"World Cup Uncut",
+          bio:"breaking down the moments everyone's talking about ⚽️👀",
+          verified:false, followers:"89K", following:"340", posts:"612", joined:"Joined 2 weeks ago"}},
+      {headline:"Fans notice a suspicious gap in the championship photo.", tactic:"Loaded language",
+        background:{handle:"@SportsDrama24", displayName:"Sports Drama 24",
+          bio:"⚽️🔥 the drama, the takes, the receipts (sometimes)",
+          verified:false, followers:"210K", following:"890", posts:"11,204", joined:"Joined Oct 2021"}},
+      {headline:"Why this celebration photo looks different from every angle.", tactic:"Selective framing",
+        background:{handle:"@GameDayInsider", displayName:"Game Day Insider",
+          bio:"📸 behind-the-scenes sports coverage, every angle",
+          verified:false, followers:"156K", following:"420", posts:"6,120", joined:"Joined Jan 2022"}}
     ]},
   {id:4, subject:"Health", hue:340, sourceUrl:"instagram.com/wellnesswithmara/p/c8m1q", wired:true,
     hook:"Personal stories spread fast and feel convincing — worth checking what the confirmed data actually says, and who else is weighing in.",
-    background:{handle:"@WellnessWithMara", displayName:"Mara ✨ Wellness",
-      bio:"holistic mama of 3 🌿 sharing what the doctors won't tell you | not medical advice",
-      verified:false, followers:"620K", following:"980", posts:"3,140", joined:"Joined Apr 2018"},
     npcVotes:{maya:"misinfo", diego:"true", priya:"true"},
     variants:[
-      {headline:"The measles vaccine is riskier than measles itself.", source:"@WellnessWithMara", tactic:"Loaded language"},
-      {headline:"Parents are sharing vaccine reaction stories the news won't cover.", source:"@ParentVoices", tactic:"Unverifiable source"},
-      {headline:"What the CDC's own data says about MMR vaccine safety.", source:"@HealthLineFacts", tactic:"Named, checkable source"}
+      {headline:"The measles vaccine is riskier than measles itself.", tactic:"Loaded language",
+        background:{handle:"@WellnessWithMara", displayName:"Mara ✨ Wellness",
+          bio:"holistic mama of 3 🌿 sharing what the doctors won't tell you | not medical advice",
+          verified:false, followers:"620K", following:"980", posts:"3,140", joined:"Joined Apr 2018"}},
+      {headline:"Parents are sharing vaccine reaction stories the news won't cover.", tactic:"Unverifiable source",
+        background:{handle:"@ParentVoices", displayName:"Parent Voices",
+          bio:"👨‍👩‍👧 parent-run community | sharing real stories, not medical advice",
+          verified:false, followers:"64K", following:"1,240", posts:"2,890", joined:"Joined Aug 2021"}},
+      {headline:"What the CDC's own data says about MMR vaccine safety.", tactic:"Named, checkable source",
+        background:{handle:"@HealthLineFacts", displayName:"HealthLine Facts",
+          bio:"🩺 health news, straight from the source data",
+          verified:true, followers:"920K", following:"140", posts:"8,410", joined:"Joined May 2017"}}
     ]},
   {id:5, subject:"Politics", hue:0, sourceUrl:"x.com/breakingpoliticsnow/status/19834", wired:true,
     hook:"\"Breaking\" is doing a lot of work in that caption — worth checking when this clip is actually from and who's saying what about it.",
-    background:{handle:"@BreakingPoliticsNow", displayName:"Breaking Politics Now",
-      bio:"🚨 breaking news, first | anonymous team | tips welcome",
-      verified:false, followers:"1.1M", following:"4", posts:"48,302", joined:"Joined Nov 2016"},
     npcVotes:{maya:"misinfo", diego:"misinfo", priya:"true"},
     variants:[
-      {headline:"BREAKING: video shows a senator collapsing getting into a car.", source:"@BreakingPoliticsNow", tactic:"Old footage, new label"},
-      {headline:"This \"breaking\" senator video is older than you think.", source:"@PoliticsWatchdog", tactic:"Named, checkable source"},
-      {headline:"Senator's team stays silent as this clip goes viral again.", source:"@CapitolBuzz", tactic:"Loaded language"}
+      {headline:"BREAKING: video shows a senator collapsing getting into a car.", tactic:"Old footage, new label",
+        background:{handle:"@BreakingPoliticsNow", displayName:"Breaking Politics Now",
+          bio:"🚨 breaking news, first | anonymous team | tips welcome",
+          verified:false, followers:"1.1M", following:"4", posts:"48,302", joined:"Joined Nov 2016"}},
+      {headline:"This \"breaking\" senator video is older than you think.", tactic:"Named, checkable source",
+        background:{handle:"@PoliticsWatchdog", displayName:"Politics Watchdog",
+          bio:"🔍 tracking recycled political clips & misleading timestamps",
+          verified:false, followers:"310K", following:"95", posts:"4,780", joined:"Joined Feb 2020"}},
+      {headline:"Senator's team stays silent as this clip goes viral again.", tactic:"Loaded language",
+        background:{handle:"@CapitolBuzz", displayName:"Capitol Buzz",
+          bio:"🏛️ Capitol Hill buzz, first | unverified tips welcome",
+          verified:false, followers:"445K", following:"310", posts:"9,650", joined:"Joined Jul 2019"}}
     ]},
   {id:6, subject:"Disaster", hue:25, sourceUrl:"nbcnews.com/news/us-news/heat-wave-alerts", wired:true,
     hook:"Numbers like this move fast during a crisis — worth checking who's actually behind the figure and whether other outlets are lining up.",
-    background:{handle:"@NBCNews", displayName:"NBC News",
-      bio:"Breaking news, contextualized. Tips: nbcnews.com/tips",
-      verified:true, followers:"12.4M", following:"1,204", posts:"891,204", joined:"Joined Mar 2007"},
     npcVotes:{maya:"true", diego:"true", priya:"true"},
     variants:[
-      {headline:"Wire reporting: a heat wave has pushed 50M+ people under heat alerts.", source:"NBC News", tactic:"Named, checkable source"},
-      {headline:"50 million under heat alerts as wildfires spread — full coverage.", source:"NBC News · via @WireDailyClips", tactic:"Named, checkable source"},
-      {headline:"Record heat alerts issued — here's what forecasters are saying.", source:"NBC News · via @LocalWeatherNow", tactic:"Named, checkable source"}
+      {headline:"Wire reporting: a heat wave has pushed 50M+ people under heat alerts.", tactic:"Named, checkable source",
+        background:{handle:"@NBCNews", displayName:"NBC News",
+          bio:"Breaking news, contextualized. Tips: nbcnews.com/tips",
+          verified:true, followers:"12.4M", following:"1,204", posts:"891,204", joined:"Joined Mar 2007"}},
+      {headline:"50 million under heat alerts as wildfires spread — full coverage.", tactic:"Named, checkable source",
+        background:{handle:"@WireDailyClips", displayName:"Wire Daily Clips",
+          bio:"🔁 syndicating wire news fast | not a newsroom, just reposting",
+          verified:false, followers:"210K", following:"40", posts:"18,300", joined:"Joined Apr 2018"}},
+      {headline:"Record heat alerts issued — here's what forecasters are saying.", tactic:"Named, checkable source",
+        background:{handle:"@LocalWeatherNow", displayName:"Local Weather Now",
+          bio:"🌤️ local weather updates & alerts, region-wide",
+          verified:false, followers:"88K", following:"120", posts:"6,740", joined:"Joined Sep 2019"}}
     ]},
   {id:7, subject:"Brands", hue:270, sourceUrl:"tiktok.com/@dailyhaul_finds/video/74998", wired:true,
     hook:"One claim, one headline — worth seeing what the actual lawsuit says and how other coverage is framing it.",
-    background:{handle:"@dailyhaul_finds", displayName:"Daily Haul Finds",
-      bio:"your fav products, dupes + drama 🛍️ | shop my finds below 🔗",
-      verified:false, followers:"2.2M", following:"612", posts:"5,430", joined:"Joined Jun 2020"},
     npcVotes:{maya:"misinfo", diego:"biased", priya:"true"},
     variants:[
-      {headline:"A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.", source:"@dailyhaul_finds", tactic:"Cherry picking"},
-      {headline:"Is your skincare routine hiding a cancer risk? What the lawsuit claims.", source:"@BeautyAlertsDaily", tactic:"Loaded language"},
-      {headline:"One lab test, one lawsuit — here's the fuller picture on the skincare claim.", source:"@ConsumerCheckNow", tactic:"Named, checkable source"}
+      {headline:"A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.", tactic:"Cherry picking",
+        background:{handle:"@dailyhaul_finds", displayName:"Daily Haul Finds",
+          bio:"your fav products, dupes + drama 🛍️ | shop my finds below 🔗",
+          verified:false, followers:"2.2M", following:"612", posts:"5,430", joined:"Joined Jun 2020"}},
+      {headline:"Is your skincare routine hiding a cancer risk? What the lawsuit claims.", tactic:"Loaded language",
+        background:{handle:"@BeautyAlertsDaily", displayName:"Beauty Alerts Daily",
+          bio:"💄🚨 beauty product alerts & recalls, daily",
+          verified:false, followers:"340K", following:"560", posts:"7,210", joined:"Joined Dec 2020"}},
+      {headline:"One lab test, one lawsuit — here's the fuller picture on the skincare claim.", tactic:"Named, checkable source",
+        background:{handle:"@ConsumerCheckNow", displayName:"Consumer Check Now",
+          bio:"🔬 consumer product claims, checked against the actual filings",
+          verified:true, followers:"512K", following:"88", posts:"3,960", joined:"Joined Jan 2021"}}
     ]}
 ];
+CLAIMS.forEach(function(c){ c.variants.forEach(function(v){ v.source = v.background.handle; }); });
 function domainFor(url){ return url.split("/")[0]; }
 function claimById(id){ return CLAIMS.find(function(c){ return c.id===id; }); }
 function variantForPlayer(claim, playerId){
@@ -761,7 +917,15 @@ var CLIPS = {
 };
 
 // ---------------- STATE ----------------
-var currentApp = "round1";     // round1 | spread | tactics — no separate "claim" screen anymore
+// Simulated lobby (8/18/2026, per Tara): a quick auto-playing beat before Round 1 —
+// fake room code, teammates "joining" one by one — so this file still reads as a
+// multiplayer game on first glance, without adding any typing/tapping to get into
+// it. Mirrors the real lobby in infodemic-multiplayer-prototype.html visually, but
+// nothing here is real — see scheduleLobbyJoins/renderLobby below.
+var currentApp = "lobby";      // lobby | round1 | spread | tactics — no separate "claim" screen anymore
+var lobbyCode = null;          // generated once at load — see initLobby()
+var lobbyJoined = ["you"];     // player ids who have "joined" — you're always first
+var lobbyStarted = false;      // guards the auto-advance-into-round1 timer from firing twice
 var claimVotes = {};           // claimId -> "misinfo"|"biased"|"true"|null (your R1 vote)
 // Individual investigation (Search/Ask AI) now happens inline, on the back of the same
 // feed card — Jared's "the card turns around" idea. claimFlipped tracks which contested
@@ -787,14 +951,17 @@ var justFiledClaimId = null;
 // that way findClipById/addToBoard/skipClip/clipState/the board's exhibit list all
 // just work on it for free, same as any Search or Ask AI result.
 CLAIMS.forEach(function(claim){
-  if(!claim.background) return;
+  // background now lives per-variant (see the CLAIMS array above) — this seeds the
+  // CLIPS entry from what "you" specifically see on your own card, since that's the
+  // only variant a real single player ever actually investigates here.
+  var b = variantForPlayer(claim, "you").background;
+  if(!b) return;
   if(!CLIPS[claim.id]) CLIPS[claim.id] = [];
-  var b = claim.background;
   CLIPS[claim.id].push({
     id: "bg-"+claim.id,
     source: "background",
     // Used only for the board's exhibit-list summary line — the actual profile
-    // rendering (renderClaimBackground) reads claim.background directly.
+    // rendering (renderClaimBackground) reads the variant's background directly.
     text: b.displayName+" ("+b.handle+") — "+b.followers+" followers · "+b.joined,
     detail: null,
     tactic: null
@@ -810,10 +977,31 @@ var aiRevealed = {};
 var unlockedTactics = {};
 var seenOnboard = {round1:false, investigate:false, board:false, spread:false};
 var pendingOnboard = null;
+// See the ONBOARDING section further down for what these do — onboardScreenIdx is
+// which screen of the current tour is showing, onboardReady/onboardNpcScheduled
+// back the simulated "waiting on your table" ready-gate.
+var onboardScreenIdx = 0;
+var onboardReady = {};
+var onboardNpcScheduled = {};
 var voteExpanded = {};
 function toggleVoteExpand(claimId){ voteExpanded[claimId] = !voteExpanded[claimId]; render(); }
 var sourceExpanded = {};
 function toggleSource(claimId){ sourceExpanded[claimId] = !sourceExpanded[claimId]; render(); }
+// Playtest note (8/18/2026, mirrored from infodemic-multiplayer-prototype.html):
+// tapping the source used to just expand a "via domain.com" line inline — now,
+// once investigation's actually open on this claim, it's a shortcut straight into
+// the Background check tab (same destination as the "Who said it?" onboarding
+// screen teaches). Falls back to the old toggle for claims that don't have an
+// investigation to jump into yet (still voting, agreed, or filed).
+function handleSourceTap(claimId){
+  var claim = claimById(claimId);
+  var board = getBoard(claimId);
+  if(roundState.ended && claimStatus(claim)==="contested" && !board.filed && seenOnboard.investigate){
+    openSpoke(claimId, "background");
+  } else {
+    toggleSource(claimId);
+  }
+}
 
 function findClipById(id){
   var found = null;
@@ -916,11 +1104,16 @@ function castVote(claimId, call){
   // keeps the gut-check moving instead of making players manually scroll each time.
   if(claimVotes[claimId] !== null) scrollToNextCard(claimId);
 }
+// scrollAnimUntil guards the engagement-gravity tick below from rebuilding the
+// feed mid-scroll — mirrors the same fix in infodemic-multiplayer-prototype.html
+// (8/16/2026 playtest: card-to-card jump didn't always work seamlessly).
+var scrollAnimUntil = 0;
 function scrollToNextCard(claimId){
   var current = document.getElementById("slide-"+claimId);
   if(!current || !current.nextElementSibling) return;
   var next = current.nextElementSibling;
   if(typeof next.scrollIntoView === "function"){
+    scrollAnimUntil = Date.now() + 700;
     next.scrollIntoView({behavior:"smooth", block:"start"});
   }
 }
@@ -964,6 +1157,7 @@ function openApp(name){ currentApp = name; render(); }
 function flipCard(claimId){
   var claim = claimById(claimId);
   if(claimStatus(claim)!=="contested") return;
+  if(!seenOnboard.investigate) return; // whole table clears the Investigate tour before anyone can flip a card open
   claimFlipped[claimId] = !claimFlipped[claimId];
   render();
 }
@@ -975,6 +1169,7 @@ function flipCard(claimId){
 function openSpoke(claimId, mode){
   var claim = claimById(claimId);
   if(claimStatus(claim)!=="contested") return;
+  if(!seenOnboard.investigate) return; // same gate as flipCard — finalizeOnboard() flips this true before its own hand-off call
   claimFlipped[claimId] = true;
   if(mode) cardMode[claimId] = mode;
   render();
@@ -982,13 +1177,17 @@ function openSpoke(claimId, mode){
 function setCardMode(claimId, mode){ cardMode[claimId] = mode; render(); }
 
 // ---------------- ROUND 1 RENDER ("For You" immersive feed) ----------------
+// The onboarding tour (see maybeShowOnboard/ONBOARD_CONTENT) covers this screen
+// immediately on entry and now owns starting the round — its last screen's
+// "I'm ready" IS the start action once the whole table's (simulated teammates
+// included) tapped it (see finalizeOnboard). Mirrors the same change in
+// infodemic-multiplayer-prototype.html.
 function renderRound1Start(){
   var html = '<div class="r1start">';
   html += '<div class="r1startbadge">ROUND 1</div>';
   html += '<div class="r1starttitle">Gut Check</div>';
   html += '<div class="r1startsub">'+CLAIMS.length+' stories, one shared 60-second clock. Red, yellow, or green — go with your gut on each one before time runs out.</div>';
-  html += '<div class="r1startbtn" onclick="beginRound1()">▶ Start Round 1</div>';
-  html += '<div class="r1starthint">Everyone at the table starts together — tap when your group is ready.</div>';
+  html += '<div class="r1starthint">Getting your table ready…</div>';
   html += '</div>';
   document.getElementById("screenArea").innerHTML = html;
 }
@@ -1167,9 +1366,10 @@ function renderFeedCard(claim, justSorted, idx){
   // small glassy circles with a soft pulse, not a loud full-width red CTA — modeled on
   // flashcard-app / card-game corners, just now two of them side by side.
   if(roundState.ended && status==="contested" && !board.filed){
-    html += '<div class="flipcluster">';
-    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+')"><div class="flipnub">🔍</div><div class="flipnub-label">dig in</div></div>';
-    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+',\'board\')"><div class="flipnub">🗂️'+(board.board.length>0?('<span class="flipnub-badge">'+board.board.length+'</span>'):'')+'</div><div class="flipnub-label">case</div></div>';
+    var invLocked = !seenOnboard.investigate;
+    html += '<div class="flipcluster'+(invLocked?' locked':'')+'">';
+    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+')"><div class="flipnub">'+(invLocked?'🔒':'🔍')+'</div><div class="flipnub-label">'+(invLocked?'wait':'dig in')+'</div></div>';
+    html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+',\'board\')"><div class="flipnub">'+(invLocked?'🔒':('🗂️'+(board.board.length>0?('<span class="flipnub-badge">'+board.board.length+'</span>'):'')))+'</div><div class="flipnub-label">'+(invLocked?'wait':'case')+'</div></div>';
     html += '</div>';
   }
 
@@ -1177,7 +1377,7 @@ function renderFeedCard(claim, justSorted, idx){
   // block on the card. Source is tappable: expands to show which platform it's from.
   html += '<div class="feedbottom">';
   var srcExpanded = !!sourceExpanded[claim.id];
-  html += '<div class="cardsource" onclick="toggleSource('+claim.id+')">🔗 '+variant.source+' <span class="chev">'+(srcExpanded?'▲':'▼')+'</span></div>';
+  html += '<div class="cardsource" onclick="handleSourceTap('+claim.id+')">🔗 '+variant.source+' <span class="chev">'+(srcExpanded?'▲':'▼')+'</span></div>';
   if(srcExpanded) html += '<div class="cardsourceextra">via '+domainFor(claim.sourceUrl)+'</div>';
   html += '<div class="subjecttag">'+claim.subject+'</div>';
   // Once a case is filed, the verdict is the single most important thing about this
@@ -1377,7 +1577,7 @@ function renderClaimAI(claim){
 // a one-line note), injected into CLIPS as a source:"background" item so it can be
 // marked as evidence and shows up on the shared board exactly like any other exhibit.
 function renderClaimBackground(claim){
-  var b = claim.background;
+  var b = variantForPlayer(claim, "you").background;
   var clipId = "bg-"+claim.id;
   if(!b || !clipState[clipId]) return '<div class="emptystate">No background info for this one yet.</div>';
   var s = clipState[clipId];
@@ -1454,7 +1654,7 @@ function renderClaimBoard(claim){
   // on every keystroke — this file has a documented history of full re-renders stealing
   // focus/cursor position out from under an in-progress interaction (see the Round 1
   // timer tick comments above), so this follows the same targeted-update pattern.
-  html += '<div class="sectionhead">Community note</div>';
+  html += '<div class="sectionhead">Community note <span class="requiredmark">*</span></div>';
   if(!b.filed){
     html += '<textarea class="communitynote" id="notebox-'+claim.id+'" placeholder="Explain why your table called this the way you did — this gets filed alongside your determination." oninput="onNoteInput('+claim.id+', this.value)" onblur="onNoteBlur('+claim.id+')">'+escapeHtml(b.note||"")+'</textarea>';
   } else {
@@ -1605,74 +1805,132 @@ function renderTactics(){
 }
 
 // ---------------- ONBOARDING ----------------
+// Jackbox-style redesign (8/18/2026), mirrored from infodemic-multiplayer-
+// prototype.html: full-screen, one-idea-per-screen tours, replacing the old
+// bottom-sheet-with-three-text-rows version. Only round1 and investigate are
+// teamGated — the whole table has to hit "I'm ready" on the last screen before
+// anyone can proceed — which gates round1's start and flipping a contested card
+// open. investigate fires as soon as round1 ends with a contested claim on the
+// table. board's tour is NOT teamGated (reversed 8/18/2026, same day as the first
+// pass — Tara didn't want it blocking anyone or making players wait on teammates,
+// so it dismisses per-player like spread while everyone keeps clipping evidence
+// freely) — it does still wait to trigger until some claim's board actually has
+// evidence on it (BOARD_TOUR_EVIDENCE_THRESHOLD, see onboardKeyFor), just doesn't
+// gate anything once shown. spread stays ungated and per-player too, first time
+// this player taps that nav icon.
+// This file has no real multiplayer (see PLAYERS above — maya/diego/priya are
+// fixed simulated teammates), so "the team" readying up is simulated locally:
+// scheduleNpcOnboardReady staggers each NPC marking themselves ready a beat after
+// the tour appears, so the "waiting on Diego, Priya" state is visible for a moment
+// instead of jumping straight to Round 1, same felt effect as waiting on real
+// teammates in the multiplayer build.
 var ONBOARD_CONTENT = {
-  round1: {
-    kicker:"Round 1", title:"Trust Your Gut",
-    sub:"Call each story before time's up.",
-    rows:[
-      {icon:"🔴", title:"Misinfo", desc:"Made up, false, or misleading."},
-      {icon:"🟡", title:"Biased", desc:"Some truth, but spun or one-sided."},
-      {icon:"🟢", title:"True", desc:"Accurate as far as you can tell."}
-    ]
-  },
-  investigate: {
-    kicker:"Round 2 · Investigate", title:"Flip the Card, Dig Deeper",
-    sub:"Claims your table agreed on get set aside. This one split the room — flip it over to start digging.",
-    rows:[
-      {icon:"🔄", title:"Same story, turned over", desc:"Flip a contested card and Search / Ask AI open right on the back — you never leave the feed."},
-      {icon:"🕵️", title:"Who's behind it?", desc:"An anonymous account and a named expert aren't equally trustworthy — check who's actually talking."},
-      {icon:"🗣️", title:"Bring it to the board", desc:"What you find here feeds into one shared board for this claim — that's where your table actually decides."}
-    ]
-  },
-  board: {
-    kicker:"Stop the Spread", title:"One Shared Board",
-    sub:"Everyone's evidence lands here together. Talk it through, agree on a call, then file it.",
-    rows:[
-      {icon:"🤝", title:"Pool it together", desc:"Evidence from Search and Ask AI collects here regardless of who found it."},
-      {icon:"🎭", title:"See how you were each played", desc:"Once there's evidence on the board, compare everyone's version of this claim side by side — and the specific tactic baked into each one."},
-      {icon:"📮", title:"File when you agree", desc:"Filing is what shifts this claim from spreading to contained on the Spread."}
-    ]
-  },
-  spread: {
-    kicker:"The Spread", title:"Attention, Not Accuracy",
-    sub:"Claims don't grow because they're true — they grow the longer they sit contested.",
-    rows:[
-      {icon:"🔥", title:"Engagement gravity", desc:"Heat climbs on its own for any contested, unfiled claim — that's spread happening in real time."},
-      {icon:"🧯", title:"Filing cools it down", desc:"Once a claim is filed, its heat fades — that's containment."},
-      {icon:"📊", title:"Check back anytime", desc:"The Spread only reflects what's happening below — it never drives it."}
-    ]
-  }
+  round1: {teamGated:true, screens:[
+    {kicker:"ROUND 1", big:"🎯", title:"Trust your gut", sub:"60 seconds. Call every story."},
+    {big:"🔴", title:"Misinfo", sub:"Made up or false"},
+    {big:"🟡", title:"Biased", sub:"Spun, one-sided"},
+    {big:"🟢", title:"True", sub:"Checks out"}
+  ]},
+  investigate: {teamGated:true, screens:[
+    // 8/18/2026 revision, per Tara (mirrored from infodemic-multiplayer-prototype.html):
+    // the why (title) was landing, the how (sub) wasn't — each sub now names the
+    // literal tap, matching real UI copy where one exists (e.g. "+ Add to case" is
+    // the actual button label on each clip). Same-day follow-up: `mock` replaces the
+    // generic emoji with a small recreation of the actual UI being described — see
+    // the .onboardmock-* CSS block and renderOnboard().
+    {kicker:"ROUND 2", big:"🔄", title:"Investigate", sub:"Tap a card to flip it open",
+      mock:'<div class="onboardmock"><div class="onboardmock-card"><div class="onboardmock-flipcluster"><div class="onboardmock-nub">🔍</div><div class="onboardmock-nub">🗂️</div></div><div class="onboardmock-tap">👆</div></div></div>'},
+    {big:"🔍", title:"Dive deeper", sub:"Tap Search or Ask AI on the card",
+      mock:'<div class="onboardmock"><div class="onboardmock-tabs"><div class="onboardmock-tab active">🔍 Search</div><div class="onboardmock-tab">✨ Ask AI</div></div></div>'},
+    // Tapping the source pill now jumps straight into Background check (see
+    // handleSourceTap) instead of just expanding the domain inline.
+    // Shows both ends of the tap now: the source pill you tap, and the Background
+    // tab it actually lands you on — not just the trigger on its own.
+    {big:"🕵️", title:"Who said it?", sub:"Tap the source — opens background check",
+      mock:'<div class="onboardmock"><div class="onboardmock-flow"><div style="position:relative;"><div class="onboardmock-source">🔗 @AIHypeDaily <span class="onboardmock-chev">▼</span></div><div class="onboardmock-tap" style="right:-6px; bottom:-16px;">👆</div></div><div class="onboardmock-arrow">↓</div><div class="onboardmock-tabs"><div class="onboardmock-tab active">🕵️ Background</div></div></div></div>'},
+    {big:"🗂️", title:"File your evidence", sub:"Tap + Add to case on what holds up",
+      mock:'<div class="onboardmock"><div class="onboardmock-evidbtn">+ Add to case</div></div>'}
+  ]},
+  // Not teamGated (8/18/2026, per Tara — reversed from the first pass, mirrored
+  // from infodemic-multiplayer-prototype.html): shouldn't block anything or make
+  // anyone wait on teammates. Dismisses per-player with "Got it," same as spread,
+  // while everyone keeps clipping evidence freely.
+  board: {teamGated:false, screens:[
+    {kicker:"STOP THE SPREAD", big:"🗂️", title:"One shared board", sub:"Talk it through, agree, file it"},
+    {big:"🤝", title:"Pool it", sub:"Everyone's evidence, one place"},
+    {big:"🎭", title:"Compare versions", sub:"See how each of you got played"},
+    {big:"📝", title:"Write the note", sub:"Explain your call — required to file"},
+    {big:"📮", title:"File to win", sub:"Agreeing files the case"}
+  ]},
+  spread: {teamGated:false, screens:[
+    {kicker:"THE SPREAD", big:"📊", title:"Attention ≠ accuracy", sub:"It grows the longer it sits contested"},
+    {big:"🔥", title:"Heat climbs", sub:"On its own, while it's unfiled"},
+    {big:"🧯", title:"Filing cools it", sub:"Contained, not just correct"},
+    {big:"👀", title:"Check anytime", sub:"It reflects — it never drives"}
+  ]}
 };
+// Board's tour used to auto-chain right after investigate's, both up front before
+// anyone had gathered anything (8/18/2026, first pass). Revised same day, per Tara
+// (mirrored from infodemic-multiplayer-prototype.html): "one shared board" only
+// means something once there's an actual case sitting in front of you, so it now
+// waits until some claim's board has real evidence on it.
+var BOARD_TOUR_EVIDENCE_THRESHOLD = 4;
 function onboardKeyFor(){
   if(currentApp==="round1"){
-    if(!roundState.ended) return "round1";
+    if(!roundState.started) return seenOnboard.round1 ? null : "round1";
+    if(!roundState.ended) return null;
     if(!roundState.readyForR2Popup) return null; // wait for the shuffle to settle first
-    // Board now opens inline (a tab on a flipped card) instead of a separate screen,
-    // so its onboarding sheet triggers off that state instead of currentApp.
-    var anyBoardOpen = Object.keys(claimFlipped).some(function(id){
-      return claimFlipped[id] && cardMode[id]==="board";
-    });
-    if(anyBoardOpen) return "board";
     var hasContested = CLAIMS.some(function(c){ return claimStatus(c)==="contested"; });
-    return hasContested ? "investigate" : null;
+    if(!hasContested) return null;
+    if(!seenOnboard.investigate) return "investigate";
+    if(!seenOnboard.board){
+      var caseReady = CLAIMS.some(function(c){ return getBoard(c.id).board.length >= BOARD_TOUR_EVIDENCE_THRESHOLD; });
+      return caseReady ? "board" : null;
+    }
+    return null;
   }
-  if(currentApp==="spread") return "spread";
+  if(currentApp==="spread") return seenOnboard.spread ? null : "spread";
   return null;
 }
 function maybeShowOnboard(){
   var key = onboardKeyFor();
-  pendingOnboard = (key && !seenOnboard[key]) ? key : null;
+  if(key !== pendingOnboard) onboardScreenIdx = 0;
+  pendingOnboard = key;
+  if(key && ONBOARD_CONTENT[key].teamGated) scheduleNpcOnboardReady(key);
   renderOnboard();
 }
-function dismissOnboard(){
-  var wasKey = pendingOnboard;
-  if(pendingOnboard) seenOnboard[pendingOnboard] = true;
+function isTeamReady(key){
+  var ready = onboardReady[key] || [];
+  return PLAYERS.every(function(p){ return ready.indexOf(p.id) !== -1; });
+}
+// Simulated teammates each mark themselves ready on a staggered delay, once per key
+// (guarded by onboardNpcScheduled) regardless of how many times this key's tour gets
+// recomputed by render().
+function scheduleNpcOnboardReady(key){
+  if(onboardNpcScheduled[key]) return;
+  onboardNpcScheduled[key] = true;
+  PLAYERS.filter(function(p){ return !p.isYou; }).forEach(function(p, i){
+    setTimeout(function(){
+      if((onboardReady[key]||[]).indexOf(p.id) !== -1) return;
+      onboardReady[key] = (onboardReady[key]||[]).concat([p.id]);
+      if(isTeamReady(key)) finalizeOnboard(key); else render();
+    }, 900 + i*700 + Math.random()*500);
+  });
+}
+function onboardMarkReady(key){
+  if((onboardReady[key]||[]).indexOf("you") !== -1) return;
+  onboardReady[key] = (onboardReady[key]||[]).concat(["you"]);
+  if(isTeamReady(key)) finalizeOnboard(key); else render();
+}
+function finalizeOnboard(key){
+  seenOnboard[key] = true;
   pendingOnboard = null;
-  renderOnboard();
+  onboardScreenIdx = 0;
+  if(key==="round1" && !roundState.started) beginRound1();
   // A clearer hand-off into Round 2: rather than just dropping back into the feed and
   // hoping players notice a corner nub on their own, open the first contested story
   // straight to its "how do you wanna dig in" move menu — same agency, guided start.
-  if(wasKey==="investigate" && currentApp==="round1"){
+  if(key==="investigate" && currentApp==="round1"){
     var firstContested = CLAIMS.find(function(c){ return claimStatus(c)==="contested" && !getBoard(c.id).filed; });
     if(firstContested){
       openSpoke(firstContested.id);
@@ -1682,25 +1940,63 @@ function dismissOnboard(){
       }, 50);
     }
   }
+  render(); // notices once the board tour's own trigger condition (enough evidence gathered) is met
+}
+function onboardNext(){
+  if(!pendingOnboard) return;
+  var gate = ONBOARD_CONTENT[pendingOnboard];
+  var isLast = onboardScreenIdx === gate.screens.length - 1;
+  if(!isLast){ onboardScreenIdx++; renderOnboard(); return; }
+  if(gate.teamGated) onboardMarkReady(pendingOnboard);
+  else finalizeOnboard(pendingOnboard);
+}
+function onboardPrev(){
+  if(!pendingOnboard) return;
+  if(onboardScreenIdx > 0){ onboardScreenIdx--; renderOnboard(); }
+}
+function onboardTapZone(e){
+  var rect = e.currentTarget.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  if(x < rect.width/2) onboardPrev(); else onboardNext();
 }
 function renderOnboard(){
   var el = document.getElementById("onboardScrim");
   if(!pendingOnboard){ el.className = "onboard-scrim"; el.innerHTML = ""; return; }
-  var c = ONBOARD_CONTENT[pendingOnboard];
-  var html = '<div class="onboard-sheet"><div class="onboard-grip"></div>';
-  html += '<div class="onboard-kicker">'+c.kicker+'</div>';
-  html += '<div class="onboard-title">'+c.title+'</div>';
-  html += '<div class="onboard-sub">'+c.sub+'</div>';
-  c.rows.forEach(function(r){
-    html += '<div class="onboard-row"><div class="onboard-icon">'+r.icon+'</div><div><div class="onboard-rowtitle">'+r.title+'</div><div class="onboard-rowdesc">'+r.desc+'</div></div></div>';
+  var gate = ONBOARD_CONTENT[pendingOnboard];
+  var s = gate.screens[onboardScreenIdx];
+  var isLast = onboardScreenIdx === gate.screens.length - 1;
+  var html = '<div class="onboard-full" onclick="onboardTapZone(event)">';
+  if(s.kicker) html += '<div class="onboard-kicker">'+s.kicker+'</div>';
+  html += s.mock ? s.mock : ('<div class="onboard-big">'+s.big+'</div>');
+  html += '<div class="onboard-title">'+s.title+'</div>';
+  html += '<div class="onboard-sub">'+s.sub+'</div>';
+  if(isLast){
+    html += '<div class="onboard-cta" onclick="event.stopPropagation();">';
+    if(gate.teamGated){
+      var already = (onboardReady[pendingOnboard]||[]).indexOf("you") !== -1;
+      if(!already){
+        html += '<div class="onboard-btn" onclick="onboardMarkReady(\''+pendingOnboard+'\')">I\'m ready</div>';
+      } else {
+        var waitingNames = PLAYERS.filter(function(p){ return (onboardReady[pendingOnboard]||[]).indexOf(p.id)===-1; }).map(function(p){ return p.name; });
+        html += '<div class="onboard-waiting">'+(waitingNames.length ? 'Waiting on '+waitingNames.join(", ") : 'Everyone\'s ready — starting…')+'</div>';
+      }
+    } else {
+      html += '<div class="onboard-btn" onclick="onboardNext()">Got it</div>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="onboard-dots">';
+  gate.screens.forEach(function(_, i){
+    html += '<div class="onboard-dot'+(i===onboardScreenIdx?' active':'')+'"></div>';
   });
-  html += '<div class="onboard-btn" onclick="dismissOnboard()">Continue</div></div>';
+  html += '</div></div>';
   el.innerHTML = html;
   el.className = "onboard-scrim active";
 }
 
 // ---------------- MASTER RENDER ----------------
 function render(){
+  if(currentApp==="lobby"){ renderLobby(); return; }
   if(currentApp==="round1") renderRound1();
   else if(currentApp==="spread") renderSpread();
   else if(currentApp==="tactics") renderTactics();
@@ -1722,7 +2018,14 @@ setInterval(function(){
   // them just recreates the DOM nodes underneath, which replays their one-shot
   // entrance animations on a loop instead of letting them settle.
   var onSubScreen = roundState.showingTimesUp || revealState.active;
-  if(currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) render();
+  // Mirrors the multiplayer file's fix (8/16/2026 playtest): the community note
+  // textarea only took a couple characters before losing focus, and the gut-check's
+  // card-to-card scroll got cut off mid-animation — both caused by this tick's full
+  // render() rebuilding the DOM node underneath an in-progress interaction.
+  var typingInNote = document.activeElement && document.activeElement.classList &&
+    document.activeElement.classList.contains("communitynote");
+  var scrollingCards = Date.now() < scrollAnimUntil;
+  if((currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) && !typingInNote && !scrollingCards) render();
 }, 2200);
 
 function tickClock(){
@@ -1734,6 +2037,7 @@ function tickClock(){
 setInterval(tickClock, 15000);
 tickClock();
 
+initLobby();
 render();
 </script>
 </body>
