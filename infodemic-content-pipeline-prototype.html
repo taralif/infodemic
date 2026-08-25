@@ -92,6 +92,13 @@
   .mixlabels{display:flex; justify-content:space-between; font-size:11px; color:var(--dim); margin-bottom:14px;}
   .subject-chips{display:flex; flex-wrap:wrap; gap:6px;}
 
+  .round-guide{
+    font-size:12.5px; line-height:1.6; color:var(--faint); background:var(--panel2);
+    border:1px solid var(--grid); border-left:3px solid var(--blue);
+    border-radius:10px; padding:11px 13px; margin:0 0 14px;
+  }
+  .round-guide b{ color:var(--ink); font-weight:700; }
+  .count .off-target{ color:var(--faint); }
   .publish-box{text-align:center;}
   .publish-hint{font-size:12px; color:var(--faint); margin-top:10px; line-height:1.5;}
   .code-display{
@@ -147,7 +154,7 @@
 </header>
 
 <div class="strip">
-  <b>How this works:</b> pick your topics — the round builds itself, no per-story approving needed. Swap out anything you don't want, then publish. You never choose how a story gets framed; the game's AI personalizes that per player from the pro-tip tactic taxonomy — that's generated at publish time, not something to review here.
+  <b>How this works:</b> pick your topics — the round builds itself, no per-story approving needed. Swap out anything you don't want, then publish. You never choose how a story gets framed; the game's AI personalizes that per player from the Tells taxonomy — that's generated at publish time, not something to review here.
 </div>
 
 <section class="topicpicker">
@@ -172,6 +179,15 @@
     <div class="round-head">
       <h2>This round</h2>
       <span class="count" id="round-count"></span>
+    </div>
+    <!-- Guidance, not a limit (Tara, 8/24/2026): a table with no code gets 5 stories,
+         and 5 is the length the round is paced around. The curator can publish more
+         or fewer - this says what's recommended without taking the choice away. -->
+    <div class="round-guide" id="round-guide">
+      <b>5 stories is a good number to aim for.</b> That's what a table gets when they
+      start without a code, and it's about one round's worth of attention — enough for
+      the split between versions to show up, short enough to finish and file. You can
+      publish more or fewer; it's your call.
     </div>
     <div id="round-list"></div>
     <div id="addback-wrap"></div>
@@ -214,6 +230,27 @@
 <div class="footnote"><b>Live-connected as of 8/13/2026:</b> Publish writes a real <code>drops</code> row to the shared Supabase project (the same one the multiplayer lobby uses), and the word it returns is immediately joinable there — enter it in the game itself (<code>infodemic-multiplayer-prototype.html</code>) and a table spins up for real, straight into Round 1 with your real content. What's still mocked: the 10 stories are hand-written data standing in for a NewsData.io free-tier pull (the API recommended for this pipeline — see <code>personalization-data-model-sketch.md</code>), and each story's AI framings — plus, as of 8/14/2026, each story's Round 2 investigation content (hook, poster persona, evidence clips) — are pre-drafted rather than generated live, so we could pressure-test the <i>mechanic</i> before wiring a real key or a live drafting model. 9 of 10 stories carry full Round 2 content now; story 9 stays intentionally unwired as the "not every story needs a flag lens" counterweight, and shows the game's existing empty state for it. The curator's job stays narrowed on purpose: pick topics, optionally swap a story out, publish — nothing about how any story gets framed for any given player, and nothing about approving stories one by one. Matches <code>curation-charter.md</code>'s "AI-drafted, human-vetted" model: publishing here is a first draft, not a ship — Tara's vetting pass (source-checking, freshness, mix quotas, hard exclusions) still applies before anything reaches players. Publish only ever produces the word (the prefix); the number after it is minted for real by whichever player enters that word first at each table, per the sketch's join scheme.</div>
 
 <script>
+var TELL_NAMES = {
+  "made-to-feel-it": "Written to make you feel it",
+  "everyones-doing-it": "Everyone\u2019s already doing it",
+  "rushing-you": "Rushing you",
+  "only-two-choices": "Only two choices",
+  "what-about-them": "What about them",
+  "chart-cut-to-fit": "A real chart, cut to fit",
+  "paid-to-say-it": "Paid to say it",
+  "no-way-to-check": "No way to check it",
+  "old-clip-new-caption": "Old clip, new caption",
+  "cropped-out-the-rest": "Cropped out the rest",
+  "it-was-a-joke": "It was a joke",
+  "one-number-not-the-set": "One number, not the whole set",
+  "machine-made-this": "A machine made this",
+  "go-look-yourself": "You can go look yourself",
+  "someone-whod-know": "Someone who\u2019d actually know",
+  "two-who-didnt-talk": "Two who didn\u2019t talk to each other",
+  "they-fixed-it": "They fixed it themselves"
+};
+function tellName(key){ return TELL_NAMES[key] || key; }
+
 // Fallback content — see "Live story source" block below for how this gets
 // replaced by real generate-drop-candidates output once it exists.
 var MOCK_STORIES = [
@@ -222,20 +259,21 @@ var MOCK_STORIES = [
     headline:"OpenAI says ChatGPT usage hit an all-time high ahead of its fall product launch",
     url:"techcrunch.com/2026/08/09/chatgpt-usage-record",
     hook:"\"Everyone's switched\" is doing a lot of work in that post — worth checking what the actual usage report says and whether anyone else is reporting the same surge.",
-    background:{handle:"@AIHypeDaily", displayName:"AI Hype Daily", bio:"Breaking AI news 24/7 🤖 not affiliated with any company", verified:false, followers:"412K", following:892, posts:6104, joined:"Mar 2023"},
+    background:{ funding:[{k:"Who's behind it", v:"No company named — the bio only says “not affiliated”"},{k:"How it makes money", v:"Ad revenue on posts, plus a tip jar"},{k:"Paid posts tagged?", v:"No paid tags on any recent post"}],handle:"@AIHypeDaily", displayName:"AI Hype Daily", bio:"Breaking AI news 24/7 🤖 not affiliated with any company", verified:false, followers:"412K", following:892, posts:6104, joined:"Mar 2023"},
     clips:[
-      {id:"a", text:"AI Hype Daily's post: \"Everyone's already switched to the new ChatGPT — miss this update and you're behind.\"", who:"Influencer", detail:"412K followers, no data linked, no byline beyond the account itself.", tactic:null},
-      {id:"b", text:"TechCrunch's actual report: usage hit an all-time high, framed around the upcoming fall launch — not a claim that \"everyone\" switched.", who:"News / institution", detail:"Named outlet, dated, links back to OpenAI's own usage numbers.", tactic:"Named, checkable source"},
-      {id:"c", text:"A reply thread pointing out plenty of people still use older AI tools, or none at all.", who:"Friend", detail:"Anecdotal, but a useful check against \"everyone.\"", tactic:null},
-      {id:"d", text:"An account reposting the same \"you're behind\" language with a different app's name swapped in last month.", who:"Can't tell — bot or AI?", detail:"Same phrasing recycled across unrelated launches — a template, not a fact.", tactic:"Unverifiable source"},
+      {id:"a", text:"AI Hype Daily's post: \"Everyone's already switched to the new ChatGPT — miss this update and you're behind.\"", who:"Influencer", detail:"412K followers, no data linked, no byline beyond the account itself.", tell:null},
+      {id:"b", text:"TechCrunch's actual report: usage hit an all-time high, framed around the upcoming fall launch — not a claim that \"everyone\" switched.", who:"News / institution", detail:"Named outlet, dated, links back to OpenAI's own usage numbers.", tell:"go-look-yourself"},
+      {id:"c", text:"A reply thread pointing out plenty of people still use older AI tools, or none at all.", who:"Friend", detail:"Anecdotal, but a useful check against \"everyone.\"", tell:null},
+      {id:"d", text:"An account reposting the same \"you're behind\" language with a different app's name swapped in last month.", who:"Can't tell — bot or AI?", detail:"Same phrasing recycled across unrelated launches — a template, not a fact.", tell:"no-way-to-check"},
       {id:"ai1", text:"A single usage-record report doesn't establish that \"everyone\" switched — usage highs and universal adoption are different claims.", source:"ai"},
       {id:"ai2", text:"Worth checking whether the record is measured in total users, active users, or something narrower before treating it as a consensus signal.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named checkable source", cat:"hygiene",
+      {tell:"go-look-yourself", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"Three reporters, named with contact emails"},{k:"How it makes money", v:"Reader subscriptions"},{k:"Paid posts tagged?", v:"Yes; none in three months"}],handle:"@PlainTechDesk", displayName:"Plain Tech Desk", bio:"tech news minus the hype · we link the report every time", verified:true, followers:"94K", following:118, posts:"4,720", joined:"Joined Apr 2018"},
        claim:"ChatGPT usage just hit an all-time high, a tech outlet reports.",
        note:"Straight paraphrase, one named outlet, nothing added — a plain, checkable card."},
-      {tactic:"Bandwagon", cat:"flag",
+      {tell:"everyones-doing-it", cat:"red",
        claim:"Everyone's already switched to ChatGPT — you're behind if you haven't.",
        note:"The source is just a usage stat. “Everyone's already switched” and “you're behind” are pressure this card invents, not something reported."}
     ]
@@ -245,19 +283,20 @@ var MOCK_STORIES = [
     headline:"NOAA: August 2026 ranks among the hottest on record across the Southeast",
     url:"apnews.com/2026/08/11/noaa-southeast-heat-record",
     hook:"This chart's climbing hard right at the edge of the frame — worth checking where it's cropped and what the uncropped version actually shows.",
-    background:{handle:"@ClimateSignal", displayName:"Climate Signal", bio:"Data doesn't lie 📊 independent analysis", verified:false, followers:"88K", following:340, posts:2210, joined:"Jan 2022"},
+    background:{ funding:[{k:"Who's behind it", v:"No owner named. “Independent analysis” is the only claim."},{k:"How it makes money", v:"Donations and a paid data newsletter"}],handle:"@ClimateSignal", displayName:"Climate Signal", bio:"Data doesn't lie 📊 independent analysis", verified:false, followers:"88K", following:340, posts:2210, joined:"Jan 2022"},
     clips:[
-      {id:"a", text:"Climate Signal's chart, cropped tight where the line turns sharply upward, captioned \"this proves it's the hottest ever, anywhere.\"", who:"Can't tell — bot or AI?", detail:"No named source on the chart, and the axis labels are cut off at the crop.", tactic:"Misleading chart", image:"chart-crop", reverseSearch:[{label:"NOAA's full regional dataset", meta:"noaa.gov · published this week", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 9 times this week", color:"#221c12"},{label:"Meteorologist's breakdown", meta:"posted yesterday", color:"#121c22"}]},
-      {id:"b", text:"NOAA's own dataset, uncropped: August 2026 ranks among the hottest on record — for the Southeast specifically, not \"anywhere.\"", who:"News / institution", detail:"A federal agency's public dataset, dated and downloadable.", tactic:"Named, checkable source", image:"chart-full"},
-      {id:"c", text:"AP wire coverage of the same NOAA data, independently confirming the regional framing.", who:"News / institution", detail:"A second, separately reported source lining up with NOAA's own numbers.", tactic:"Named, checkable source"},
+      {id:"a", text:"Climate Signal's chart, cropped tight where the line turns sharply upward, captioned \"this proves it's the hottest ever, anywhere.\"", who:"Can't tell — bot or AI?", detail:"No named source on the chart, and the axis labels are cut off at the crop.", tell:"chart-cut-to-fit", image:"chart-crop", reverseSearch:[{label:"NOAA's full regional dataset", meta:"noaa.gov · published this week", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 9 times this week", color:"#221c12"},{label:"Meteorologist's breakdown", meta:"posted yesterday", color:"#121c22"}]},
+      {id:"b", text:"NOAA's own dataset, uncropped: August 2026 ranks among the hottest on record — for the Southeast specifically, not \"anywhere.\"", who:"News / institution", detail:"A federal agency's public dataset, dated and downloadable.", tell:"go-look-yourself", image:"chart-full"},
+      {id:"c", text:"AP wire coverage of the same NOAA data, independently confirming the regional framing.", who:"News / institution", detail:"A second, separately reported source lining up with NOAA's own numbers.", tell:"go-look-yourself"},
       {id:"ai1", text:"Claims that a single chart proves something is true \"anywhere\" are worth extra scrutiny — regional records and global records are different claims.", source:"ai"},
       {id:"ai2", text:"NOAA publishes the underlying dataset directly, so a cropped repost isn't the only way to check this.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Independent confirmation", cat:"hygiene",
+      {tell:"two-who-didnt-talk", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"A weather company; its meteorologists are named"},{k:"How it makes money", v:"App subscriptions"},{k:"Paid posts tagged?", v:"Sponsored forecasts are labelled"}],handle:"@StormDeskLive", displayName:"Storm Desk", bio:"wildfire + heat updates pulled straight from NOAA and the wires", verified:true, followers:"212K", following:76, posts:"11,308", joined:"Joined Feb 2016"},
        claim:"This August ranks among the Southeast's hottest on record, data confirms.",
        note:"Two independent sources (NOAA + AP) point the same way — that convergence is what “independent confirmation” means."},
-      {tactic:"Misleading chart", cat:"flag",
+      {tell:"chart-cut-to-fit", cat:"red",
        claim:"This chart proves it's the hottest month ever recorded — anywhere.",
        note:"Real NOAA data, stretched: “among the hottest on record, one region” becomes “hottest ever, everywhere” by dropping the fine print."}
     ]
@@ -267,20 +306,21 @@ var MOCK_STORIES = [
     headline:"CDC updates recommended flu vaccine formulation for the 2026–27 season",
     url:"reuters.com/health/2026/08/08/cdc-flu-vaccine-update",
     hook:"\"Quietly\" and \"no one's supposed to notice\" are strong words for a routine update — worth checking what the actual advisory process looks like.",
-    background:{handle:"@HealthWatchNow", displayName:"Health Watch Now", bio:"Asking questions the mainstream won't 💉👀", verified:false, followers:"156K", following:1204, posts:3877, joined:"Jun 2021"},
+    background:{ funding:[{k:"Who's behind it", v:"No organisation named"},{k:"How it makes money", v:"Supplement affiliate links in the bio"},{k:"Paid posts tagged?", v:"No ad tags on the supplement posts"}],handle:"@HealthWatchNow", displayName:"Health Watch Now", bio:"Asking questions the mainstream won't 💉👀", verified:false, followers:"156K", following:1204, posts:3877, joined:"Jun 2021"},
     clips:[
-      {id:"a", text:"Health Watch Now's post: \"CDC quietly rewrites vaccine rules again — and no one's supposed to notice.\"", who:"Influencer", detail:"156K followers, no link to any CDC document or meeting record.", tactic:null},
-      {id:"b", text:"CDC's own advisory panel meeting notes, publicly posted, recommending this year's flu formulation update.", who:"News / institution", detail:"A named federal panel, meeting on a public, published schedule — not quiet at all.", tactic:"Named, checkable source"},
-      {id:"c", text:"Reuters Health's report on the update, citing the same public meeting.", who:"News / institution", detail:"Independent wire coverage lining up with CDC's own record.", tactic:"Named, checkable source"},
-      {id:"d", text:"A comment thread repeating \"no one's supposed to notice\" with no new information added.", who:"Friend", detail:"Just recirculating the same phrase, not a new source.", tactic:null},
+      {id:"a", text:"Health Watch Now's post: \"CDC quietly rewrites vaccine rules again — and no one's supposed to notice.\"", who:"Influencer", detail:"156K followers, no link to any CDC document or meeting record.", tell:null},
+      {id:"b", text:"CDC's own advisory panel meeting notes, publicly posted, recommending this year's flu formulation update.", who:"News / institution", detail:"A named federal panel, meeting on a public, published schedule — not quiet at all.", tell:"go-look-yourself"},
+      {id:"c", text:"Reuters Health's report on the update, citing the same public meeting.", who:"News / institution", detail:"Independent wire coverage lining up with CDC's own record.", tell:"go-look-yourself"},
+      {id:"d", text:"A comment thread repeating \"no one's supposed to notice\" with no new information added.", who:"Friend", detail:"Just recirculating the same phrase, not a new source.", tell:null},
       {id:"ai1", text:"Annual flu vaccine formulation updates are a routine, publicly documented CDC process — not evidence of anything being hidden.", source:"ai"},
       {id:"ai2", text:"Words like \"quietly\" and \"no one's supposed to notice\" are worth noticing themselves — they're doing persuasive work, not reporting a new fact.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named expert, own field", cat:"hygiene",
+      {tell:"someone-whod-know", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"A public-health nurse; licence number in the bio"},{k:"How it makes money", v:"No ads. She calls it a side project."}],handle:"@PublicHealthPlain", displayName:"Public Health, Plainly", bio:"what the health agencies actually published, in normal words · links included", verified:false, followers:"77K", following:204, posts:"3,142", joined:"Joined Sep 2017"},
        claim:"CDC's advisory panel just updated this year's flu shot formula.",
        note:"Routine annual process, attributed to the body whose actual job this is."},
-      {tactic:"Loaded language", cat:"flag",
+      {tell:"made-to-feel-it", cat:"red",
        claim:"CDC quietly rewrites vaccine rules again — no one's supposed to notice.",
        note:"Same routine annual update; “quietly” and “no one's supposed to notice” imply secrecy the source never claimed."}
     ]
@@ -290,19 +330,20 @@ var MOCK_STORIES = [
     headline:"Eastview High advances to state football semifinal after 21-14 win",
     url:"localnews.example/sports/2026/08/10/eastview-semifinal",
     hook:"A semifinal win got turned into a championship claim overnight — worth checking what actually happened on the field.",
-    background:{handle:"@EastviewNationHype", displayName:"Eastview Nation", bio:"#1 fan account 🏈 GO EAGLES", verified:false, followers:"4.1K", following:210, posts:966, joined:"Sep 2024"},
+    background:{ funding:[{k:"Who's behind it", v:"A fan account — not the school, not the team"},{k:"How it makes money", v:"Sells its own team merch"},{k:"Paid posts tagged?", v:"Merch posts aren't tagged as ads"}],handle:"@EastviewNationHype", displayName:"Eastview Nation", bio:"#1 fan account 🏈 GO EAGLES", verified:false, followers:"4.1K", following:210, posts:966, joined:"Sep 2024"},
     clips:[
-      {id:"a", text:"Eastview Nation's post: \"The whole town's already calling it — Eastview's basically state champs.\"", who:"Influencer", detail:"A local fan account, not the team or the paper.", tactic:null},
-      {id:"b", text:"The local paper's sports desk: Eastview won its semifinal 21-14 — one win, one round left.", who:"News / institution", detail:"A named local outlet with a byline, reporting the actual result.", tactic:"Named, checkable source"},
-      {id:"c", text:"A comment from a rival team's fan pointing out the championship game hasn't been played yet.", who:"Friend", detail:"A simple, accurate correction — not everything needs a citation to be true.", tactic:null},
+      {id:"a", text:"Eastview Nation's post: \"The whole town's already calling it — Eastview's basically state champs.\"", who:"Influencer", detail:"A local fan account, not the team or the paper.", tell:null},
+      {id:"b", text:"The local paper's sports desk: Eastview won its semifinal 21-14 — one win, one round left.", who:"News / institution", detail:"A named local outlet with a byline, reporting the actual result.", tell:"go-look-yourself"},
+      {id:"c", text:"A comment from a rival team's fan pointing out the championship game hasn't been played yet.", who:"Friend", detail:"A simple, accurate correction — not everything needs a citation to be true.", tell:null},
       {id:"ai1", text:"A semifinal win means one game remains before any championship claim would be accurate.", source:"ai"},
       {id:"ai2", text:"Local sports hype accounts often round up on wins — worth checking the actual bracket before repeating a title claim.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named checkable source", cat:"hygiene",
+      {tell:"go-look-yourself", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"The local paper's sports desk"},{k:"How it makes money", v:"Subscriptions to the paper"}],handle:"@PrepScoreDesk", displayName:"Prep Score Desk", bio:"high school scores and brackets · results only, no predictions", verified:false, followers:"31K", following:412, posts:"18,960", joined:"Joined Aug 2015"},
        claim:"Eastview High heads to the state semifinal after a 21-14 win.",
        note:"Small, true, boring — useful green counterweight so ‘everything's fake’ doesn't win the table."},
-      {tactic:"Bandwagon", cat:"flag",
+      {tell:"everyones-doing-it", cat:"red",
        claim:"The whole town's already calling it — Eastview's basically state champs.",
        note:"Turns a semifinal win into a premature victory claim by leaning on implied town-wide consensus."}
     ]
@@ -312,19 +353,20 @@ var MOCK_STORIES = [
     headline:"Sneaker brand Halo Step sued over sourcing claims in its supply chain",
     url:"businesswire.example/2026/08/07/halo-step-lawsuit",
     hook:"This creator never mentions being paid — worth checking whether this video is a paid partnership before treating it as her honest opinion.",
-    background:{handle:"@haul_with_jade", displayName:"Jade | Haul Finds", bio:"your fave for honest reviews ✨ not sponsored (usually)", verified:true, followers:"1.2M", following:340, posts:2891, joined:"Feb 2020"},
+    background:{ funding:[{k:"Who's behind it", v:"Jade, plus a management agency named in her bio"},{k:"How it makes money", v:"Paid brand partnerships and affiliate links"},{k:"Paid posts tagged?", v:"Her other brands get #ad. This post doesn't."}],handle:"@haul_with_jade", displayName:"Jade | Haul Finds", bio:"your fave for honest reviews ✨ not sponsored (usually)", verified:true, followers:"1.2M", following:340, posts:2891, joined:"Feb 2020"},
     clips:[
-      {id:"a", text:"Jade's haul video calling Halo Step \"ethically made, start to finish\" — no paid-partnership disclosure anywhere in the caption or video.", who:"Influencer", detail:"1.2M followers, verified account, no #ad or #sponsored tag visible.", tactic:"Sponsored content"},
-      {id:"b", text:"A business-wire report naming a specific lawsuit alleging Halo Step misrepresented its supply-chain sourcing.", who:"News / institution", detail:"A filed, checkable legal claim with a named court and date.", tactic:"Named, checkable source"},
-      {id:"c", text:"A separate creator's video disclosing \"#ad — paid partnership with Halo Step\" the same week as Jade's.", who:"Influencer", detail:"Same brand, same week, one account discloses and one doesn't.", tactic:null},
+      {id:"a", text:"Jade's haul video calling Halo Step \"ethically made, start to finish\" — no paid-partnership disclosure anywhere in the caption or video.", who:"Influencer", detail:"1.2M followers, verified account, no #ad or #sponsored tag visible.", tell:"paid-to-say-it"},
+      {id:"b", text:"A business-wire report naming a specific lawsuit alleging Halo Step misrepresented its supply-chain sourcing.", who:"News / institution", detail:"A filed, checkable legal claim with a named court and date.", tell:"go-look-yourself"},
+      {id:"c", text:"A separate creator's video disclosing \"#ad — paid partnership with Halo Step\" the same week as Jade's.", who:"Influencer", detail:"Same brand, same week, one account discloses and one doesn't.", tell:null},
       {id:"ai1", text:"Undisclosed brand partnerships are a known pattern — a missing #ad tag doesn't confirm one exists, but it's worth checking the account's other posts and FTC disclosure norms.", source:"ai"},
       {id:"ai2", text:"A pending lawsuit doesn't mean the claims in it are proven — it means they're being formally tested; both things can be true while it's ongoing.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named checkable source", cat:"hygiene",
+      {tell:"go-look-yourself", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"A legal-news outlet; reporters named"},{k:"How it makes money", v:"Subscriptions from law firms"},{k:"Paid posts tagged?", v:"Takes no advertising"}],handle:"@ConsumerFiled", displayName:"Consumer Filed", bio:"lawsuits, recalls and complaints · we name the court and the docket", verified:false, followers:"58K", following:133, posts:"2,704", joined:"Joined Nov 2019"},
        claim:"Sneaker brand Halo Step sued over its supply-chain sourcing claims.",
        note:"Straight paraphrase of a filed, checkable legal claim."},
-      {tactic:"Sponsored content", cat:"flag",
+      {tell:"paid-to-say-it", cat:"red",
        claim:"A creator calls the brand “ethically made” — never mentions she's paid.",
        note:"Modeled on the real Shein/Celsius/Revolve pattern (Feed Drop #2, card 14): paid promotion presented as an independent opinion."}
     ]
@@ -334,19 +376,20 @@ var MOCK_STORIES = [
     headline:"Wildfire smoke triggers air-quality alerts in three Western states",
     url:"apnews.com/2026/08/11/wildfire-smoke-air-quality",
     hook:"\"Officials are staying silent\" is a strong claim about a story where officials are the ones actually issuing the alert — worth checking the timeline.",
-    background:{handle:"@BreakingNowUSA", displayName:"Breaking Now USA", bio:"🚨 breaking news, first 🚨 not affiliated with any network", verified:false, followers:"620K", following:180, posts:9440, joined:"Nov 2019"},
+    background:{ funding:[{k:"Who's behind it", v:"No owner named, no contact"},{k:"How it makes money", v:"Ad revenue on breaking-news traffic"},{k:"Paid posts tagged?", v:"No paid tags"}],handle:"@BreakingNowUSA", displayName:"Breaking Now USA", bio:"🚨 breaking news, first 🚨 not affiliated with any network", verified:false, followers:"620K", following:180, posts:9440, joined:"Nov 2019"},
     clips:[
-      {id:"a", text:"Breaking Now USA's post: \"🚨 BREAKING: toxic air is spreading right now and officials are staying silent.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, posted the same day as the real advisory, riding its attention.", tactic:"Unverifiable source"},
-      {id:"b", text:"AP wire report: air-quality alerts active in three Western states due to wildfire smoke, with agency quotes.", who:"News / institution", detail:"A named wire service, byline and dateline included.", tactic:"Named, checkable source"},
-      {id:"c", text:"NOAA's public heat/air-quality advisory map, covering the same dates and states — the alert itself, published by officials.", who:"News / institution", detail:"A federal agency's own real-time advisory system.", tactic:"Named, checkable source"},
+      {id:"a", text:"Breaking Now USA's post: \"🚨 BREAKING: toxic air is spreading right now and officials are staying silent.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, posted the same day as the real advisory, riding its attention.", tell:"no-way-to-check"},
+      {id:"b", text:"AP wire report: air-quality alerts active in three Western states due to wildfire smoke, with agency quotes.", who:"News / institution", detail:"A named wire service, byline and dateline included.", tell:"go-look-yourself"},
+      {id:"c", text:"NOAA's public heat/air-quality advisory map, covering the same dates and states — the alert itself, published by officials.", who:"News / institution", detail:"A federal agency's own real-time advisory system.", tell:"go-look-yourself"},
       {id:"ai1", text:"An active public advisory is the opposite of officials \"staying silent\" — the alert itself is officials speaking.", source:"ai"},
       {id:"ai2", text:"\"BREAKING\" labels attached to an already-public advisory are often just riding an existing story's attention, not reporting something new.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named checkable source", cat:"hygiene",
+      {tell:"go-look-yourself", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"A wire service co-owned by its member papers"},{k:"How it makes money", v:"Fees from the papers that carry it"}],handle:"@WireRoomDaily", displayName:"Wire Room", bio:"wire copy with the datelines left in · no commentary added", verified:true, followers:"410K", following:58, posts:"26,415", joined:"Joined Jan 2014"},
        claim:"Air-quality alerts hit three Western states as wildfire smoke spreads.",
        note:"Plain confirmed fact, one named wire service."},
-      {tactic:"“Breaking news” as a lever", cat:"flag",
+      {tell:"rushing-you", cat:"red",
        claim:"🚨 BREAKING: toxic air is spreading right now and officials are staying silent.",
        note:"Same real alert; the urgency label and ‘staying silent’ (untrue — the alert is officials speaking) do the persuading, not new facts."}
     ]
@@ -356,19 +399,20 @@ var MOCK_STORIES = [
     headline:"New console's second production run sells out in preorders within an hour",
     url:"gamingtrade.example/2026/08/09/console-preorders-sold-out",
     hook:"\"Your only shot\" is a big claim for a console that's restocked before — worth checking what actually happened after past sellouts.",
-    background:{handle:"@ConsoleDropAlerts", displayName:"Console Drop Alerts", bio:"never miss a restock 🎮 (affiliate links in bio)", verified:false, followers:"210K", following:55, posts:5602, joined:"Apr 2021"},
+    background:{ funding:[{k:"Who's behind it", v:"No owner named"},{k:"How it makes money", v:"Affiliate links to restocks"},{k:"Paid posts tagged?", v:"No tags on the restock links"}],handle:"@ConsoleDropAlerts", displayName:"Console Drop Alerts", bio:"never miss a restock 🎮 (affiliate links in bio)", verified:false, followers:"210K", following:55, posts:5602, joined:"Apr 2021"},
     clips:[
-      {id:"a", text:"Console Drop Alerts' post: \"Preorder today or you'll never get one — this is your only shot.\"", who:"Influencer", detail:"Affiliate links in bio — this account earns a cut if you buy through it.", tactic:null},
-      {id:"b", text:"Gaming trade press confirms the second production run's preorders sold out within an hour.", who:"News / institution", detail:"A named trade outlet reporting the actual sellout, no urgency framing added.", tactic:"Named, checkable source"},
-      {id:"c", text:"Coverage of the console's first sellout earlier this year, followed by a restock within a month.", who:"News / institution", detail:"The same trade press's own earlier reporting — a pattern, not a one-time event.", tactic:"Named, checkable source"},
+      {id:"a", text:"Console Drop Alerts' post: \"Preorder today or you'll never get one — this is your only shot.\"", who:"Influencer", detail:"Affiliate links in bio — this account earns a cut if you buy through it.", tell:null},
+      {id:"b", text:"Gaming trade press confirms the second production run's preorders sold out within an hour.", who:"News / institution", detail:"A named trade outlet reporting the actual sellout, no urgency framing added.", tell:"go-look-yourself"},
+      {id:"c", text:"Coverage of the console's first sellout earlier this year, followed by a restock within a month.", who:"News / institution", detail:"The same trade press's own earlier reporting — a pattern, not a one-time event.", tell:"go-look-yourself"},
       {id:"ai1", text:"Real scarcity (a sellout) doesn't automatically mean zero future restocks — that's an added claim, not something the sellout itself proves.", source:"ai"},
       {id:"ai2", text:"Accounts with affiliate links have a financial reason to push urgency — worth weighing that when reading \"only shot\" language.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named checkable source", cat:"hygiene",
+      {tell:"go-look-yourself", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"A games trade publisher"},{k:"How it makes money", v:"Ads, kept separate from editorial"},{k:"Paid posts tagged?", v:"Sponsored posts are labelled"}],handle:"@PatchNoteDesk", displayName:"Patch Note Desk", bio:"gaming news with the announcement linked · rumours labelled as rumours", verified:false, followers:"126K", following:389, posts:"7,551", joined:"Joined Jun 2017"},
        claim:"The console's second preorder run sold out within an hour.",
        note:"Straight, checkable claim about real demand."},
-      {tactic:"False dilemma", cat:"flag",
+      {tell:"only-two-choices", cat:"red",
        claim:"Preorder today or you'll never get one — this is your only shot.",
        note:"Real scarcity, invented binary: past sellouts were followed by restocks; ‘only shot’ forecloses an option the story doesn't rule out."}
     ]
@@ -378,19 +422,20 @@ var MOCK_STORIES = [
     headline:"Riverside School District pilots a four-day school week for 2026–27",
     url:"localnews.example/2026/08/06/riverside-four-day-week",
     hook:"Pointing at other districts doesn't actually answer what's being asked about this one — worth checking what Riverside's own plan actually says.",
-    background:{handle:"@RiversideParentVoice", displayName:"Riverside Parent Voice", bio:"parent-run, not affiliated with the district", verified:false, followers:"3.4K", following:190, posts:512, joined:"Jan 2025"},
+    background:{ funding:[{k:"Who's behind it", v:"A candidate's campaign, named in the footer"},{k:"How it makes money", v:"Campaign funds"},{k:"Paid posts tagged?", v:"No “paid for by” notice on the posts"}],handle:"@RiversideParentVoice", displayName:"Riverside Parent Voice", bio:"parent-run, not affiliated with the district", verified:false, followers:"3.4K", following:190, posts:512, joined:"Jan 2025"},
     clips:[
-      {id:"a", text:"Riverside Parent Voice's reply to a concerned comment: \"Why complain about losing a school day when other districts cut way more?\"", who:"Friend", detail:"Deflects the specific concern raised without addressing it.", tactic:null},
-      {id:"b", text:"Local reporting confirms Riverside School District is piloting a four-day week for 2026–27, with the district's own stated reasoning.", who:"News / institution", detail:"A named local outlet, attributed directly to the district.", tactic:"Named, checkable source"},
-      {id:"c", text:"A district spokesperson's statement addressing the specific concern (instructional hours) raised in the original comment.", who:"News / institution", detail:"A named official responding directly, rather than pointing elsewhere.", tactic:"Named expert, own field"},
+      {id:"a", text:"Riverside Parent Voice's reply to a concerned comment: \"Why complain about losing a school day when other districts cut way more?\"", who:"Friend", detail:"Deflects the specific concern raised without addressing it.", tell:null},
+      {id:"b", text:"Local reporting confirms Riverside School District is piloting a four-day week for 2026–27, with the district's own stated reasoning.", who:"News / institution", detail:"A named local outlet, attributed directly to the district.", tell:"go-look-yourself"},
+      {id:"c", text:"A district spokesperson's statement addressing the specific concern (instructional hours) raised in the original comment.", who:"News / institution", detail:"A named official responding directly, rather than pointing elsewhere.", tell:"someone-whod-know"},
       {id:"ai1", text:"Pointing to a different district's bigger cut doesn't answer a specific question about this district's plan — that's a deflection, not a rebuttal.", source:"ai"},
       {id:"ai2", text:"Worth checking Riverside's own instructional-hours numbers directly rather than a comparison to an unrelated district.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named checkable source", cat:"hygiene",
+      {tell:"go-look-yourself", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"A local nonprofit newsroom; board listed publicly"},{k:"How it makes money", v:"Grants and memberships"}],handle:"@CountyRecordDesk", displayName:"County Record", bio:"local meetings, budgets and votes · agendas and minutes linked", verified:false, followers:"22K", following:96, posts:"5,088", joined:"Joined Mar 2013"},
        claim:"Riverside School District is piloting a four-day week next year.",
        note:"Low-sensitivity local policy story, attributed plainly."},
-      {tactic:"Whataboutism", cat:"flag",
+      {tell:"what-about-them", cat:"red",
        claim:"Why complain about losing a school day when other districts cut way more?",
        note:"Deflects any concern about this specific change by pointing at a worse, unrelated example elsewhere."}
     ]
@@ -400,7 +445,7 @@ var MOCK_STORIES = [
     headline:"Fact-checking nonprofit reports over 1,500 published corrections this year",
     url:"factchecknonprofit.example/2026-annual-report",
     lenses:[
-      {tactic:"Independent confirmation", cat:"hygiene",
+      {tell:"two-who-didnt-talk", cat:"green",
        claim:"A fact-checking group logged over 1,500 corrections this year.",
        note:"The green counterweight card: a whole industry exists to do exactly what this pipeline is teaching. Not every story needs a flag lens — this one doesn't."}
     ]
@@ -410,19 +455,20 @@ var MOCK_STORIES = [
     headline:"Study: short daily walks linked to modest mood improvement",
     url:"reuters.com/health/2026/08/04/walking-study-mood",
     hook:"\"Cures anxiety\" is a much bigger claim than \"modest mood improvement\" — worth checking what the actual study found.",
-    background:{handle:"@MindBodyDaily", displayName:"Mind Body Daily", bio:"wellness tips that actually work 🧘", verified:false, followers:"340K", following:410, posts:4120, joined:"Aug 2020"},
+    background:{ funding:[{k:"Who's behind it", v:"No owner named"},{k:"How it makes money", v:"Sells the supplement the study is about"},{k:"Paid posts tagged?", v:"No ad tag on the study post"}],handle:"@MindBodyDaily", displayName:"Mind Body Daily", bio:"wellness tips that actually work 🧘", verified:false, followers:"340K", following:410, posts:4120, joined:"Aug 2020"},
     clips:[
-      {id:"a", text:"Mind Body Daily's post: \"Science says a 5-minute walk cures anxiety.\"", who:"Influencer", detail:"340K followers, no link to the actual study or its authors.", tactic:"Cherry picking"},
-      {id:"b", text:"The peer-reviewed study, via Reuters Health: short daily walks linked to a modest mood improvement, on average, across the group studied.", who:"News / institution", detail:"Keeps the study's own hedge word — \"modest\" — intact, unlike the repost.", tactic:"Named, checkable source"},
-      {id:"c", text:"A clinical psychologist's post explaining the difference between \"modest average improvement\" and \"cures anxiety.\"", who:"News / institution", detail:"A named, credentialed expert speaking in her own field.", tactic:"Named expert, own field"},
+      {id:"a", text:"Mind Body Daily's post: \"Science says a 5-minute walk cures anxiety.\"", who:"Influencer", detail:"340K followers, no link to the actual study or its authors.", tell:"one-number-not-the-set"},
+      {id:"b", text:"The peer-reviewed study, via Reuters Health: short daily walks linked to a modest mood improvement, on average, across the group studied.", who:"News / institution", detail:"Keeps the study's own hedge word — \"modest\" — intact, unlike the repost.", tell:"go-look-yourself"},
+      {id:"c", text:"A clinical psychologist's post explaining the difference between \"modest average improvement\" and \"cures anxiety.\"", who:"News / institution", detail:"A named, credentialed expert speaking in her own field.", tell:"someone-whod-know"},
       {id:"ai1", text:"\"Modest improvement, on average\" and \"cures anxiety\" describe very different findings — the second is a much stronger, unsupported claim.", source:"ai"},
       {id:"ai2", text:"Worth checking whether \"cures\" appears anywhere in the original study — it's a common gap between a headline and the actual data.", source:"ai"}
     ],
     lenses:[
-      {tactic:"Named checkable source", cat:"hygiene",
+      {tell:"go-look-yourself", cat:"green",
+       background:{ funding:[{k:"Who's behind it", v:"A science librarian, named"},{k:"How it makes money", v:"No ads, no sponsors"}],handle:"@StudyNotesDaily", displayName:"Study Notes", bio:"one study per post · journal and sample size in every caption", verified:false, followers:"64K", following:241, posts:"1,933", joined:"Joined May 2020"},
        claim:"A new study links short daily walks to a modest mood boost.",
        note:"Keeps the study's own hedge word (‘modest’) intact."},
-      {tactic:"Cherry picking", cat:"flag",
+      {tell:"one-number-not-the-set", cat:"red",
        claim:"Science says a 5-minute walk cures anxiety.",
        note:"The real study found a modest, average group effect; this reframing keeps the most dramatic possible reading and drops ‘modest’ entirely."}
     ]
@@ -518,7 +564,13 @@ function cardFromStory(story){
 
 function renderRound(){
   var list = document.getElementById("round-list"); list.innerHTML = "";
-  document.getElementById("round-count").textContent = DROP.length + " stor" + (DROP.length===1?"y":"ies") + " · builds itself as you pick topics";
+  // Nudge toward 5 without blocking anything - see .round-guide in the markup.
+  var offTarget = DROP.length === 5 ? "" :
+    (DROP.length < 5 ? " · " + (5 - DROP.length) + " under the suggested 5"
+                     : " · " + (DROP.length - 5) + " over the suggested 5");
+  document.getElementById("round-count").innerHTML =
+    DROP.length + " stor" + (DROP.length===1?"y":"ies") + " · builds itself as you pick topics" +
+    (offTarget ? '<span class="off-target">' + offTarget + '</span>' : "");
 
   if (DROP.length === 0){
     var e = document.createElement("div"); e.className = "empty-note";
@@ -617,7 +669,7 @@ function cardsForPublish(){
   return DROP.map(function(d){
     return {
       id: d.storyId, subject: d.subject, source: d.source, sourceUrl: d.url, headline: d.headline,
-      variants: d.variants.map(function(v){ return { tactic: v.tactic, cat: v.cat, claim: v.claim, note: v.note }; }),
+      variants: d.variants.map(function(v){ return { tell: v.tell, cat: v.cat, claim: v.claim, note: v.note }; }),
       // Round 2 investigation content — hook, poster persona, and evidence clips —
       // generated alongside the headline framings above. A card with no hook/clips
       // (see story 9's "not every story needs a flag lens" counterweight) publishes
@@ -641,7 +693,7 @@ function buildExport(){
   lines.push("| # | Subject | AI-personalized framings (curator did not choose these) |");
   lines.push("|---|---|---|");
   DROP.forEach(function(d, i){
-    var vtext = d.variants.map(function(v){ return "**["+v.tactic+"]** " + v.claim.replace(/\|/g,"/"); }).join("<br>");
+    var vtext = d.variants.map(function(v){ return "**["+tellName(v.tell)+"]** " + v.claim.replace(/\|/g,"/"); }).join("<br>");
     lines.push("| "+(i+1)+" | "+d.subject+" | "+vtext+" |");
   });
   lines.push("");
