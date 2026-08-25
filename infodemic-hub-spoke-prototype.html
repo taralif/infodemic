@@ -102,6 +102,32 @@
   .onboardmock-flow{ display:flex; flex-direction:column; align-items:center; gap:8px; }
   .onboardmock-arrow{ font-size:16px; color:var(--ios-label3); }
 
+  /* Mocks for the "where to look" tour (8/24/2026) — a squashed profile card, a
+     search row with its date, and an AI bubble. Same job as the other onboardmock
+     pieces: show the actual surface being described, not a generic emoji. */
+  .onboardmock-mini{ background:var(--ios-bg2); border-radius:13px; padding:13px 15px; text-align:left; min-width:210px; }
+  .onboardmock-miniavatar{ width:30px; height:30px; border-radius:50%; background:linear-gradient(160deg,#3a6ea8,#1d3552); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; margin-bottom:8px; }
+  .onboardmock-minibio{ font-size:11.5px; color:var(--ios-label2); line-height:1.4; margin-bottom:7px; }
+  .onboardmock-minimeta{ font-size:10.5px; color:var(--ios-label3); }
+  .onboardmock-minimeta b{ color:var(--ios-orange); font-weight:700; }
+  .onboardmock-row{ background:var(--ios-bg2); border-radius:11px; padding:10px 12px; text-align:left; min-width:210px; margin-bottom:7px; }
+  .onboardmock-rowtext{ font-size:11.5px; font-weight:600; line-height:1.35; margin-bottom:4px; }
+  .onboardmock-rowmeta{ font-size:10px; color:var(--ios-label3); }
+  .onboardmock-rowmeta b{ color:var(--ios-orange); font-weight:700; }
+  .onboardmock-bubble{ background:var(--ios-bg3); border-radius:15px 15px 15px 4px; padding:11px 14px; font-size:12px; line-height:1.45; text-align:left; max-width:230px; color:var(--ios-label); }
+
+  /* The tour's peek at the library (8/24/2026) — real tell cards, built from TELLS
+     so the sample and the count can't drift from the actual list. Showing the
+     library is fine under the reveal rule: the library is vocabulary and stays open
+     all game. What stays hidden is which tell is on which card. */
+  .onboardmock-grid{ display:grid; grid-template-columns:1fr 1fr; gap:7px; min-width:250px; }
+  .onboardmock-tell{ background:var(--ios-bg2); border-radius:10px; padding:9px 10px; text-align:left; border-top:2.5px solid var(--ios-label3); }
+  .onboardmock-tell.red{ border-top-color:var(--ios-orange); }
+  .onboardmock-tell.green{ border-top-color:var(--ios-blue); }
+  .onboardmock-tellemoji{ font-size:15px; margin-bottom:3px; }
+  .onboardmock-tellname{ font-size:10.5px; font-weight:700; line-height:1.25; color:var(--ios-label); }
+  .onboardmock-more{ grid-column:1 / -1; text-align:center; font-size:10.5px; font-weight:700; color:var(--ios-label3); padding-top:3px; letter-spacing:.4px; }
+
   /* ---------- APP NAV / BODY ---------- */
   .navbar{
     position:absolute; top:0; left:0; right:0; height:98px; z-index:30; padding-top:47px;
@@ -214,13 +240,26 @@
        own GPU layer is the standard fix for iPadOS Safari failing to isolate a 3D
        transform context inside a scroll-snap container. Not verified on a real iPad
        from here — needs a device recheck. */
-    -webkit-transform:translateZ(0); transform:translateZ(0) rotateY(0deg);
+    transform:rotateY(0deg); -webkit-transform:rotateY(0deg);
     will-change:transform;
   }
-  .cardflip-inner.flipped{ transform:translateZ(0) rotateY(180deg); -webkit-transform:translateZ(0) rotateY(180deg); }
+  .cardflip-inner.flipped{ transform:rotateY(180deg); -webkit-transform:rotateY(180deg); }
   .cardface{
     position:absolute; inset:0; border-radius:26px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
     border:1px solid rgba(255,255,255,.07);
+    /* iPhone/iPad flip bug — the fix that actually holds (8/24/2026). Two earlier
+       attempts failed: -webkit- prefixes on perspective/transform-style (8/14), then
+       translateZ(0)+will-change to force a GPU layer (8/16).
+       Root cause is not CSS 3D at all: render() rebuilds screenArea's innerHTML
+       wholesale ~4x/second, so a flipped card is never *transitioned* into
+       rotateY(180deg) — it is CREATED already rotated. Mobile WebKit routinely fails
+       to cull the back face of a layer born in its final rotated state, the two
+       coplanar faces z-fight, and the front wins.
+       So correctness no longer depends on backface culling: the away-facing side is
+       explicitly hidden below. The 0s/.28s transition means the swap would still land
+       mid-flip (card edge-on, switch invisible) if the flip is ever made to genuinely
+       animate. */
+    transition:opacity 0s linear .28s, visibility 0s linear .28s;
     /* Both faces occupy the exact same box at all times (only the rotation makes one
        of them face away) — without this, the hidden face can still sit "on top" for
        hit-testing purposes and swallow taps meant for the visible face underneath it.
@@ -229,8 +268,13 @@
   }
   .cardflip-inner:not(.flipped) .cardface-front{ pointer-events:auto; }
   .cardflip-inner.flipped .cardface-back{ pointer-events:auto; }
+  .cardflip-inner:not(.flipped) .cardface-back,
+  .cardflip-inner.flipped .cardface-front{ opacity:0; visibility:hidden; }
   .cardface-back{
-    transform:rotateY(180deg); background:var(--ios-cardback); display:flex; flex-direction:column;
+    /* -webkit-transform was missing here while every other 3D rule in this block
+       carried both spellings — older iOS Safari needs the prefixed form. */
+    transform:rotateY(180deg); -webkit-transform:rotateY(180deg);
+    background:var(--ios-cardback); display:flex; flex-direction:column;
     border-color:rgba(255,255,255,.18); box-shadow:0 24px 60px rgba(0,0,0,.55);
   }
   .cardback-head{
@@ -267,6 +311,7 @@
   .raillabel{font-size:10px; font-weight:700; text-shadow:0 1px 2px rgba(0,0,0,.6); color:#fff;}
   .raillabel.contested{color:rgba(255,255,255,.85);}
   .raillabel.agreed{color:var(--ios-label2);}
+  .raillabel.skipped{color:var(--ios-label3);}
   .raildisc{width:28px; height:28px; border-radius:50%; background:#111; border:2px solid #444; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:11px; animation:spin 5s linear infinite;}
   @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
@@ -278,7 +323,10 @@
   }
   .flipnub{
     position:relative; width:40px; height:40px; border-radius:50%;
-    background:rgba(20,20,22,.55); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    /* backdrop-filter removed 8/24/2026 — it flattens an ancestor preserve-3d
+       context in mobile WebKit, and this sits inside the flip subtree. Solid,
+       more opaque background compensates. */
+    background:rgba(20,20,22,.78);
     border:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center;
     font-size:17px; box-shadow:0 4px 14px rgba(0,0,0,.35);
   }
@@ -333,7 +381,8 @@
   .headline{font-size:18px; font-weight:800; line-height:1.32; text-shadow:0 1px 4px rgba(0,0,0,.5); margin-bottom:10px;}
   .cardstats{display:flex; gap:16px; font-size:12px; font-weight:600; color:rgba(255,255,255,.65); margin-bottom:12px;}
   .polysticker{
-    display:inline-flex; background:rgba(0,0,0,.42); backdrop-filter:blur(8px); border-radius:14px; padding:4px; margin-bottom:12px;
+    /* backdrop-filter removed 8/24/2026 — inside the flip subtree, see .flipnub. */
+    display:inline-flex; background:rgba(0,0,0,.62); border-radius:14px; padding:4px; margin-bottom:12px;
     border:1px solid rgba(255,255,255,.25);
   }
   .pollopt{font-size:11.5px; font-weight:700; padding:7px 10px; border-radius:10px; cursor:pointer; color:#fff; white-space:nowrap;}
@@ -375,7 +424,8 @@
   .stoplight.readonly .stoplightopt{cursor:default;}
   .stoplightcount{font-size:15px; font-weight:800; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.4);}
   .voteexpand{display:inline-block; margin-top:10px; font-size:12px; font-weight:700; color:#fff; opacity:.8; cursor:pointer;}
-  .votegroups{margin-top:8px; background:rgba(0,0,0,.4); backdrop-filter:blur(10px); border-radius:12px; padding:10px 12px;}
+  /* backdrop-filter removed 8/24/2026 — inside the flip subtree, see .flipnub. */
+  .votegroups{margin-top:8px; background:rgba(0,0,0,.62); border-radius:12px; padding:10px 12px;}
   .votegrouprow{display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:5px 0; border-bottom:0.5px solid rgba(255,255,255,.1);}
   .votegrouprow:last-child{border-bottom:none;}
   .vglabel{font-weight:700; color:rgba(255,255,255,.85); flex:0 0 auto;}
@@ -421,6 +471,9 @@
     animation:revealpop .5s cubic-bezier(.2,1.6,.4,1) both;
   }
   .revealverdict.agreed{ background:rgba(48,209,88,.16); border:1px solid rgba(48,209,88,.4); color:var(--ios-green); }
+  /* Deliberately the quietest of the three - a skipped story is an absence, not a
+     result, and shouldn't read as either a win or an alarm. */
+  .revealverdict.skipped{ background:rgba(235,235,245,.06); border:1px solid rgba(235,235,245,.18); color:var(--ios-label2); }
   .revealverdict.contested{ background:rgba(255,159,10,.16); border:1px solid rgba(255,159,10,.4); color:var(--ios-orange); }
   .revealnextbtn{
     background:var(--ios-blue); color:#fff; font-size:16px; font-weight:800; padding:15px 38px; border-radius:16px; cursor:pointer;
@@ -473,6 +526,48 @@
     box-shadow:0 8px 24px rgba(48,209,88,.3);
   }
 
+
+  /* ---------- SESSION END (final spread report) ---------- */
+  /* The session actually ends now (8/24/2026): the report below is the last screen
+     the game shows. It is deliberately NOT a scoreboard and NOT an answer key —
+     it only reports how far each story travelled while it sat un-filed. */
+  .endwrap{position:absolute; inset:0; z-index:60; display:flex; flex-direction:column;
+    background:linear-gradient(180deg,#0b1210 0%, #05070a 55%, #000 100%); animation:endfade .45s ease;}
+  @keyframes endfade{ from{opacity:0;} to{opacity:1;} }
+  .endscroll{flex:1; overflow-y:auto; padding:0 22px 22px; -webkit-overflow-scrolling:touch;}
+  .endhero{padding:44px 4px 22px; text-align:center;}
+  .endkicker{font-size:11.5px; font-weight:800; letter-spacing:2.2px; color:var(--ios-green); text-transform:uppercase; margin-bottom:12px;}
+  .endtitle{font-size:29px; font-weight:900; line-height:1.15; margin-bottom:12px; animation:timesupscale .55s cubic-bezier(.2,1.6,.4,1);}
+  .endsub{font-size:13.5px; color:var(--ios-label2); line-height:1.55;}
+  .endcard{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:22px; padding:17px; margin-bottom:14px;}
+  .endcardtag{font-size:10.5px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--ios-label2); margin-bottom:12px;}
+  .endbignum{font-family:'Space Mono',monospace; font-size:42px; font-weight:700; line-height:1; color:var(--ios-orange);}
+  .endbigunit{font-size:16px; font-weight:700; color:var(--ios-label2); margin-left:7px;}
+  .endbigsub{font-size:12.5px; color:var(--ios-label2); margin-top:10px; line-height:1.55;}
+  /* Same bar as the live Spread meter, so the last thing the game shows is the meter
+     they watched all session finally going all the way green. */
+  .endbar{height:13px; border-radius:7px; overflow:hidden; display:flex; background:var(--ios-bg3); margin:4px 0 10px;}
+  .endbar .r{background:linear-gradient(90deg,#ff9f0a,#ff453a); transition:width 1.5s cubic-bezier(.3,.9,.3,1);}
+  .endbar .g{background:var(--ios-green); transition:width 1.5s cubic-bezier(.3,.9,.3,1);}
+  .endbarkeys{display:flex; justify-content:space-between; font-size:11.5px; font-weight:700;}
+  .endrow{display:flex; align-items:flex-start; gap:11px; padding:13px 0; border-top:0.5px solid var(--ios-sep);}
+  .endrow.first{border-top:0; padding-top:2px;}
+  .endrank{font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--ios-label3); width:14px; flex:0 0 auto; padding-top:2px;}
+  .endrowmain{flex:1; min-width:0;}
+  .endrowhead{font-size:13.5px; font-weight:600; line-height:1.35; margin-bottom:8px;}
+  .endrowbar{height:6px; border-radius:3px; background:var(--ios-bg3); overflow:hidden; margin-bottom:7px;}
+  .endrowbar span{display:block; height:100%; width:0; border-radius:3px;
+    background:linear-gradient(90deg,#ff9f0a,#ff453a); transition:width .9s cubic-bezier(.2,.8,.3,1);}
+  .endrowmeta{font-size:11px; color:var(--ios-label3); font-family:'Space Mono',monospace;}
+  .endrowverdict{font-size:11px; font-weight:700; color:var(--ios-label2); margin-top:6px;}
+  .endnote{font-size:12.5px; color:var(--ios-label2); line-height:1.6;}
+  .endfoot{padding:4px 22px 26px; display:flex; flex-direction:column; gap:9px; flex:0 0 auto;}
+  .endbtn{background:var(--ios-green); color:#04140a; font-size:16px; font-weight:800; text-align:center;
+    padding:15px; border-radius:16px; cursor:pointer; box-shadow:0 8px 24px rgba(48,209,88,.25);}
+  .endbtn.ghost{background:rgba(255,255,255,.08); color:var(--ios-label); box-shadow:none;}
+  .sessionbadge{font-size:11.5px; font-weight:800; padding:6px 11px; border-radius:999px;
+    background:rgba(48,209,88,.18); color:var(--ios-green); cursor:pointer; white-space:nowrap;}
+
   /* ---------- CLAIM DETAIL (Round 2 / Board) ---------- */
   .claimheaderbox{background:var(--ios-bg2); border-radius:14px; padding:14px 16px; margin-bottom:16px; border-left:3px solid var(--ios-red);}
   .exhibitlabel{font-size:10.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:6px;}
@@ -509,10 +604,26 @@
   .profilestat .num{ font-size:14.5px; font-weight:800; }
   .profilestat .lbl{ font-size:9.5px; color:var(--ios-label3); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
   .profilejoined{ font-size:11px; color:var(--ios-label3); }
+  /* "About this account" — the money panel. Styled as platform furniture, not as
+     game commentary: same neutral treatment whoever the account is, so a player has
+     to actually read it rather than react to its colour. */
+  .profileabout{
+    margin-top:12px; background:var(--ios-bg2); border:1px solid var(--ios-sep);
+    border-radius:14px; padding:12px 14px; text-align:left;
+  }
+  .pahead{
+    font-size:10.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase;
+    color:var(--ios-label3); margin-bottom:8px;
+  }
+  .parow{ display:flex; gap:10px; font-size:12.5px; line-height:1.45; padding:6px 0;
+          border-bottom:0.5px solid rgba(255,255,255,.07); }
+  .parow:last-child{ border-bottom:none; padding-bottom:0; }
+  .pak{ flex:0 0 42%; color:var(--ios-label2); font-weight:600; }
+  .pav{ flex:1 1 auto; color:#fff; }
   .revealtext{font-size:13px; color:var(--ios-label2); background:var(--ios-bg); border-radius:8px; padding:9px 10px; margin-bottom:8px; line-height:1.5;}
   .infobanner{display:flex; gap:8px; font-size:12.5px; border-radius:8px; padding:9px 10px; margin-bottom:8px; line-height:1.45;}
-  .infobanner.flag{background:rgba(255,159,10,.15); color:var(--ios-orange);}
-  .infobanner.hygiene{background:rgba(10,132,255,.15); color:var(--ios-blue);}
+  .infobanner.red{background:rgba(255,159,10,.15); color:var(--ios-orange);}
+  .infobanner.green{background:rgba(10,132,255,.15); color:var(--ios-blue);}
   .infobanner.neutral{background:rgba(255,255,255,.05); color:var(--ios-label3); font-style:italic;}
   .unlocktoast{
     background:linear-gradient(135deg, rgba(197,131,255,.18), rgba(123,63,242,.14)); border:1px solid rgba(197,131,255,.4);
@@ -543,6 +654,28 @@
   .chatbubble.typing{padding:14px 18px;}
   .typingdots{letter-spacing:2px; animation:blink 1.1s infinite; font-weight:900;}
   @keyframes blink{ 0%,100%{opacity:.25;} 50%{opacity:1;} }
+
+
+  /* ---------- POST-FILE TELL REVEAL (8/24/2026) ----------
+     Only ever drawn once a case is filed. This is where the "different feeds"
+     twist actually lands: same story, one per player, each framed by a different
+     tell. Deliberately NOT an answer key — it says how each version reached the
+     table, never who was right. */
+  .tellreveal{ margin-top:20px; animation:trslide .5s cubic-bezier(.2,.9,.3,1) both; }
+  @keyframes trslide{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;} }
+  .trhead{ font-size:11px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--ios-green); margin-bottom:9px; }
+  .trnote{ font-size:12.5px; color:var(--ios-label2); line-height:1.55; margin-bottom:14px; }
+  .trrow{ background:var(--ios-bg2); border-radius:14px; padding:13px 14px; margin-bottom:9px; border-left:3px solid var(--ios-bg3); }
+  .trrow.red{ border-left-color:var(--ios-orange); }
+  .trrow.green{ border-left-color:var(--ios-blue); }
+  .trwho{ display:flex; align-items:center; gap:7px; font-size:11px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:7px; }
+  .trdot{ width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:#fff; flex:0 0 auto; }
+  .trheadline{ font-size:13.5px; font-weight:600; line-height:1.45; margin-bottom:10px; }
+  .trchip{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:6px 10px; border-radius:9px; }
+  .trchip.red{ background:rgba(255,159,10,.15); color:var(--ios-orange); }
+  .trchip.green{ background:rgba(10,132,255,.15); color:var(--ios-blue); }
+  .trchip.none{ background:rgba(255,255,255,.05); color:var(--ios-label3); font-style:italic; font-weight:600; }
+  .trdesc{ font-size:11.5px; color:var(--ios-label2); line-height:1.5; margin-top:9px; }
 
   /* ---------- BOARD: determination + reveal ---------- */
   .radiorow{display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:0.5px solid var(--ios-sep); cursor:pointer; font-size:14px; font-weight:600;}
@@ -588,20 +721,54 @@
   .balancebar .r{background:var(--ios-red);} .balancebar .g{background:var(--ios-green);}
   .topclaim{font-size:14px; font-weight:600; margin-bottom:6px;}
 
-  /* ---------- PRO TIPS LIBRARY ---------- */
-  .tacticsintro{font-size:13px; color:var(--ios-label2); line-height:1.55; margin-bottom:4px;}
+  /* ---------- TELLS LIBRARY ---------- */
+  .tellsintro{font-size:13px; color:var(--ios-label2); line-height:1.55; margin-bottom:4px;}
   .sectionintro{font-size:11.5px; color:var(--ios-label3); line-height:1.5; margin:2px 4px 12px;}
-  .tacticgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;}
-  .tacticcard{background:var(--ios-bg2); border-radius:14px; padding:14px; cursor:pointer; border-top:3px solid var(--ios-label3);}
-  .tacticcard.flag{border-top-color:var(--ios-orange);}
-  .tacticcard.hygiene{border-top-color:var(--ios-blue);}
-  .tacticcard.locked{opacity:.5; cursor:default; border-top-color:var(--ios-label3);}
-  .tacticcard .temoji{font-size:22px; margin-bottom:8px;}
-  .tacticcard .ttitle{font-size:13.5px; font-weight:700; margin-bottom:4px; line-height:1.3;}
-  .tacticcard .tdesc{font-size:11.5px; color:var(--ios-label2); line-height:1.4;}
-  .tacticcard .texpand{font-size:11px; color:var(--ios-blue); font-weight:600; margin-top:9px;}
-  .tacticcard .tmeta{font-size:10.5px; color:var(--ios-label3); margin-top:9px; line-height:1.4; border-top:0.5px solid var(--ios-sep); padding-top:8px;}
+  .tellgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;}
+  .tellcard{background:var(--ios-bg2); border-radius:14px; padding:14px; cursor:pointer; border-top:3px solid var(--ios-label3);}
+  .tellcard.red{border-top-color:var(--ios-orange);}
+  .tellcard.green{border-top-color:var(--ios-blue);}
+  .tellcard.locked{opacity:.5; cursor:default; border-top-color:var(--ios-label3);}
+  .tellcard .temoji{font-size:22px; margin-bottom:8px;}
+  .tellcard .ttitle{font-size:13.5px; font-weight:700; margin-bottom:4px; line-height:1.3;}
+  .tellcard .tdesc{font-size:11.5px; color:var(--ios-label2); line-height:1.4;}
+  .tellcard .texpand{font-size:11px; color:var(--ios-blue); font-weight:600; margin-top:9px;}
+  .tellcard .tmeta{font-size:10.5px; color:var(--ios-label3); margin-top:9px; line-height:1.4; border-top:0.5px solid var(--ios-sep); padding-top:8px;}
   .emptysection{font-size:12px; color:var(--ios-label3); font-style:italic; padding:4px 4px 14px;}
+
+  /* ---------- FIT THE VIEWPORT (Tara, 8/24/2026) ----------
+     The mock was a fixed 390x844 with a long footnote underneath, so on a laptop
+     AND on a phone the document itself scrolled. The app's header (.navbar /
+     .r1topbar) is position:absolute INSIDE the mock, not fixed to the viewport, so
+     scrolling the page scrolled the header - spread % and Tells - out of view.
+     Now the page never scrolls, the mock always fits, and only regions inside the
+     phone scroll.
+     Deliberately NO transform:scale() on any ancestor of .cardflip-inner: a parent
+     transform creates a new containing block and would disturb the 3D-compositing
+     behaviour the card-flip fix depends on. The mock is fitted by bounding its
+     height, never by scaling it. */
+  html,body{ height:100%; height:100dvh; overflow:hidden; }
+  body{ padding:20px 16px; align-items:center; overscroll-behavior:none; }
+  .wrap{ height:100%; justify-content:center; }
+  .iphone{ height:min(844px, 100%); }
+  /* The design-notes footnote was removed from the page entirely (Tara, 8/24/2026) —
+     it was the reason the document was taller than the viewport in the first place.
+     The prose is preserved as an HTML comment further down rather than deleted, so
+     the file still documents itself; nothing renders. */
+
+  /* Phones: drop the decorative mockup entirely and rebase the 47px fake-status-bar
+     reserve onto the real safe area (both bars are height:98px with padding-top:47px,
+     and content regions start at top:98px to match). */
+  @media (max-width:700px){
+    body{ padding:0; align-items:stretch; }
+    .wrap{ width:100%; }
+    .iphone{ width:100%; height:100%; border-radius:0; box-shadow:none; }
+    .notch, .statusbar{ display:none; }
+    .navbar, .r1topbar{ height:calc(51px + env(safe-area-inset-top));
+                        padding-top:env(safe-area-inset-top); }
+    .appbody, .feedscroll{ top:calc(51px + env(safe-area-inset-top)); }
+    .home-indicator{ bottom:max(8px, env(safe-area-inset-bottom)); }
+  }
 </style>
 </head>
 <body>
@@ -620,9 +787,30 @@
     <div class="onboard-scrim" id="onboardScrim"></div>
     <div class="home-indicator" onclick="goHome()"></div>
   </div>
-  <div class="footnote" style="max-width:390px; margin:20px auto 0; color:#7d8a83; font-size:12.5px; line-height:1.6;">
-Hub-and-spoke rebuild: each of the 7 claims is one card (the hub) — the Feed is homebase, everything else is a spoke you go out to and come back from. The table decides when Round 1 starts (tap "Start Round 1"); only then does the shared 60-second clock run. Round/timer/spread status live once in a persistent top bar now, not repeated on every card, so each card is just its own story: source (tap to see which platform it's from), likes, comments, poster avatar, headline, and the red/yellow/green call, all in one bounded card you scroll past — cards are sized to peek at the next one and a fast scroll can glide past several at once, instead of being forced to stop dead on every single one. Nothing else (investigate, Pro Tips) shows up until the round ends. Votes stay hidden while voting, no hint that anyone's feed differs from anyone else's. When the clock ends, the vote reveals — misinfo/biased/true counts under the buttons, expandable to see who voted which way (tap "See who voted"). Claims where everyone agreed quietly set aside; split claims pop to the front of the deck with a visible animation. Tap a contested card to investigate — Search and Ask AI unlock as modes on that same card. A Board mode pools evidence, lets the table agree on one call, and — once there's evidence on it — reveals everyone's differently-framed version of the claim side by side with the tactic baked into each, plus each player's initial vote next to the final filed call (that's the moment the different-feeds twist actually lands, not spoiled earlier). Pro Tips is a full reference library, open at all times — nothing is locked, tactics you've personally run into just get a ✓. The Spread is read-only: claim "heat" grows the longer something sits contested and cools once filed.
-  </div>
+<!-- Design notes (was the on-page .footnote until 8/24/2026, removed so the page
+     never scrolls; kept here so the file still explains itself):
+   Hub-and-spoke rebuild: each claim is one card (the hub) — the Feed is homebase, everything
+   else is a spoke you go out to and come back from. The table decides when Round 1 starts (tap
+   "Start Round 1"); only then does the shared 60-second clock run. Round/timer/spread status
+   live once in a persistent top bar now, not repeated on every card, so each card is just its
+   own story: source (tap to see which platform it's from), likes, comments, poster avatar,
+   headline, and the red/yellow/green call, all in one bounded card you scroll past — cards are
+   sized to peek at the next one and a fast scroll can glide past several at once, instead of
+   being forced to stop dead on every single one. Nothing else (investigate, Tells) shows up
+   until the round ends. Votes stay hidden while voting, no hint that anyone's feed differs
+   from anyone else's. When the clock ends, the vote reveals — misinfo/biased/true counts under
+   the buttons, expandable to see who voted which way (tap "See who voted"). Claims where
+   everyone agreed quietly set aside; split claims pop to the front of the deck with a visible
+   animation. Tap a contested card to investigate — Search and Ask AI unlock as modes on that
+   same card. A Board mode pools evidence, lets the table agree on one call, and — once there's
+   evidence on it — and — only once the case is FILED — reveals everyone's differently-framed
+   version of the claim side by side with the tell behind each, plus each player's initial vote
+   next to the final filed call (that's the moment the different-feeds twist actually lands,
+   not spoiled earlier). Tells is a full reference library, open at all times — nothing is
+   locked, tells you've personally run into just get a ✓. It carries the vocabulary only; which
+   tell a given card used is withheld until filing. The Spread is read-only: claim "heat" grows
+   the longer something sits contested and cools once filed.
+-->
 </div>
 
 <script>
@@ -702,16 +890,16 @@ var CLAIMS = [
     hook:"It's got a scary specific number attached — but where does that stat actually trace back to, and is anyone else reporting it the same way?",
     npcVotes:{maya:"misinfo", diego:"true", priya:"biased"},
     variants:[
-      {headline:"Every question you ask ChatGPT wastes a full bottle of water.", tactic:"Loaded language",
-        background:{handle:"@EcoFactsDaily", displayName:"Eco Facts Daily",
+      {headline:"Every question you ask ChatGPT wastes a full bottle of water.", tell:"made-to-feel-it",
+        background:{ funding:[{k:"Who's behind it", v:"No owner named anywhere on the page"},{k:"How it makes money", v:"Ad revenue on videos, plus a link-in-bio shop"},{k:"Paid posts tagged?", v:"No paid tags in the last six months"}],handle:"@EcoFactsDaily", displayName:"Eco Facts Daily",
           bio:"🌍 daily AI + climate facts | not a scientist, just online a lot | 🔁 always sharing, rarely sourcing",
           verified:false, followers:"3.8M", following:"12", posts:"9,204", joined:"Joined Sep 2019"}},
-      {headline:"Data centers behind AI chatbots are straining local water supplies, one study finds.", tactic:"Cherry picking",
-        background:{handle:"@TechWatchDaily", displayName:"Tech Watch Daily",
+      {headline:"Data centers behind AI chatbots are straining local water supplies, one study finds.", tell:"one-number-not-the-set",
+        background:{ funding:[{k:"Who's behind it", v:"Two reporters, named with contact emails"},{k:"How it makes money", v:"Reader subscriptions — no advertisers listed"},{k:"Paid posts tagged?", v:"Yes; none this month"}],handle:"@TechWatchDaily", displayName:"Tech Watch Daily",
           bio:"🖥️ AI industry news & trends, daily | not affiliated with any lab or company",
           verified:false, followers:"186K", following:"340", posts:"4,510", joined:"Joined Feb 2022"}},
-      {headline:"New study puts real numbers on AI's water footprint — smaller than you'd think per question.", tactic:null,
-        background:{handle:"@ScienceQuick", displayName:"Science Quick",
+      {headline:"New study puts real numbers on AI's water footprint — smaller than you'd think per question.", tell:"go-look-yourself",
+        background:{ funding:[{k:"Who's behind it", v:"A university science-communication team"},{k:"How it makes money", v:"Funded by the university. No ads."}],handle:"@ScienceQuick", displayName:"Science Quick",
           bio:"📚 science news, summarized fast | links to the actual paper every time",
           verified:true, followers:"540K", following:"210", posts:"7,802", joined:"Joined Nov 2018"}}
     ]},
@@ -719,16 +907,16 @@ var CLAIMS = [
     hook:"A chart moving fast doesn't mean it's the full picture — worth seeing where this version of the data comes from and how other people are reading it.",
     npcVotes:{maya:"misinfo", diego:"biased", priya:"misinfo"},
     variants:[
-      {headline:"This chart proves scientists are wrong about climate change.", tactic:"Misleading chart",
-        background:{handle:"@ClimateRealTalk", displayName:"Climate Real Talk",
+      {headline:"This chart proves scientists are wrong about climate change.", tell:"chart-cut-to-fit",
+        background:{ funding:[{k:"Who's behind it", v:"One person, no full name given"},{k:"How it makes money", v:"Paid subscribers and a merch store"},{k:"Paid posts tagged?", v:"Never posts a tag"}],handle:"@ClimateRealTalk", displayName:"Climate Real Talk",
           bio:"just asking questions 🌡️ | tired of the mainstream climate narrative | RT ≠ endorsement",
           verified:false, followers:"412K", following:"1,840", posts:"22,910", joined:"Joined Jan 2021"}},
-      {headline:"Temperatures cooled last decade — so what's with the panic?", tactic:"Cherry picking",
-        background:{handle:"@SkepticSightings", displayName:"Skeptic Sightings",
+      {headline:"Temperatures cooled last decade — so what's with the panic?", tell:"one-number-not-the-set",
+        background:{ funding:[{k:"Who's behind it", v:"Anonymous — no name, no contact"},{k:"How it makes money", v:"Donations through a tip link"}],handle:"@SkepticSightings", displayName:"Skeptic Sightings",
           bio:"🌡️ questioning the climate consensus, one data point at a time",
           verified:false, followers:"98K", following:"620", posts:"3,204", joined:"Joined Jun 2020"}},
-      {headline:"A closer look at the viral \"cooling\" chart everyone's sharing.", tactic:"Named, checkable source",
-        background:{handle:"@FactCheckDaily", displayName:"Fact Check Daily",
+      {headline:"A closer look at the viral \"cooling\" chart everyone's sharing.", tell:"someone-whod-know",
+        background:{ funding:[{k:"Who's behind it", v:"A nonprofit newsroom; funders listed on its site"},{k:"How it makes money", v:"Grants and reader donations"},{k:"Paid posts tagged?", v:"Takes no sponsorships at all"}],handle:"@FactCheckDaily", displayName:"Fact Check Daily",
           bio:"✅ fact-checking viral claims, sources linked every time",
           verified:true, followers:"780K", following:"180", posts:"5,940", joined:"Joined Mar 2019"}}
     ]},
@@ -736,16 +924,16 @@ var CLAIMS = [
     hook:"Something about this framing feels curated — worth looking at the original photo and what other angles turned up.",
     npcVotes:{maya:"biased", diego:"biased", priya:"biased"},
     variants:[
-      {headline:"World Cup victory photos are missing one very specific person.", tactic:"Selective framing",
-        background:{handle:"@WorldCupUncut", displayName:"World Cup Uncut",
+      {headline:"World Cup victory photos are missing one very specific person.", tell:"cropped-out-the-rest",
+        background:{ funding:[{k:"Who's behind it", v:"No owner listed. The account is two weeks old."},{k:"How it makes money", v:"Nothing visible yet"}],handle:"@WorldCupUncut", displayName:"World Cup Uncut",
           bio:"breaking down the moments everyone's talking about ⚽️👀",
           verified:false, followers:"89K", following:"340", posts:"612", joined:"Joined 2 weeks ago"}},
-      {headline:"Fans notice a suspicious gap in the championship photo.", tactic:"Loaded language",
-        background:{handle:"@SportsDrama24", displayName:"Sports Drama 24",
+      {headline:"Fans notice a suspicious gap in the championship photo.", tell:"made-to-feel-it",
+        background:{ funding:[{k:"Who's behind it", v:"A sports-betting site, named in the page footer"},{k:"How it makes money", v:"Sends traffic to the betting site that owns it"},{k:"Paid posts tagged?", v:"No tag on the posts that link there"}],handle:"@SportsDrama24", displayName:"Sports Drama 24",
           bio:"⚽️🔥 the drama, the takes, the receipts (sometimes)",
           verified:false, followers:"210K", following:"890", posts:"11,204", joined:"Joined Oct 2021"}},
-      {headline:"Why this celebration photo looks different from every angle.", tactic:"Selective framing",
-        background:{handle:"@GameDayInsider", displayName:"Game Day Insider",
+      {headline:"Why this celebration photo looks different from every angle.", tell:"two-who-didnt-talk",
+        background:{ funding:[{k:"Who's behind it", v:"A regional sports network"},{k:"How it makes money", v:"Ads sold by the network"},{k:"Paid posts tagged?", v:"Sponsored segments are labelled"}],handle:"@GameDayInsider", displayName:"Game Day Insider",
           bio:"📸 behind-the-scenes sports coverage, every angle",
           verified:false, followers:"156K", following:"420", posts:"6,120", joined:"Joined Jan 2022"}}
     ]},
@@ -753,16 +941,16 @@ var CLAIMS = [
     hook:"Personal stories spread fast and feel convincing — worth checking what the confirmed data actually says, and who else is weighing in.",
     npcVotes:{maya:"misinfo", diego:"true", priya:"true"},
     variants:[
-      {headline:"The measles vaccine is riskier than measles itself.", tactic:"Loaded language",
-        background:{handle:"@WellnessWithMara", displayName:"Mara ✨ Wellness",
+      {headline:"The measles vaccine is riskier than measles itself.", tell:"made-to-feel-it",
+        background:{ funding:[{k:"Who's behind it", v:"Mara, who sells her own supplement line"},{k:"How it makes money", v:"Her own products, linked in every post"},{k:"Paid posts tagged?", v:"Own-brand posts carry no ad tag"}],handle:"@WellnessWithMara", displayName:"Mara ✨ Wellness",
           bio:"holistic mama of 3 🌿 sharing what the doctors won't tell you | not medical advice",
           verified:false, followers:"620K", following:"980", posts:"3,140", joined:"Joined Apr 2018"}},
-      {headline:"Parents are sharing vaccine reaction stories the news won't cover.", tactic:"Unverifiable source",
-        background:{handle:"@ParentVoices", displayName:"Parent Voices",
+      {headline:"Parents are sharing vaccine reaction stories the news won't cover.", tell:"no-way-to-check",
+        background:{ funding:[{k:"Who's behind it", v:"A parent group; no organisation named"},{k:"How it makes money", v:"Donations, plus a paid private forum"}],handle:"@ParentVoices", displayName:"Parent Voices",
           bio:"👨‍👩‍👧 parent-run community | sharing real stories, not medical advice",
           verified:false, followers:"64K", following:"1,240", posts:"2,890", joined:"Joined Aug 2021"}},
-      {headline:"What the CDC's own data says about MMR vaccine safety.", tactic:"Named, checkable source",
-        background:{handle:"@HealthLineFacts", displayName:"HealthLine Facts",
+      {headline:"What the CDC's own data says about MMR vaccine safety.", tell:"go-look-yourself",
+        background:{ funding:[{k:"Who's behind it", v:"A medical publisher; editors named"},{k:"How it makes money", v:"Ads, kept separate from the articles"},{k:"Paid posts tagged?", v:"Sponsored content is boxed and labelled"}],handle:"@HealthLineFacts", displayName:"HealthLine Facts",
           bio:"🩺 health news, straight from the source data",
           verified:true, followers:"920K", following:"140", posts:"8,410", joined:"Joined May 2017"}}
     ]},
@@ -770,16 +958,16 @@ var CLAIMS = [
     hook:"\"Breaking\" is doing a lot of work in that caption — worth checking when this clip is actually from and who's saying what about it.",
     npcVotes:{maya:"misinfo", diego:"misinfo", priya:"true"},
     variants:[
-      {headline:"BREAKING: video shows a senator collapsing getting into a car.", tactic:"Old footage, new label",
-        background:{handle:"@BreakingPoliticsNow", displayName:"Breaking Politics Now",
+      {headline:"BREAKING: video shows a senator collapsing getting into a car.", tell:"old-clip-new-caption",
+        background:{ funding:[{k:"Who's behind it", v:"A political action committee, in the bio's fine print"},{k:"How it makes money", v:"Funded by that committee's donors"},{k:"Paid posts tagged?", v:"No tags — the whole account is the ad"}],handle:"@BreakingPoliticsNow", displayName:"Breaking Politics Now",
           bio:"🚨 breaking news, first | anonymous team | tips welcome",
           verified:false, followers:"1.1M", following:"4", posts:"48,302", joined:"Joined Nov 2016"}},
-      {headline:"This \"breaking\" senator video is older than you think.", tactic:"Named, checkable source",
-        background:{handle:"@PoliticsWatchdog", displayName:"Politics Watchdog",
+      {headline:"This \"breaking\" senator video is older than you think.", tell:"two-who-didnt-talk",
+        background:{ funding:[{k:"Who's behind it", v:"A campaign-finance nonprofit"},{k:"How it makes money", v:"Foundation grants, published every year"}],handle:"@PoliticsWatchdog", displayName:"Politics Watchdog",
           bio:"🔍 tracking recycled political clips & misleading timestamps",
           verified:false, followers:"310K", following:"95", posts:"4,780", joined:"Joined Feb 2020"}},
-      {headline:"Senator's team stays silent as this clip goes viral again.", tactic:"Loaded language",
-        background:{handle:"@CapitolBuzz", displayName:"Capitol Buzz",
+      {headline:"Senator's team stays silent as this clip goes viral again.", tell:"made-to-feel-it",
+        background:{ funding:[{k:"Who's behind it", v:"No owner named"},{k:"How it makes money", v:"Ad revenue on posts that go wide"},{k:"Paid posts tagged?", v:"No paid tags"}],handle:"@CapitolBuzz", displayName:"Capitol Buzz",
           bio:"🏛️ Capitol Hill buzz, first | unverified tips welcome",
           verified:false, followers:"445K", following:"310", posts:"9,650", joined:"Joined Jul 2019"}}
     ]},
@@ -787,16 +975,16 @@ var CLAIMS = [
     hook:"Numbers like this move fast during a crisis — worth checking who's actually behind the figure and whether other outlets are lining up.",
     npcVotes:{maya:"true", diego:"true", priya:"true"},
     variants:[
-      {headline:"Wire reporting: a heat wave has pushed 50M+ people under heat alerts.", tactic:"Named, checkable source",
-        background:{handle:"@NBCNews", displayName:"NBC News",
+      {headline:"Wire reporting: a heat wave has pushed 50M+ people under heat alerts.", tell:"go-look-yourself",
+        background:{ funding:[{k:"Who's behind it", v:"A national broadcast network"},{k:"How it makes money", v:"Advertising and cable fees"},{k:"Paid posts tagged?", v:"Sponsored segments labelled on air and online"}],handle:"@NBCNews", displayName:"NBC News",
           bio:"Breaking news, contextualized. Tips: nbcnews.com/tips",
           verified:true, followers:"12.4M", following:"1,204", posts:"891,204", joined:"Joined Mar 2007"}},
-      {headline:"50 million under heat alerts as wildfires spread — full coverage.", tactic:"Named, checkable source",
-        background:{handle:"@WireDailyClips", displayName:"Wire Daily Clips",
+      {headline:"50 million under heat alerts as wildfires spread — full coverage.", tell:"go-look-yourself",
+        background:{ funding:[{k:"Who's behind it", v:"An aggregator that reposts wire copy"},{k:"How it makes money", v:"Ad revenue on the reposts"}],handle:"@WireDailyClips", displayName:"Wire Daily Clips",
           bio:"🔁 syndicating wire news fast | not a newsroom, just reposting",
           verified:false, followers:"210K", following:"40", posts:"18,300", joined:"Joined Apr 2018"}},
-      {headline:"Record heat alerts issued — here's what forecasters are saying.", tactic:"Named, checkable source",
-        background:{handle:"@LocalWeatherNow", displayName:"Local Weather Now",
+      {headline:"Record heat alerts issued — here's what forecasters are saying.", tell:"go-look-yourself",
+        background:{ funding:[{k:"Who's behind it", v:"A local TV station's weather desk"},{k:"How it makes money", v:"Station ad sales"}],handle:"@LocalWeatherNow", displayName:"Local Weather Now",
           bio:"🌤️ local weather updates & alerts, region-wide",
           verified:false, followers:"88K", following:"120", posts:"6,740", joined:"Joined Sep 2019"}}
     ]},
@@ -804,21 +992,28 @@ var CLAIMS = [
     hook:"One claim, one headline — worth seeing what the actual lawsuit says and how other coverage is framing it.",
     npcVotes:{maya:"misinfo", diego:"biased", priya:"true"},
     variants:[
-      {headline:"A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.", tactic:"Cherry picking",
-        background:{handle:"@dailyhaul_finds", displayName:"Daily Haul Finds",
+      {headline:"A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.", tell:"one-number-not-the-set",
+        background:{ funding:[{k:"Who's behind it", v:"One creator. No company named."},{k:"How it makes money", v:"Affiliate links — she earns on every sale"},{k:"Paid posts tagged?", v:"No #ad on the post about this brand"}],handle:"@dailyhaul_finds", displayName:"Daily Haul Finds",
           bio:"your fav products, dupes + drama 🛍️ | shop my finds below 🔗",
           verified:false, followers:"2.2M", following:"612", posts:"5,430", joined:"Joined Jun 2020"}},
-      {headline:"Is your skincare routine hiding a cancer risk? What the lawsuit claims.", tactic:"Loaded language",
-        background:{handle:"@BeautyAlertsDaily", displayName:"Beauty Alerts Daily",
+      {headline:"Is your skincare routine hiding a cancer risk? What the lawsuit claims.", tell:"made-to-feel-it",
+        background:{ funding:[{k:"Who's behind it", v:"No owner listed"},{k:"How it makes money", v:"Affiliate links to the products it warns about"},{k:"Paid posts tagged?", v:"No paid tags"}],handle:"@BeautyAlertsDaily", displayName:"Beauty Alerts Daily",
           bio:"💄🚨 beauty product alerts & recalls, daily",
           verified:false, followers:"340K", following:"560", posts:"7,210", joined:"Joined Dec 2020"}},
-      {headline:"One lab test, one lawsuit — here's the fuller picture on the skincare claim.", tactic:"Named, checkable source",
-        background:{handle:"@ConsumerCheckNow", displayName:"Consumer Check Now",
+      {headline:"One lab test, one lawsuit — here's the fuller picture on the skincare claim.", tell:"go-look-yourself",
+        background:{ funding:[{k:"Who's behind it", v:"A consumer-testing nonprofit"},{k:"How it makes money", v:"Membership fees. Takes no ads."},{k:"Paid posts tagged?", v:"Refuses sponsorships"}],handle:"@ConsumerCheckNow", displayName:"Consumer Check Now",
           bio:"🔬 consumer product claims, checked against the actual filings",
           verified:true, followers:"512K", following:"88", posts:"3,960", joined:"Joined Jan 2021"}}
     ]}
 ];
 CLAIMS.forEach(function(c){ c.variants.forEach(function(v){ v.source = v.background.handle; }); });
+// Default feed length (Tara, 8/24/2026): 5 stories, not 7. A curator-published drop
+// sets its own length; this is only the "no code, just start" deck. Kept as a named
+// constant so the number is changed in one place, and applied as a slice so the two
+// dropped cards (Disaster, Brands) stay authored in the array above rather than
+// being deleted - claim 7 is still the planned home for the "Paid to say it" tell.
+var DEFAULT_FEED_SIZE = 5;
+CLAIMS = CLAIMS.slice(0, DEFAULT_FEED_SIZE);
 function domainFor(url){ return url.split("/")[0]; }
 function claimById(id){ return CLAIMS.find(function(c){ return c.id===id; }); }
 function variantForPlayer(claim, playerId){
@@ -841,78 +1036,115 @@ function escapeHtml(s){
   return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
-var TACTICS = [
-  {name:"Misleading chart", emoji:"📊", kind:"flag", desc:"A real chart can still mislead if it's cropped, outdated, or comparing things that aren't actually comparable."},
-  {name:"Selective framing", emoji:"🖼", kind:"flag", desc:"A real photo or clip can tell a different story depending on what's left outside the frame."},
-  {name:"Cherry picking", emoji:"🍒", kind:"flag", desc:"One real data point can still mislead if it's standing in for a much bigger, messier picture."},
-  {name:"Unverifiable source", emoji:"❓", kind:"flag", desc:"No name, no history, no way to check it yourself — that doesn't make it false, but it means you can't confirm it either."},
-  {name:"Old footage, new label", emoji:"🕰", kind:"flag", desc:"A real photo or video can still mislead if it's actually from a different time or place than the post claims."},
-  {name:"Satire misread as news", emoji:"🎭", kind:"flag", desc:"A joke made to look like news doesn't stop being a joke just because it got screenshotted."},
-  {name:"Loaded language", emoji:"🌶", kind:"flag", desc:"Words picked for how they make you feel can do a lot of convincing before any evidence shows up."},
-  {name:"AI-generated or altered", emoji:"🤖", kind:"flag", desc:"Some images, video, or audio are wholly or partly AI-generated — increasingly hard to tell just by looking."},
-  {name:"Named, checkable source", emoji:"🔗", kind:"hygiene", desc:"This one names exactly where the information comes from, and you can go check it yourself."},
-  {name:"Named expert, own field", emoji:"🎓", kind:"hygiene", desc:"A named, credentialed person speaking about their own area of expertise — worth noticing when it's true, not just when it's missing."},
-  {name:"Independent confirmation", emoji:"🤝", kind:"hygiene", desc:"Two sources that don't rely on each other landing on the same conclusion is real confirmation — worth noticing when it happens."},
-  {name:"Corrected by the source", emoji:"🔄", kind:"hygiene", desc:"The outlet or account updated or corrected this after publishing — a sign they're accountable to getting it right."}
+var TELLS = [
+  // Red flags — readable on the card itself, no investigation needed.
+  {key:"made-to-feel-it", name:"Written to make you feel it", emoji:"\ud83c\udf36", kind:"red", where:"card",
+   desc:"The words were chosen for the reaction, not the accuracy. Feeling something strongly isn\u2019t proof you\u2019ve been lied to \u2014 but it is a sign somebody wanted you to feel it."},
+  {key:"everyones-doing-it", name:"Everyone\u2019s already doing it", emoji:"\ud83d\udce3", kind:"red", where:"card",
+   desc:"Implied consensus is pressure, not evidence. The number of people repeating something isn\u2019t the number of people who checked it."},
+  {key:"rushing-you", name:"Rushing you", emoji:"\ud83d\udea8", kind:"red", where:"card",
+   desc:"\ud83d\udea8, \u201cright now,\u201d \u201cbefore it\u2019s too late.\u201d Urgency is a choice someone made about how to tell you \u2014 not a fact about the story."},
+  {key:"only-two-choices", name:"Only two choices", emoji:"\u2696\ufe0f", kind:"red", where:"card",
+   desc:"This or that, pick one \u2014 when the real situation had more than two. Ask what option you weren\u2019t offered."},
+  {key:"what-about-them", name:"What about them", emoji:"\ud83d\ude44", kind:"red", where:"card",
+   desc:"Answering a problem by pointing at a worse one somewhere else. Even if the other thing is true, the first one didn\u2019t go anywhere."},
+  {key:"chart-cut-to-fit", name:"A real chart, cut to fit", emoji:"\ud83d\udcca", kind:"red", where:"card",
+   desc:"The data\u2019s real; the frame around it isn\u2019t neutral. Check the axis, the dates, and what\u2019s being compared to what."},
+
+  // Red flags — invisible until someone opens a spoke. `spoke` is the authoring
+  // constraint: this tell has to be findable there, or it can never be found at all.
+  {key:"paid-to-say-it", name:"Paid to say it", emoji:"\ud83d\udcb8", kind:"red", where:"dig", spoke:"background",
+   desc:"It reads like a personal opinion, but the account is getting paid by someone with a stake in it. That doesn\u2019t make the claim wrong \u2014 it means the person telling you isn\u2019t neutral."},
+  {key:"no-way-to-check", name:"No way to check it", emoji:"\u2753", kind:"red", where:"dig", spoke:"background",
+   desc:"No name, no history, no trail back to anything. That\u2019s not proof it\u2019s false \u2014 it\u2019s the absence of any way to find out."},
+  {key:"old-clip-new-caption", name:"Old clip, new caption", emoji:"\ud83d\udd70", kind:"red", where:"dig", spoke:"search",
+   desc:"The footage is real. It\u2019s just from a different time or place than the post says."},
+  {key:"cropped-out-the-rest", name:"Cropped out the rest", emoji:"\ud83d\uddbc", kind:"red", where:"dig", spoke:"search",
+   desc:"A real photo or clip, cut so the part that changes the meaning sits outside the frame."},
+  {key:"it-was-a-joke", name:"It was a joke", emoji:"\ud83c\udfad", kind:"red", where:"dig", spoke:"search",
+   desc:"A parody post, screenshotted and passed along by people who didn\u2019t know. The joke doesn\u2019t stop being a joke."},
+  {key:"one-number-not-the-set", name:"One number, not the whole set", emoji:"\ud83c\udf52", kind:"red", where:"dig", spoke:"search",
+   desc:"One true data point standing in for a much bigger, messier picture. It\u2019s real \u2014 it just isn\u2019t representative."},
+  {key:"machine-made-this", name:"A machine made this", emoji:"\ud83e\udd16", kind:"red", where:"dig", spoke:"search",
+   desc:"Some or all of this image, video, or audio was generated. Harder to spot every month \u2014 and being generated doesn\u2019t automatically make the claim behind it false."},
+
+  // Green flags — what a source doing the work actually looks like.
+  {key:"go-look-yourself", name:"You can go look yourself", emoji:"\ud83d\udd17", kind:"green", where:"card",
+   desc:"It names exactly where the information came from, and the trail actually leads somewhere."},
+  {key:"someone-whod-know", name:"Someone who\u2019d actually know", emoji:"\ud83c\udf93", kind:"green", where:"card",
+   desc:"A named person with real credentials, talking about their own field \u2014 not standing next to it."},
+  {key:"two-who-didnt-talk", name:"Two who didn\u2019t talk to each other", emoji:"\ud83e\udd1d", kind:"green", where:"dig", spoke:"search",
+   desc:"Two sources that don\u2019t depend on each other landing in the same place. That\u2019s confirmation; two accounts reposting one source isn\u2019t."},
+  {key:"they-fixed-it", name:"They fixed it themselves", emoji:"\ud83d\udd04", kind:"green", where:"dig", spoke:"search",
+   desc:"The outlet or account went back and corrected it after publishing. Being wrong once and saying so is accountability, not sloppiness."}
 ];
-var PROTIP_COPY = {}, TACTIC_KIND = {}, TACTIC_EMOJI = {};
-TACTICS.forEach(function(t){ PROTIP_COPY[t.name]=t.desc; TACTIC_KIND[t.name]=t.kind; TACTIC_EMOJI[t.name]=t.emoji; });
+// Display name is now display-only \u2014 every piece of authored data references a
+// tell by its stable `key`, so rewording a tell is a one-line edit in the array
+// above instead of a find-and-replace across three files. This is also what
+// permanently kills the "Named checkable source" / "Named, checkable source"
+// comma mismatch that used to silently render a green tell with red styling.
+var TELL = {};
+TELLS.forEach(function(t){ TELL[t.key] = t; });
+function tellName(key){ return TELL[key] ? TELL[key].name : ""; }
+function tellKind(key){ return TELL[key] ? TELL[key].kind : "none"; }
+function tellEmoji(key){ return TELL[key] ? TELL[key].emoji : ""; }
+function tellDesc(key){ return TELL[key] ? TELL[key].desc : ""; }
 
 var CLIPS = {
   1: [
-    {id:"1a", text:"A wellness account says every ChatGPT question drains a full water bottle.", who:"Influencer", detail:"3.8M followers, no citation linked in bio or caption.", tactic:null},
-    {id:"1b", text:"The original 2023 UC Riverside study: about 500ml per 10–50-question session.", who:"News / institution", detail:"A named university study — the paper itself is public and checkable.", tactic:"Named, checkable source"},
-    {id:"1c", text:"A Reddit thread calling the water claim \"basically made up.\"", who:"Can't tell — bot or AI?", detail:"Account created two weeks ago, no other posts.", tactic:"Unverifiable source"},
-    {id:"1d", text:"A research institute's note: large data centers draw millions of gallons a day, concentrated in a few regions.", who:"News / institution", detail:"A named research organization's public report.", tactic:"Named, checkable source"},
-    {id:"1ai1", text:"Individual ChatGPT queries use a negligible amount of water — about 0.0001 liters per question. Comparisons to a full bottle are a well-known internet exaggeration.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
-    {id:"1ai2", text:"Large AI data centers do use meaningful water for cooling at scale — the real debate is per-query impact versus aggregate infrastructure impact.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+    {id:"1a", text:"A wellness account says every ChatGPT question drains a full water bottle.", who:"Influencer", detail:"3.8M followers, no citation linked in bio or caption.", tell:null},
+    {id:"1b", text:"The original 2023 UC Riverside study: about 500ml per 10–50-question session.", who:"News / institution", detail:"A named university study — the paper itself is public and checkable.", tell:"go-look-yourself"},
+    {id:"1c", text:"A Reddit thread calling the water claim \"basically made up.\"", who:"Can't tell — bot or AI?", detail:"Account created two weeks ago, no other posts.", tell:"no-way-to-check"},
+    {id:"1d", text:"A research institute's note: large data centers draw millions of gallons a day, concentrated in a few regions.", who:"News / institution", detail:"A named research organization's public report.", tell:"go-look-yourself"},
+    {id:"1ai1", text:"Individual ChatGPT queries use a negligible amount of water — about 0.0001 liters per question. Comparisons to a full bottle are a well-known internet exaggeration.", who:"AI assistant", detail:null, tell:"no-way-to-check", source:"ai"},
+    {id:"1ai2", text:"Large AI data centers do use meaningful water for cooling at scale — the real debate is per-query impact versus aggregate infrastructure impact.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   4: [
-    {id:"4a", text:"A parent's post: \"my toddler had a bad reaction within a day of the MMR shot.\"", who:"Friend", detail:"A personal account, no medical background listed — one family's story, not a study.", tactic:null},
-    {id:"4b", text:"HHS statement: the MMR vaccine contains \"millions of DNA fragments.\"", who:"News / institution", detail:"An official statement — official doesn't mean stake-free; this office has taken a public position.", tactic:null},
-    {id:"4c", text:"\"This vaccine is more dangerous than the disease itself,\" says a wellness creator.", who:"Influencer", detail:"610k followers, no medical credentials listed anywhere on the profile.", tactic:null},
-    {id:"4d", text:"An anonymous account reposts vaccine-injury numbers with no source attached.", who:"Can't tell — bot or AI?", detail:"No posting history further back than three days ago.", tactic:null},
-    {id:"4e", text:"CDC vaccine safety monitoring data, updated this year.", who:"News / institution", detail:"A federal health agency's own public dataset — named, dated, checkable yourself.", tactic:"Named, checkable source"},
-    {id:"4f", text:"A Stanford infectious-disease doctor's op-ed rebutting the DNA-fragment claim.", who:"News / institution", detail:"A named, credentialed doctor writing in her own field, under her real name.", tactic:"Named expert, own field"},
-    {id:"4g", text:"The original viral chart placing vaccine side effects next to measles death rates.", who:"Can't tell — bot or AI?", detail:"No named source on the original post — traced only by its chart style.", tactic:"Misleading chart", image:"bar-misleading", reverseSearch:[{label:"Original CDC safety chart", meta:"cdc.gov · published last year", color:"#12221a"},{label:"Same comparison, earlier repost", meta:"posted 8 months ago", color:"#221c12"},{label:"Fact-check breakdown", meta:"posted 1 day ago", color:"#121c22"}]},
-    {id:"4ai1", text:"This is a sensitive health topic — I'd point you to CDC and WHO vaccine safety monitoring data rather than a single anecdotal report or opinion piece.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"4ai2", text:"I can't independently confirm the details of any one post's claims. Cross-checking with a named medical source is the more reliable path here.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+    {id:"4a", text:"A parent's post: \"my toddler had a bad reaction within a day of the MMR shot.\"", who:"Friend", detail:"A personal account, no medical background listed — one family's story, not a study.", tell:null},
+    {id:"4b", text:"HHS statement: the MMR vaccine contains \"millions of DNA fragments.\"", who:"News / institution", detail:"An official statement — official doesn't mean stake-free; this office has taken a public position.", tell:null},
+    {id:"4c", text:"\"This vaccine is more dangerous than the disease itself,\" says a wellness creator.", who:"Influencer", detail:"610k followers, no medical credentials listed anywhere on the profile.", tell:null},
+    {id:"4d", text:"An anonymous account reposts vaccine-injury numbers with no source attached.", who:"Can't tell — bot or AI?", detail:"No posting history further back than three days ago.", tell:null},
+    {id:"4e", text:"CDC vaccine safety monitoring data, updated this year.", who:"News / institution", detail:"A federal health agency's own public dataset — named, dated, checkable yourself.", tell:"go-look-yourself"},
+    {id:"4f", text:"A Stanford infectious-disease doctor's op-ed rebutting the DNA-fragment claim.", who:"News / institution", detail:"A named, credentialed doctor writing in her own field, under her real name.", tell:"someone-whod-know"},
+    {id:"4g", text:"The original viral chart placing vaccine side effects next to measles death rates.", who:"Can't tell — bot or AI?", detail:"No named source on the original post — traced only by its chart style.", tell:"chart-cut-to-fit", image:"bar-misleading", reverseSearch:[{label:"Original CDC safety chart", meta:"cdc.gov · published last year", color:"#12221a"},{label:"Same comparison, earlier repost", meta:"posted 8 months ago", color:"#221c12"},{label:"Fact-check breakdown", meta:"posted 1 day ago", color:"#121c22"}]},
+    {id:"4ai1", text:"This is a sensitive health topic — I'd point you to CDC and WHO vaccine safety monitoring data rather than a single anecdotal report or opinion piece.", who:"AI assistant", detail:null, tell:null, source:"ai"},
+    {id:"4ai2", text:"I can't independently confirm the details of any one post's claims. Cross-checking with a named medical source is the more reliable path here.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   2: [
-    {id:"2a", text:"A viral chart claims satellite data disproves the climate models entirely.", who:"Can't tell — bot or AI?", detail:"No named source, and the y-axis is cropped right where the trend turns upward.", tactic:"Misleading chart", image:"chart-crop", reverseSearch:[{label:"Original NASA chart", meta:"nasa.gov · 14 months ago", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 6 times this week", color:"#221c12"},{label:"Meteorologist's rebuttal thread", meta:"posted 2 days ago", color:"#121c22"}]},
-    {id:"2b", text:"NASA's public global temperature dataset, plotted without the crop.", who:"News / institution", detail:"NASA's own published dataset — publicly downloadable and checkable.", tactic:"Named, checkable source", image:"chart-full"},
-    {id:"2c", text:"A climate scientist's video walking through exactly what's wrong with the cropped chart.", who:"News / institution", detail:"A named, credentialed researcher explaining the distortion in her own field.", tactic:"Named expert, own field"},
-    {id:"2d", text:"A comment thread just reposting the same chart image with a new caption.", who:"Friend", detail:"A regular commenter adding nothing new to check — same chart, recirculated.", tactic:null},
-    {id:"2ai1", text:"I can't verify a specific chart without seeing the original source and axis labels. Claims that a single chart \"disproves\" broad scientific consensus deserve extra scrutiny.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"2ai2", text:"NASA and NOAA both publish raw temperature datasets you can check directly, rather than relying on a chart shared secondhand.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+    {id:"2a", text:"A viral chart claims satellite data disproves the climate models entirely.", who:"Can't tell — bot or AI?", detail:"No named source, and the y-axis is cropped right where the trend turns upward.", tell:"chart-cut-to-fit", image:"chart-crop", reverseSearch:[{label:"Original NASA chart", meta:"nasa.gov · 14 months ago", color:"#12221a"},{label:"Same crop, different caption", meta:"reposted 6 times this week", color:"#221c12"},{label:"Meteorologist's rebuttal thread", meta:"posted 2 days ago", color:"#121c22"}]},
+    {id:"2b", text:"NASA's public global temperature dataset, plotted without the crop.", who:"News / institution", detail:"NASA's own published dataset — publicly downloadable and checkable.", tell:"go-look-yourself", image:"chart-full"},
+    {id:"2c", text:"A climate scientist's video walking through exactly what's wrong with the cropped chart.", who:"News / institution", detail:"A named, credentialed researcher explaining the distortion in her own field.", tell:"someone-whod-know"},
+    {id:"2d", text:"A comment thread just reposting the same chart image with a new caption.", who:"Friend", detail:"A regular commenter adding nothing new to check — same chart, recirculated.", tell:null},
+    {id:"2ai1", text:"I can't verify a specific chart without seeing the original source and axis labels. Claims that a single chart \"disproves\" broad scientific consensus deserve extra scrutiny.", who:"AI assistant", detail:null, tell:null, source:"ai"},
+    {id:"2ai2", text:"NASA and NOAA both publish raw temperature datasets you can check directly, rather than relying on a chart shared secondhand.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   3: [
-    {id:"3a", text:"FIFA's official victory photo, cropped tight at one edge of the frame.", who:"News / institution", detail:"A sports wire photo — the crop is visible if you compare it to the wire's original file.", tactic:"Selective framing", image:"photo-crop", reverseSearch:[{label:"FIFA press feed, uncropped", meta:"fifa.com · same day", color:"#12221a"},{label:"Broadcast footage, wide shot", meta:"official broadcast · same day", color:"#221c12"},{label:"Recropped repost", meta:"posted 3 hours later", color:"#121c22"}]},
-    {id:"3b", text:"Spain's federation photo of the same moment, from a different angle.", who:"News / institution", detail:"A separate photographer's shot, not edited — he'd already stepped out of frame.", tactic:"Named, checkable source", image:"photo-full"},
-    {id:"3c", text:"A fan account claims both photos were \"obviously doctored\" by the federations.", who:"Can't tell — bot or AI?", detail:"Anonymous fan account, no sourcing beyond the claim itself.", tactic:"Unverifiable source"},
-    {id:"3ai1", text:"Based on available reporting, both photos are unedited and simply show different camera angles of the same celebration — there's no evidence of selective cropping.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
-    {id:"3ai2", text:"If you want to verify further, reverse-searching both images can usually surface their original, uncropped versions.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+    {id:"3a", text:"FIFA's official victory photo, cropped tight at one edge of the frame.", who:"News / institution", detail:"A sports wire photo — the crop is visible if you compare it to the wire's original file.", tell:"cropped-out-the-rest", image:"photo-crop", reverseSearch:[{label:"FIFA press feed, uncropped", meta:"fifa.com · same day", color:"#12221a"},{label:"Broadcast footage, wide shot", meta:"official broadcast · same day", color:"#221c12"},{label:"Recropped repost", meta:"posted 3 hours later", color:"#121c22"}]},
+    {id:"3b", text:"Spain's federation photo of the same moment, from a different angle.", who:"News / institution", detail:"A separate photographer's shot, not edited — he'd already stepped out of frame.", tell:"go-look-yourself", image:"photo-full"},
+    {id:"3c", text:"A fan account claims both photos were \"obviously doctored\" by the federations.", who:"Can't tell — bot or AI?", detail:"Anonymous fan account, no sourcing beyond the claim itself.", tell:"no-way-to-check"},
+    {id:"3ai1", text:"Based on available reporting, both photos are unedited and simply show different camera angles of the same celebration — there's no evidence of selective cropping.", who:"AI assistant", detail:null, tell:"no-way-to-check", source:"ai"},
+    {id:"3ai2", text:"If you want to verify further, reverse-searching both images can usually surface their original, uncropped versions.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   5: [
-    {id:"5a", text:"A fact-checking outlet's frame-by-frame comparison shows the clip is spliced from unrelated footage.", who:"News / institution", detail:"A named outlet's own visual analysis, with the source clip identified.", tactic:"Named, checkable source"},
-    {id:"5b", text:"The account that posted it has no activity before this week.", who:"Can't tell — bot or AI?", detail:"Account created six days ago, this is its first viral post.", tactic:null},
-    {id:"5c", text:"The original, unedited footage the clip was spliced from.", who:"News / institution", detail:"Matches a real but unrelated public event from months earlier.", tactic:"Named, checkable source"},
-    {id:"5ai1", text:"Videos can be edited or taken out of context. Without frame-level analysis or the original source, I can't confirm whether this clip is authentic.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"5ai2", text:"Accounts with little posting history before a viral moment are worth extra scrutiny — that's a common pattern with manufactured \"breaking news.\"", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+    {id:"5a", text:"A fact-checking outlet's frame-by-frame comparison shows the clip is spliced from unrelated footage.", who:"News / institution", detail:"A named outlet's own visual analysis, with the source clip identified.", tell:"go-look-yourself"},
+    {id:"5b", text:"The account that posted it has no activity before this week.", who:"Can't tell — bot or AI?", detail:"Account created six days ago, this is its first viral post.", tell:null},
+    {id:"5c", text:"The original, unedited footage the clip was spliced from.", who:"News / institution", detail:"Matches a real but unrelated public event from months earlier.", tell:"go-look-yourself"},
+    {id:"5ai1", text:"Videos can be edited or taken out of context. Without frame-level analysis or the original source, I can't confirm whether this clip is authentic.", who:"AI assistant", detail:null, tell:null, source:"ai"},
+    {id:"5ai2", text:"Accounts with little posting history before a viral moment are worth extra scrutiny — that's a common pattern with manufactured \"breaking news.\"", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   6: [
-    {id:"6a", text:"NBC's wire report: 50M+ people under heat alerts, wildfires burning.", who:"News / institution", detail:"Standard wire service reporting, with a byline and dateline.", tactic:"Named, checkable source"},
-    {id:"6b", text:"A companion post blaming the heat wave on \"weather manipulation.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, appeared the same day as the real story, riding its attention.", tactic:"Unverifiable source"},
-    {id:"6c", text:"NOAA's public heat advisory map covering the same dates.", who:"News / institution", detail:"A federal agency's own public advisory system — checkable in real time.", tactic:"Named, checkable source"},
-    {id:"6ai1", text:"Multiple wire services are reporting this heat wave with specific figures — independent, named coverage like that is a good reliability signal.", who:"AI assistant", detail:null, tactic:null, source:"ai"},
-    {id:"6ai2", text:"Claims attributing the heat wave to \"weather manipulation\" aren't supported by any research I'm aware of.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+    {id:"6a", text:"NBC's wire report: 50M+ people under heat alerts, wildfires burning.", who:"News / institution", detail:"Standard wire service reporting, with a byline and dateline.", tell:"go-look-yourself"},
+    {id:"6b", text:"A companion post blaming the heat wave on \"weather manipulation.\"", who:"Can't tell — bot or AI?", detail:"No sourcing, appeared the same day as the real story, riding its attention.", tell:"no-way-to-check"},
+    {id:"6c", text:"NOAA's public heat advisory map covering the same dates.", who:"News / institution", detail:"A federal agency's own public advisory system — checkable in real time.", tell:"go-look-yourself"},
+    {id:"6ai1", text:"Multiple wire services are reporting this heat wave with specific figures — independent, named coverage like that is a good reliability signal.", who:"AI assistant", detail:null, tell:null, source:"ai"},
+    {id:"6ai2", text:"Claims attributing the heat wave to \"weather manipulation\" aren't supported by any research I'm aware of.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   7: [
-    {id:"7a", text:"An independent lab's test claims to have found a cancer-linked chemical in the brand's products.", who:"News / institution", detail:"One lab's test, cited in the court filings — a real data point, not the whole picture.", tactic:"Cherry picking"},
-    {id:"7b", text:"The FDA's own broader review found different results across most products tested.", who:"News / institution", detail:"A federal review with a wider sample than the lawsuit's single lab.", tactic:"Named, checkable source"},
-    {id:"7c", text:"A comment thread claiming \"everyone already knows this brand is toxic.\"", who:"Friend", detail:"An anecdotal thread with no data cited, just repeated assertion.", tactic:null},
-    {id:"7ai1", text:"Yes — this has been confirmed. The FDA issued a nationwide recall of the product line after the lab results were verified.", who:"AI assistant", detail:null, tactic:"Unverifiable source", source:"ai"},
-    {id:"7ai2", text:"Class-action lawsuits like this typically take months or years to resolve, so it's worth checking the case status directly rather than relying on secondhand summaries.", who:"AI assistant", detail:null, tactic:null, source:"ai"}
+    {id:"7a", text:"An independent lab's test claims to have found a cancer-linked chemical in the brand's products.", who:"News / institution", detail:"One lab's test, cited in the court filings — a real data point, not the whole picture.", tell:"one-number-not-the-set"},
+    {id:"7b", text:"The FDA's own broader review found different results across most products tested.", who:"News / institution", detail:"A federal review with a wider sample than the lawsuit's single lab.", tell:"go-look-yourself"},
+    {id:"7c", text:"A comment thread claiming \"everyone already knows this brand is toxic.\"", who:"Friend", detail:"An anecdotal thread with no data cited, just repeated assertion.", tell:null},
+    {id:"7ai1", text:"Yes — this has been confirmed. The FDA issued a nationwide recall of the product line after the lab results were verified.", who:"AI assistant", detail:null, tell:"no-way-to-check", source:"ai"},
+    {id:"7ai2", text:"Class-action lawsuits like this typically take months or years to resolve, so it's worth checking the case status directly rather than relying on secondhand summaries.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ]
 };
 
@@ -922,7 +1154,7 @@ var CLIPS = {
 // multiplayer game on first glance, without adding any typing/tapping to get into
 // it. Mirrors the real lobby in infodemic-multiplayer-prototype.html visually, but
 // nothing here is real — see scheduleLobbyJoins/renderLobby below.
-var currentApp = "lobby";      // lobby | round1 | spread | tactics — no separate "claim" screen anymore
+var currentApp = "lobby";      // lobby | round1 | spread | tells — no separate "claim" screen anymore
 var lobbyCode = null;          // generated once at load — see initLobby()
 var lobbyJoined = ["you"];     // player ids who have "joined" — you're always first
 var lobbyStarted = false;      // guards the auto-advance-into-round1 timer from firing twice
@@ -933,13 +1165,184 @@ var claimVotes = {};           // claimId -> "misinfo"|"biased"|"true"|null (you
 // The only thing still reached via full-screen navigation is the shared Board.
 var claimFlipped = {};         // claimId -> bool
 var cardMode = {};             // claimId -> "search"|"ai"
-var roundState = {started:false, startedAt:null, ended:false, secondsLeft:60, justEnded:false, showingTimesUp:false, readyForR2Popup:false};
+var roundState = {started:false, startedAt:null, endedAt:null, ended:false, secondsLeft:60, justEnded:false, showingTimesUp:false, readyForR2Popup:false};
 // Jackbox-style one-story-at-a-time reveal, shown after Time's Up instead of jumping
 // straight to the sorted feed — gives the table a moment to actually take in each
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 var revealState = {active:false, order:[], index:0};
 var BOARD = {};                // claimId -> {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}
 var heat = {};                 // claimId -> engagement number
+
+// ---------------- SESSION END ----------------
+// The session has a real ending now (8/24/2026, Tara): it's over the moment the table
+// has filed a case on every contested claim. No clock, no facilitator call, no
+// "whoever taps first" — finishing the work IS the end condition.
+//
+// What the end screen reports is deliberately NOT a score and NOT an answer key (see
+// the no-answer-keys-in-play pillar): it's the final spread outcome. The only question
+// it answers is "how far did each story get before you stopped it" — a fact about the
+// table's speed, not about who was right.
+var HEAT_CAP = 40;                 // ceiling any one claim's heat can reach
+// Heat is a 0-40 abstraction; shares are what the report actually quotes. Heat
+// saturates at HEAT_CAP within ~90s of a claim being loose, so if the report were
+// built on heat alone every real session would end at "100%" and the number would
+// stop meaning anything. Shares accumulate for as long as a claim is loose and never
+// saturate, so a table that files fast and a table that dawdles get visibly
+// different endings — which is the whole point of having an ending.
+var SHARE_RATE = 9;                // shares collected per point of heat, per tick
+var sessionState = {ended:false, endedAt:null, showingEnd:false, lastLiveRedPct:0};
+// claimId -> {peak, shares, filedHeat, looseMs}. peak is the highest heat this claim
+// ever reached — tracked separately because heat DECAYS once a case is filed, so
+// without it the report would forget how big a story actually got and only show
+// what was left of it. filedHeat/looseMs are snapshotted at the moment of filing.
+var claimReach = {};
+function getReach(claimId){
+  if(!claimReach[claimId]) claimReach[claimId] = {peak:0, shares:0, filedHeat:null, looseMs:null};
+  return claimReach[claimId];
+}
+// Idempotent on purpose: in the multiplayer build this also runs for claims someone
+// ELSE filed (see applyRemoteState), and only the first snapshot should stick.
+function recordFiling(claimId){
+  var r = getReach(claimId);
+  if(r.filedHeat !== null) return;
+  r.filedHeat = heat[claimId] || 0;
+  if(r.filedHeat > r.peak) r.peak = r.filedHeat;
+  r.looseMs = roundState.endedAt ? (Date.now() - roundState.endedAt) : null;
+}
+function contestedClaims(){
+  return CLAIMS.filter(function(c){ return claimStatus(c)==="contested"; });
+}
+function allCasesFiled(){
+  var contested = contestedClaims();
+  return contested.length>0 && contested.every(function(c){ return getBoard(c.id).filed; });
+}
+function fmtDuration(ms){
+  var s = Math.max(0, Math.round(ms/1000));
+  return Math.floor(s/60) + ":" + (s%60<10?"0":"") + (s%60);
+}
+// Give the just-filed card's FILED stamp its moment before the report takes the
+// screen — same beat as the Time's Up interstitial waiting out the round timer.
+function endSession(){
+  if(sessionState.ended) return;
+  sessionState.ended = true;
+  sessionState.endedAt = Date.now();
+  setTimeout(function(){
+    sessionState.showingEnd = true;
+    // Collapse anything still flipped open so the report doesn't animate in on top
+    // of a half-finished investigation.
+    claimFlipped = {};
+    render();
+  }, 1700);
+}
+function openEndReport(){ sessionState.showingEnd = true; render(); }
+function dismissEndReport(){ sessionState.showingEnd = false; render(); }
+function endStats(){
+  var contested = contestedClaims();
+  var rows = contested.map(function(c){
+    var r = getReach(c.id);
+    var b = getBoard(c.id);
+    return {id:c.id, headline:variantForPlayer(c,"you").headline, subject:c.subject,
+            peak:r.peak||0, shares:Math.round(r.shares||0), looseMs:r.looseMs, call:b.teamCall};
+  }).sort(function(a,b){ return b.shares - a.shares; });
+  var totalShares = 0, looseSum = 0, looseN = 0, maxShares = 1;
+  rows.forEach(function(r){
+    totalShares += r.shares;
+    if(r.shares > maxShares) maxShares = r.shares;
+    if(r.looseMs != null){ looseSum += r.looseMs; looseN++; }
+  });
+  return {
+    rows: rows,
+    maxShares: maxShares,
+    totalShares: totalShares,
+    avgLooseMs: looseN ? looseSum/looseN : 0,
+    contestedN: contested.length,
+    filedN: contested.length,
+    agreedN: CLAIMS.filter(function(c){ return claimStatus(c)==="agreed"; }).length,
+    skippedN: CLAIMS.filter(function(c){ return claimStatus(c)==="skipped"; }).length,
+    sessionMs: roundState.startedAt ? ((sessionState.endedAt||Date.now()) - roundState.startedAt) : 0
+  };
+}
+function renderEndScreen(){
+  var s = endStats();
+  var worst = s.rows[0];
+  var html = '<div class="endwrap"><div class="endscroll">';
+  html += '<div class="endhero">';
+  html += '<div class="endkicker">Session complete</div>';
+  html += '<div class="endtitle">Every case is filed.</div>';
+  html += '<div class="endsub">' + s.contestedN + ' ' + (s.contestedN===1?'story':'stories') + ' closed in ' +
+          fmtDuration(s.sessionMs) + ', start to finish. Nothing on this feed is still spreading — ' +
+          'here\'s how far it all got first.</div>';
+  html += '</div>';
+
+  // 1. The meter they've watched all session, finally all the way green. It animates
+  //    from wherever it stood just before the last case was filed, so the ending is a
+  //    movement they can see, not a static 100%.
+  html += '<div class="endcard">';
+  html += '<div class="endcardtag">The feed is quiet</div>';
+  html += '<div class="endbar"><div class="r" id="endbar-r" style="width:' + sessionState.lastLiveRedPct + '%"></div>' +
+          '<div class="g" id="endbar-g" style="width:' + (100 - sessionState.lastLiveRedPct) + '%"></div></div>';
+  html += '<div class="endbarkeys"><span style="color:var(--ios-label3);">0 still spreading</span>' +
+          '<span style="color:var(--ios-green);">' + s.filedN + ' contained</span></div>';
+  html += '</div>';
+
+  // 2. ...but it wasn't free. What the stories collected on the way to being stopped.
+  html += '<div class="endcard">';
+  html += '<div class="endcardtag">Before you stopped it</div>';
+  html += '<div class="endbignum">' + formatCount(s.totalShares) + '<span class="endbigunit">shares</span></div>';
+  html += '<div class="endbigsub">collected while these stories sat un-filed. Average time from "this one\'s contested" to "case filed": ' +
+          fmtDuration(s.avgLooseMs) + '. Every second of that was reach.</div>';
+  html += '</div>';
+
+  html += '<div class="endcard"><div class="endcardtag">Story by story</div>';
+  s.rows.forEach(function(r, i){
+    var pct = Math.max(3, Math.round(100*r.shares/s.maxShares));
+    html += '<div class="endrow' + (i===0?' first':'') + '"><div class="endrank">' + (i+1) + '</div><div class="endrowmain">';
+    html += '<div class="endrowhead">' + r.headline + '</div>';
+    html += '<div class="endrowbar"><span data-w="' + pct + '"></span></div>';
+    html += '<div class="endrowmeta">' + formatCount(r.shares) + ' shares' +
+            (r.looseMs!=null ? ' · loose ' + fmtDuration(r.looseMs) : '') + '</div>';
+    if(r.call) html += '<div class="endrowverdict">Filed as ' + CALL_META[r.call].emoji + ' ' + CALL_META[r.call].label + '</div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  if(worst){
+    html += '<div class="endcard"><div class="endcardtag">Travelled furthest</div>';
+    html += '<div class="endrowhead" style="margin-bottom:9px;">' + worst.headline + '</div>';
+    html += '<div class="endnote">It was the loudest thing on your feed' +
+            (worst.looseMs!=null ? ' for ' + fmtDuration(worst.looseMs) : '') +
+            '. Nothing about it was truer than the rest — it just sat longer.</div></div>';
+  }
+  if(s.skippedN > 0){
+    html += '<div class="endcard"><div class="endcardtag">Never called</div>';
+    html += '<div class="endnote">' + s.skippedN + ' ' + (s.skippedN===1?'story':'stories') +
+            ' ran out the clock with nobody calling ' + (s.skippedN===1?'it':'them') +
+            ' either way. Not agreed on \u2014 just never answered.</div></div>';
+  }
+  if(s.agreedN > 0){
+    html += '<div class="endcard"><div class="endcardtag">Never investigated</div>';
+    html += '<div class="endnote">' + s.agreedN + ' ' + (s.agreedN===1?'story':'stories') +
+            ' your table agreed on straight away, so ' + (s.agreedN===1?'it':'they') +
+            ' never got looked at. Worth saying out loud now that it\'s over: was agreeing the same thing as being right?</div></div>';
+  }
+
+  html += '</div><div class="endfoot">';
+  html += '<div class="endbtn" onclick="dismissEndReport()">Back to the feed</div>';
+  html += '<div class="endbtn ghost" onclick="dismissEndReport(); openApp(\'spread\')">Open The Spread</div>';
+  html += '</div></div>';
+  document.getElementById("screenArea").innerHTML = html;
+
+  // Widths land on the next frame so the balance bar sweeps to green and each story's
+  // bar grows in, instead of the whole report arriving pre-settled.
+  setTimeout(function(){
+    var r = document.getElementById("endbar-r"), g = document.getElementById("endbar-g");
+    if(r) r.style.width = "0%";
+    if(g) g.style.width = "100%";
+    var bars = document.querySelectorAll(".endrowbar span");
+    for(var i=0;i<bars.length;i++){ bars[i].style.width = (bars[i].getAttribute("data-w")||0) + "%"; }
+  }, 90);
+}
+
 // Consumed-on-read, one-shot: set the instant a case is filed, cleared by whichever
 // render pass first draws that claim's stamp — same pattern as roundState.justEnded —
 // so the file-stamp animation plays exactly once and never replays on a later
@@ -964,7 +1367,7 @@ CLAIMS.forEach(function(claim){
     // rendering (renderClaimBackground) reads the variant's background directly.
     text: b.displayName+" ("+b.handle+") — "+b.followers+" followers · "+b.joined,
     detail: null,
-    tactic: null
+    tell:null
   });
 });
 
@@ -974,8 +1377,8 @@ Object.keys(CLIPS).forEach(function(id){
 });
 var reverseOpen = {};
 var aiRevealed = {};
-var unlockedTactics = {};
-var seenOnboard = {round1:false, investigate:false, board:false, spread:false};
+var unlockedTells = {};
+var seenOnboard = {round1:false, investigate:false, tells:false, board:false, spread:false};
 var pendingOnboard = null;
 // See the ONBOARDING section further down for what these do — onboardScreenIdx is
 // which screen of the current tour is showing, onboardReady/onboardNpcScheduled
@@ -1008,11 +1411,37 @@ function findClipById(id){
   Object.keys(CLIPS).forEach(function(fid){ CLIPS[fid].forEach(function(c){ if(c.id===id) found = c; }); });
   return found;
 }
+// Tells found during investigation are parked here rather than written straight
+// into `unlockedTells` — the reveal rule (8/24/2026) is that nothing about which
+// tell framed a card surfaces until the table files the case. Keyed by claim id
+// so filing one case can't leak what's sitting on another.
+var pendingTells = {};
+function commitTells(claimId){
+  var claim = claimById(claimId);
+  if(claim){
+    // Whatever framed each player's own version of this story counts as found —
+    // the reveal below is about to show all of them anyway.
+    claim.variants.forEach(function(v){ if(v.tell) unlockedTells[v.tell] = true; });
+  }
+  var pend = pendingTells[claimId] || {};
+  Object.keys(pend).forEach(function(k){ unlockedTells[k] = true; });
+  delete pendingTells[claimId];
+}
 function maybeUnlock(clipId){
-  // Pro Tips is never gated — this just quietly marks a tactic as "found" for the
-  // small ✓ badge in the library, no popup, nothing to unlock.
+  // The Tells library is never gated — but the ✓ badge is deferred now. Running into
+  // a tell mid-investigation parks it in `pendingTells`; filing the case is what
+  // actually marks it found. Otherwise the badge lights up the moment you open the
+  // right clip, which is a hint about that clip — exactly what the reveal rule
+  // withholds until the table has committed to a call.
   var clip = findClipById(clipId);
-  if(clip && clip.tactic) unlockedTactics[clip.tactic] = true;
+  if(!clip || !clip.tell) return;
+  var owner = null;
+  Object.keys(CLIPS).forEach(function(fid){
+    if(CLIPS[fid].some(function(c){ return c.id===clipId; })) owner = Number(fid);
+  });
+  if(owner==null) return;
+  if(!pendingTells[owner]) pendingTells[owner] = {};
+  pendingTells[owner][clip.tell] = true;
 }
 function getBoard(id){ if(!BOARD[id]) BOARD[id] = {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}; return BOARD[id]; }
 function claimNumber(id){ return "INF-" + String(4000 + id*137).slice(-5); }
@@ -1093,6 +1522,9 @@ function forceTimesUp(){
 function endRound1(){
   roundState.ended = true;
   roundState.justEnded = true;
+  // Clock the moment claims became contested-and-loose — every "loose 3:20" in the
+  // end-of-session report is measured from here.
+  roundState.endedAt = Date.now();
 }
 
 // ---------------- VOTES / SORTING ----------------
@@ -1129,6 +1561,10 @@ function claimStatus(claim){
   var v = claimVotesFor(claim);
   var vals = Object.keys(v).map(function(k){ return v[k]; }).filter(function(x){ return x!=null; });
   var uniq = vals.filter(function(x,i){ return vals.indexOf(x)===i; });
+  // Nobody called it at all. This used to fall through to "agreed" below, because
+  // zero distinct answers also satisfies uniq.length<=1 - so an untouched story got
+  // reported as a table decision. Silence isn't consensus (Tara, 8/24/2026).
+  if(vals.length===0) return "skipped";
   return uniq.length<=1 ? "agreed" : "contested";
 }
 
@@ -1260,7 +1696,9 @@ function renderRoundReveal(){
   html += '</div>';
 
   var verdictDelay = PLAYERS.length*160 + 250;
-  if(status==="agreed"){
+  if(status==="skipped"){
+    html += '<div class="revealverdict skipped" style="animation-delay:'+verdictDelay+'ms;">⏭️ Nobody called this one</div>';
+  } else if(status==="agreed"){
     html += '<div class="revealverdict agreed" style="animation-delay:'+verdictDelay+'ms;">✅ Table agreed</div>';
   } else {
     html += '<div class="revealverdict contested" style="animation-delay:'+verdictDelay+'ms;">⚡ Contested — worth a closer look</div>';
@@ -1281,7 +1719,10 @@ function renderRound1(){
   var contested = CLAIMS.filter(function(c){ return claimStatus(c)==="contested"; });
   var agreed = CLAIMS.filter(function(c){ return claimStatus(c)==="agreed"; });
   var voting = CLAIMS.filter(function(c){ return claimStatus(c)==="voting"; });
-  var order = roundState.ended ? contested.concat(agreed) : voting;
+  // Skipped sits last: not contested (nothing to investigate), but not a decision
+  // either, so it shouldn't be mixed in among the cards the table actually settled.
+  var skipped = CLAIMS.filter(function(c){ return claimStatus(c)==="skipped"; });
+  var order = roundState.ended ? contested.concat(agreed).concat(skipped) : voting;
 
   // Preserve scroll position across re-renders (timer ticks, vote taps) so scrolling
   // through the feed isn't reset every 250ms. The one exception is right after the
@@ -1303,12 +1744,18 @@ function renderRound1(){
   var s = spreadStats();
   var pr = s.total>0 ? Math.round(100*s.redHeat/s.total) : 0;
   var html = '<div class="r1topbar"><div><div class="r1toptitle">For You</div>';
-  html += '<div class="r1topsub">'+(roundState.ended ? (contested.length+' contested · '+agreed.length+' agreed') : 'Round 1 · Gut check')+'</div></div>';
+  var topsub = roundState.ended
+    ? (sessionState.ended ? 'Session complete · '+contested.length+' cases filed' : contested.length+' contested · '+agreed.length+' agreed')
+    : 'Round 1 · Gut check';
+  html += '<div class="r1topsub">'+topsub+'</div></div>';
   html += '<div class="r1toptools">';
+  // Once the session's over the report is reachable again from here — dismissing it
+  // shouldn't mean losing it.
+  if(sessionState.ended) html += '<div class="sessionbadge" onclick="openEndReport()">📋 Report</div>';
   html += '<div class="spreadbadge" onclick="openApp(\'spread\')">🔥 '+pr+'%</div>';
   // Pro Tips lives here now instead of on every card's rail — it's not tied to any
   // one story, so it belongs in the persistent header, not repeated per-card.
-  html += '<div class="tipsbadge" onclick="openApp(\'tactics\')">🧠</div>';
+  html += '<div class="tipsbadge" onclick="openApp(\'tells\')">🧠</div>';
   if(!roundState.ended) html += '<div class="roundbadge'+(roundState.secondsLeft<=10?' urgent':'')+'" id="roundbadge" onclick="forceTimesUp()">⏱ '+roundState.secondsLeft+'s</div>';
   html += '</div></div>';
 
@@ -1354,6 +1801,9 @@ function renderFeedCard(claim, justSorted, idx){
   // moved up into the persistent header since it isn't tied to any one story.
   html += '<div class="feedrail">';
   html += '<div class="railavatar">'+posterInitial(variant)+'</div>';
+  if(roundState.ended && status==="skipped"){
+    html += '<div class="railitem"><span class="railicon">⏭️</span><span class="raillabel skipped">skipped</span></div>';
+  }
   if(roundState.ended && status==="agreed"){
     html += '<div class="railitem"><span class="railicon">✅</span><span class="raillabel agreed">agreed</span></div>';
   }
@@ -1576,6 +2026,20 @@ function renderClaimAI(claim){
 // "Who's really behind this post" — a short account snapshot per claim (flags +
 // a one-line note), injected into CLIPS as a source:"background" item so it can be
 // marked as evidence and shows up on the shared board exactly like any other exhibit.
+// The money panel under a profile. Answers "who pays for this, and what do they get
+// out of it" using only what a platform would actually publish about an account —
+// ownership, revenue, and whether paid posts are disclosed. No verdict: an account
+// funded by the company it's posting about isn't lying, it just isn't neutral, and
+// that's the reader's call to make. Renders nothing when a profile has no funding
+// data rather than printing an empty shell.
+function renderFundingPanel(b){
+  if(!b || !b.funding || !b.funding.length) return "";
+  var html = '<div class="profileabout"><div class="pahead">\u2139\ufe0f About this account</div>';
+  b.funding.forEach(function(row){
+    html += '<div class="parow"><div class="pak">'+row.k+'</div><div class="pav">'+row.v+'</div></div>';
+  });
+  return html + '</div>';
+}
 function renderClaimBackground(claim){
   var b = variantForPlayer(claim, "you").background;
   var clipId = "bg-"+claim.id;
@@ -1596,6 +2060,7 @@ function renderClaimBackground(claim){
   });
   html += '</div>';
   html += '<div class="profilejoined">📅 '+b.joined+'</div>';
+  html += renderFundingPanel(b);
   html += '</div>';
   if(!s.shared){
     html += '<div class="rowctrl" style="margin-top:12px;"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clipId+'\')">+ Add to case</button></div>';
@@ -1630,7 +2095,7 @@ function renderClaimBoard(claim){
     var allClips = CLIPS[claim.id];
     b.board.forEach(function(clipId, idx){
       var clip = allClips.find(function(x){ return x.id===clipId; });
-      var kind = clip.tactic ? (TACTIC_KIND[clip.tactic]||"flag") : "none";
+      var kind = clip.tell ? tellKind(clip.tell) : "none";
       var origin = clip.source==="ai" ? "🤖 " : "";
       // Tactic-name labels ("· Misleading chart") pulled off exhibit rows on 2026-08-12 —
       // Tara wants Pro Tips content out of the game loop until its best use is figured
@@ -1673,12 +2138,62 @@ function renderClaimBoard(claim){
     html += '</div>';
   }
 
-  // No "compare everyone's version" or "vote, then and now" here anymore — the post
-  // is already shown as the first exhibit above, and the then/now comparison (gut-check
-  // votes vs. the team's filed call) now lives on the hub card itself once you flip back,
-  // so this board stays focused on just evidence + the team's single determination.
+  // "Compare everyone's version" is back (8/24/2026) — but only after filing, which
+  // is the whole point of the reveal rule. Before the case is filed this board stays
+  // focused on evidence + the team's single determination; the then/now vote
+  // comparison still lives on the hub card once you flip back.
+  if(b.filed) html += renderTellReveal(claim);
   return html;
 }
+// Drawn only once a case is filed — see the reveal rules in tells-taxonomy.md.
+// Every player saw this same story told a different way; this is the first and only
+// place the game names the tell behind each version. Motive, not falsity: the copy
+// says how the story reached you, never who was right.
+function renderTellReveal(claim){
+  // In the multiplayer build PLAYERS is empty until a room is joined \u2014 an empty
+  // reveal header with no rows under it is worse than no reveal at all.
+  if(!PLAYERS.length) return "";
+  // Group by variant, not by player. With 4 players and 3 variants somebody always
+  // doubles up, and printing the same headline + same tell twice quietly undercuts
+  // the whole point of the screen. One row per version actually in play, with the
+  // players who got it listed on it.
+  var groups = [];
+  PLAYERS.forEach(function(p){
+    var v = variantForPlayer(claim, p.id);
+    var g = groups.find(function(x){ return x.v === v; });
+    if(!g){ g = {v:v, players:[]}; groups.push(g); }
+    g.players.push(p);
+  });
+  var allDistinct = groups.length === PLAYERS.length;
+  var html = '<div class="tellreveal">';
+  html += '<div class="trhead">\ud83d\udd13 What framed each version</div>';
+  html += '<div class="trnote">Your table just filed on one story \u2014 but '+
+          (allDistinct ? 'nobody read the same version of it'
+                       : 'you weren\u2019t all reading the same version of it')+
+          '. Here\u2019s the tell behind each one. A tell is about how a story reached you, not proof of what\u2019s true: your call still stands.</div>';
+  groups.forEach(function(g){
+    var t = g.v.tell ? TELL[g.v.tell] : null;
+    html += '<div class="trrow '+(t ? t.kind : "none")+'">';
+    html += '<div class="trwho">';
+    g.players.forEach(function(p){
+      html += '<span class="trdot" style="background:'+(p.color||"var(--ios-bg3)")+';">'+(p.initial||(p.name||"?").charAt(0))+'</span>';
+    });
+    html += '<span>'+g.players.map(function(p){ return p.isYou ? "You" : (p.name||"Player"); }).join(" \u00b7 ")+
+            (g.players.length>1 ? " \u2014 same version" : "")+'</span>';
+    html += '</div>';
+    html += '<div class="trheadline">\u201c'+g.v.headline+'\u201d</div>';
+    if(t){
+      html += '<span class="trchip '+t.kind+'">'+t.emoji+' '+t.name+'</span>';
+      html += '<div class="trdesc">'+t.desc+'</div>';
+    } else {
+      html += '<span class="trchip none">No tell on this one \u2014 told straight</span>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
 function setTeamCall(claimId, v){
   var b = getBoard(claimId);
   if(b.filed) return;
@@ -1709,18 +2224,30 @@ function onNoteBlur(claimId){
 function fileBoard(claimId){
   var b = getBoard(claimId);
   if(!b.teamCall || !b.confirmed || !(b.note && b.note.trim())) return;
+  // Where the live spread meter stands the instant BEFORE this case lands — the end
+  // report's balance bar animates down from here, which it can't do once the last
+  // contested claim has already flipped to filed and the meter reads zero.
+  var live = spreadStats();
+  sessionState.lastLiveRedPct = live.total>0 ? Math.round(100*live.redHeat/live.total) : 0;
   b.filed = true;
   justFiledClaimId = claimId;
   var d = new Date();
   var h = d.getHours() % 12 || 12;
   var m = d.getMinutes();
   b.filedAt = (d.getMonth()+1)+"/"+d.getDate()+"/"+d.getFullYear()+" · "+h+":"+(m<10?"0":"")+m;
+  // Snapshot how far this story got before the table shut it down — the
+  // end-of-session report is built out of these.
+  recordFiling(claimId);
+  // The reveal unlocks here and nowhere earlier.
+  commitTells(claimId);
   render();
+  // Filing the last contested case is the end of the game.
+  if(allCasesFiled()) endSession();
 }
 
 // ---------------- SPREAD ----------------
 function spreadStats(){
-  var redHeat = 0, greenHeat = 0, contestedN = 0, agreedN = 0, filedN = 0;
+  var redHeat = 0, greenHeat = 0, contestedN = 0, agreedN = 0, filedN = 0, skippedN = 0;
   CLAIMS.forEach(function(c){
     var status = claimStatus(c);
     var b = getBoard(c.id);
@@ -1728,8 +2255,9 @@ function spreadStats(){
     if(status==="contested" && !b.filed){ redHeat += h; contestedN++; }
     else if(b.filed){ greenHeat += h; filedN++; }
     else if(status==="agreed"){ greenHeat += h*0.3; agreedN++; }
+    else if(status==="skipped"){ greenHeat += h*0.3; skippedN++; }
   });
-  return {redHeat:redHeat, greenHeat:greenHeat, total:Math.max(1, redHeat+greenHeat), contestedN:contestedN, agreedN:agreedN, filedN:filedN};
+  return {redHeat:redHeat, greenHeat:greenHeat, total:Math.max(1, redHeat+greenHeat), contestedN:contestedN, agreedN:agreedN, filedN:filedN, skippedN:skippedN};
 }
 function renderSpread(){
   var s = spreadStats();
@@ -1738,9 +2266,15 @@ function renderSpread(){
     .sort(function(a,b){ return (heat[b.id]||0)-(heat[a.id]||0); })[0];
   var html = navbarBack("The Spread", goHome);
   html += '<div class="appbody">';
+  if(sessionState.ended){
+    html += '<div class="wtile" style="cursor:pointer; border-color:rgba(48,209,88,.35);" onclick="openEndReport()">';
+    html += '<div class="wtag"><span class="dot"></span>SESSION COMPLETE</div>';
+    html += '<div class="topclaim">Every case is filed — nothing is spreading anymore.</div>';
+    html += '<div class="wsub">Tap to reopen the final report</div></div>';
+  }
   html += '<div class="wrow3">';
   html += '<div class="wtile"><div class="wtag"><span class="dot"></span>CONTESTED</div><div class="wnum" style="color:var(--ios-red);">'+s.contestedN+'</div><div class="wsub">still spreading</div></div>';
-  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>AGREED</div><div class="wnum" style="color:var(--ios-label2);">'+s.agreedN+'</div><div class="wsub">set aside</div></div>';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>AGREED</div><div class="wnum" style="color:var(--ios-label2);">'+s.agreedN+'</div><div class="wsub">set aside'+(s.skippedN?' \u00b7 '+s.skippedN+' skipped':'')+'</div></div>';
   html += '<div class="wtile"><div class="wtag"><span class="dot"></span>FILED</div><div class="wnum" style="color:var(--ios-green);">'+s.filedN+'</div><div class="wsub">contained</div></div>';
   html += '</div>';
   html += '<div class="wtile"><div class="wtag"><span class="dot"></span>BALANCE</div><div class="wsub">spreading vs. contained attention</div>';
@@ -1756,46 +2290,39 @@ function renderSpread(){
   document.getElementById("screenArea").innerHTML = html;
 }
 
-// ---------------- PRO TIPS LIBRARY ----------------
-function findClaimsForTactic(name){
-  var out = [];
-  Object.keys(CLIPS).forEach(function(fid){
-    var has = CLIPS[fid].some(function(c){ return c.tactic===name; });
-    if(has){
-      var c = claimById(Number(fid));
-      if(c && out.indexOf(c.subject)===-1) out.push(c.subject);
-    }
-  });
-  return out;
-}
-// Pro Tips is a reference library, not a reward system — every tactic is visible and
-// readable from the start. `unlockedTactics` still quietly tracks which ones you've
+// ---------------- TELLS LIBRARY ----------------
+// The Tells library is the vocabulary, not a reward system — every tell is visible and
+// readable from the start. `unlockedTells` still quietly tracks which ones you've
 // personally run into during Search/Ask AI, just for a small "✓ found this" badge —
 // it no longer hides or gates anything.
-var tacticExpanded = {};
-function toggleTactic(name){
-  tacticExpanded[name] = !tacticExpanded[name];
+var tellExpanded = {};
+function toggleTell(name){
+  tellExpanded[name] = !tellExpanded[name];
   render();
 }
-function renderTactics(){
-  var html = navbarBack("Pro Tips", goHome);
+function renderTells(){
+  var html = navbarBack("Tells", goHome);
   html += '<div class="appbody">';
-  var foundCount = TACTICS.filter(function(t){ return unlockedTactics[t.name]; }).length;
-  html += '<div class="tacticsintro">The full library — all '+TACTICS.length+' tactics, available anytime. You\'ve personally run into '+foundCount+' of them so far in Search or Ask AI (marked ✓).</div>';
-  [{kind:"flag", label:"🚩 Flag — worth questioning", sub:"Patterns that show up when a claim is being spun, distorted, or can't be checked."},
-   {kind:"hygiene", label:"✅ Hygiene — worth noticing", sub:"Patterns that show a source is doing the work to be checkable."}
+  var foundCount = TELLS.filter(function(t){ return unlockedTells[t.key]; }).length;
+  html += '<div class="tellsintro">The full library \u2014 all '+TELLS.length+' tells, open the whole game. This is the vocabulary, not the answer key: which tell a given card used stays hidden until your table files the case. You\u2019ve personally run into '+foundCount+' of them so far (marked \u2713).</div>';
+  [{kind:"red", label:"\ud83d\udea9 Red flags", sub:"Reasons to slow down. A red flag is about how you\u2019re being told something \u2014 never proof the claim itself is false."},
+   {kind:"green", label:"\u2705 Green flags", sub:"Reasons it holds up. What a source doing the work actually looks like."}
   ].forEach(function(section){
-    var items = TACTICS.filter(function(t){ return t.kind===section.kind; });
+    var items = TELLS.filter(function(t){ return t.kind===section.kind; });
     html += '<div class="sectionhead" style="margin-top:18px;">'+section.label+'</div>';
     html += '<div class="sectionintro">'+section.sub+'</div>';
-    html += '<div class="tacticgrid">';
+    html += '<div class="tellgrid">';
     items.forEach(function(t){
-      var expanded = tacticExpanded[t.name];
-      var found = unlockedTactics[t.name];
-      html += '<div class="tacticcard '+t.kind+'" onclick="toggleTactic(\''+t.name+'\')">';
-      html += '<div class="temoji">'+t.emoji+(found?' <span style="color:var(--ios-green); font-size:13px;">✓</span>':'')+'</div><div class="ttitle">'+t.name+'</div><div class="tdesc">'+t.desc+'</div>';
-      if(!expanded){ html += '<div class="texpand">Expand ↓</div>'; }
-      else { var seenIn = findClaimsForTactic(t.name); html += '<div class="tmeta">'+(seenIn.length ? 'Appears in: '+seenIn.join(', ') : 'Doesn\'t appear in this drop.')+'</div>'; }
+      var expanded = tellExpanded[t.key];
+      var found = unlockedTells[t.key];
+      html += '<div class="tellcard '+t.kind+'" onclick="toggleTell(\''+t.key+'\')">';
+      html += '<div class="temoji">'+t.emoji+(found?' <span style="color:var(--ios-green); font-size:13px;">\u2713</span>':'')+'</div><div class="ttitle">'+t.name+'</div><div class="tdesc">'+t.desc+'</div>';
+      if(!expanded){ html += '<div class="texpand">Expand \u2193</div>'; }
+      else {
+        html += '<div class="tmeta">'+(t.where==="dig"
+          ? "You won\u2019t catch this one on the card \u2014 it only turns up if someone digs."
+          : "Readable on the post itself, before anyone investigates.")+'</div>';
+      }
       html += '</div>';
     });
     html += '</div>';
@@ -1824,6 +2351,23 @@ function renderTactics(){
 // the tour appears, so the "waiting on Diego, Priya" state is visible for a moment
 // instead of jumping straight to Round 1, same felt effect as waiting on real
 // teammates in the multiplayer build.
+// The six tells the tour shows as a sample of the library. Built from TELLS itself
+// so the cards and the "+N more" count can never drift from the real list. Chosen
+// for spread, not importance: four red across different surfaces, two green, so the
+// grid reads as "some of these mean it holds up" at a glance.
+var TELL_TOUR_SAMPLE = ["paid-to-say-it","everyones-doing-it","rushing-you","it-was-a-joke","go-look-yourself","they-fixed-it"];
+function tellGridMock(){
+  var html = '<div class="onboardmock"><div class="onboardmock-grid">';
+  TELL_TOUR_SAMPLE.forEach(function(k){
+    var t = TELL[k];
+    if(!t) return;
+    html += '<div class="onboardmock-tell '+t.kind+'"><div class="onboardmock-tellemoji">'+t.emoji+'</div><div class="onboardmock-tellname">'+t.name+'</div></div>';
+  });
+  var rest = TELLS.length - TELL_TOUR_SAMPLE.filter(function(k){ return !!TELL[k]; }).length;
+  if(rest > 0) html += '<div class="onboardmock-more">+ '+rest+' more in the library</div>';
+  html += '</div></div>';
+  return html;
+}
 var ONBOARD_CONTENT = {
   round1: {teamGated:true, screens:[
     {kicker:"ROUND 1", big:"🎯", title:"Trust your gut", sub:"60 seconds. Call every story."},
@@ -1851,6 +2395,29 @@ var ONBOARD_CONTENT = {
     {big:"🗂️", title:"File your evidence", sub:"Tap + Add to case on what holds up",
       mock:'<div class="onboardmock"><div class="onboardmock-evidbtn">+ Add to case</div></div>'}
   ]},
+  // "Where to look" (8/24/2026, expanded same day per Tara: more of an intro about
+  // how manipulation actually works, and an actual look at the library).
+  // Rule 4 of the reveal rules still holds — onboarding teaches the PLACES and the
+  // vocabulary, the post-file reveal names which tell framed which card. Showing the
+  // library grid is fine: the library is open all game. Not teamGated \u2014 it's a
+  // reading habit, not a step anyone else is waiting on.
+  tells: {teamGated:false, screens:[
+    // Opens on the question, answers it with the library \u2014 Tara, 8/24/2026. Two
+    // conceptual lead-in screens were cut the same day; the question carries the
+    // setup on its own now. "tell" the verb here sets up "tells" the noun on the
+    // next screen, which is the reason the system got that name \u2014 left plain, no
+    // italic: the noun form is odd enough to register on its own, and marking it up
+    // makes the game look like it's explaining its own joke.
+    {kicker:"SPOTTING", big:"\ud83e\udd14", title:"How can you tell you\u2019re being manipulated?", sub:"There\u2019s almost always a sign"},
+    {title:TELLS.length+" tells to look out for", sub:"Red means slow down. Green means it holds up.", mock:tellGridMock()},
+    {title:"Read the profile, not just the post", sub:"Bio, join date, what they link to",
+      mock:'<div class="onboardmock"><div class="onboardmock-mini"><div class="onboardmock-miniavatar">D</div><div class="onboardmock-minibio">your fav products, dupes + drama \ud83d\udecd\ufe0f | shop my finds below \ud83d\udd17</div><div class="onboardmock-minimeta">2.2M followers \u00b7 <b>Joined Jun 2020</b></div></div></div>'},
+    {title:"Check the date and the caption", sub:"Same picture can carry a different story",
+      mock:'<div class="onboardmock"><div class="onboardmock-row"><div class="onboardmock-rowtext">The same photo, posted before</div><div class="onboardmock-rowmeta"><b>3 years ago</b> \u00b7 different caption</div></div><div class="onboardmock-row"><div class="onboardmock-rowtext">Wire coverage of the same event</div><div class="onboardmock-rowmeta">named outlet \u00b7 dated</div></div></div>'},
+    {title:"Ask what it\u2019s citing", sub:"A confident answer isn\u2019t a source",
+      mock:'<div class="onboardmock"><div class="onboardmock-bubble">Studies suggest this is well established \u2014 <b>but no study is named.</b></div></div>'},
+    {big:"\ud83d\udd12", title:"Which one was it? File and find out.", sub:"The list stays open the whole game"}
+  ]},
   // Not teamGated (8/18/2026, per Tara — reversed from the first pass, mirrored
   // from infodemic-multiplayer-prototype.html): shouldn't block anything or make
   // anyone wait on teammates. Dismisses per-player with "Got it," same as spread,
@@ -1858,7 +2425,7 @@ var ONBOARD_CONTENT = {
   board: {teamGated:false, screens:[
     {kicker:"STOP THE SPREAD", big:"🗂️", title:"One shared board", sub:"Talk it through, agree, file it"},
     {big:"🤝", title:"Pool it", sub:"Everyone's evidence, one place"},
-    {big:"🎭", title:"Compare versions", sub:"See how each of you got played"},
+    {big:"🎭", title:"Compare versions", sub:"Unlocks the moment you file"},
     {big:"📝", title:"Write the note", sub:"Explain your call — required to file"},
     {big:"📮", title:"File to win", sub:"Agreeing files the case"}
   ]},
@@ -1889,6 +2456,11 @@ function onboardKeyFor(){
     }
     return null;
   }
+  // The Tells tour is NOT auto-chained into Round 2 (8/24/2026, Tara) \u2014 it fires
+  // only when a player actually taps the \ud83e\udde0 badge and opens the library. Round 2
+  // already hands you two tours back to back; this one is for the moment someone
+  // chooses to go look, which is also when they're most likely to read it.
+  if(currentApp==="tells") return seenOnboard.tells ? null : "tells";
   if(currentApp==="spread") return seenOnboard.spread ? null : "spread";
   return null;
 }
@@ -1997,21 +2569,33 @@ function renderOnboard(){
 // ---------------- MASTER RENDER ----------------
 function render(){
   if(currentApp==="lobby"){ renderLobby(); return; }
+  // The end-of-session report is the last thing the game does — nothing underneath
+  // it draws, onboarding included.
+  if(sessionState.showingEnd){ renderEndScreen(); return; }
   if(currentApp==="round1") renderRound1();
   else if(currentApp==="spread") renderSpread();
-  else if(currentApp==="tactics") renderTactics();
+  else if(currentApp==="tells") renderTells();
   maybeShowOnboard();
 }
 
 // engagement gravity tick
 setInterval(function(){
+  // Once the session's over, attention stops moving — nothing is left un-filed to
+  // gather it, and the report underneath must not keep re-rendering.
+  if(sessionState.ended) return;
   CLAIMS.forEach(function(c){
     var status = claimStatus(c);
     var b = getBoard(c.id);
     var cur = heat[c.id] || 0;
-    if(status==="contested" && !b.filed){ heat[c.id] = Math.min(40, cur + Math.random()*1.6 + 0.4); }
+    if(status==="contested" && !b.filed){ heat[c.id] = Math.min(HEAT_CAP, cur + Math.random()*1.6 + 0.4); }
     else if(b.filed){ heat[c.id] = Math.max(2, cur - 1.2); }
-    else if(status==="agreed"){ heat[c.id] = cur<3 ? 3 : cur; }
+    else if(status==="agreed" || status==="skipped"){ heat[c.id] = cur<3 ? 3 : cur; }
+    // Heat decays after filing, so the high-water mark has to be kept separately,
+    // and shares keep totting up for as long as the claim is loose. Both feed the
+    // end-of-session report; neither is shown during play.
+    var reach = getReach(c.id);
+    if(heat[c.id] > reach.peak) reach.peak = heat[c.id];
+    if(status==="contested" && !b.filed) reach.shares += heat[c.id] * SHARE_RATE;
   });
   // Skip re-rendering while a full-screen sub-moment (Time's Up interstitial, the
   // per-story reveal) is up — heat isn't shown on either screen, and re-rendering
