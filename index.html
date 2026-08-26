@@ -10,6 +10,7 @@
     --ink:#f2f1ea; --dim:#9aa39a; --faint:#5f6362;
     --blue:#0a84ff; --blue-dim:rgba(10,132,255,.12);
     --green:#4caf7d; --green-dim:rgba(76,175,125,.12);
+    --amber:#d9a441; --amber-dim:rgba(217,164,65,.12);
   }
   *{box-sizing:border-box;}
   html,body{height:100%;}
@@ -19,39 +20,80 @@
     display:flex; align-items:center; justify-content:center;
     background-image:radial-gradient(circle at 50% 0%, rgba(255,255,255,.04), transparent 60%);
   }
-  .wrap{ width:100%; max-width:860px; padding:48px 24px; }
+  .wrap{ width:100%; max-width:1000px; padding:48px 24px; }
   .brand{ text-align:center; margin-bottom:8px; }
   .brand .word{ font-size:15px; font-weight:800; letter-spacing:5px; color:var(--ink); }
   .brand .tag{ font-family:'SF Mono',Menlo,monospace; font-size:11.5px; color:var(--faint); letter-spacing:.5px; margin-top:8px; }
   h1{ text-align:center; font-size:26px; font-weight:700; margin:28px 0 4px; letter-spacing:-.2px; }
-  .lede{ text-align:center; font-size:14.5px; color:var(--dim); max-width:440px; margin:0 auto 40px; line-height:1.5; }
-  .doors{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  @media (max-width:620px){ .doors{ grid-template-columns:1fr; } }
-  a.door{ text-decoration:none; }
+  .lede{ text-align:center; font-size:14.5px; color:var(--dim); max-width:540px; margin:0 auto 18px; line-height:1.6; }
+
+  .facts{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:10px 0;
+    margin:0 auto 38px; max-width:560px;
+  }
+  .fact{
+    font-family:'SF Mono',Menlo,monospace; font-size:11px; letter-spacing:.5px;
+    color:var(--faint); text-transform:uppercase; padding:0 14px;
+    border-right:1px solid var(--sep);
+  }
+  .fact:last-child{ border-right:none; }
+
+  .sectionlabel{
+    text-align:center; font-family:'SF Mono',Menlo,monospace; font-size:10.5px;
+    font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--faint); margin-bottom:18px;
+  }
+
+  .doors{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; }
+  @media (max-width:820px){ .doors{ grid-template-columns:1fr; } }
+  a.door{ text-decoration:none; display:block; }
   .door{
-    display:block; background:var(--panel); border:1px solid var(--sep); border-radius:20px;
-    padding:28px 26px 26px; transition:transform .15s ease, border-color .15s ease, background .15s ease;
+    background:var(--panel); border:1px solid var(--sep); border-radius:20px;
+    padding:26px 24px 24px; height:100%;
+    display:flex; flex-direction:column;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
   }
   .door:hover{ transform:translateY(-2px); background:var(--panel-hover); }
   .door.student:hover{ border-color:rgba(10,132,255,.4); }
   .door.teacher:hover{ border-color:rgba(76,175,125,.4); }
-  .doricon{
-    width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-    font-size:20px; margin-bottom:16px;
+  .door.feedback:hover{ border-color:rgba(217,164,65,.4); }
+
+  .stepnum{
+    width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'SF Mono',Menlo,monospace; font-size:13px; font-weight:700;
+    margin-bottom:16px;
   }
-  .door.student .doricon{ background:var(--blue-dim); color:var(--blue); }
-  .door.teacher .doricon{ background:var(--green-dim); color:var(--green); }
+  .door.teacher .stepnum{ background:var(--green-dim); color:var(--green); }
+  .door.student .stepnum{ background:var(--blue-dim); color:var(--blue); }
+  .door.feedback .stepnum{ background:var(--amber-dim); color:var(--amber); }
+
   .dorkicker{ font-family:'SF Mono',Menlo,monospace; font-size:10.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
-  .door.student .dorkicker{ color:var(--blue); }
   .door.teacher .dorkicker{ color:var(--green); }
+  .door.student .dorkicker{ color:var(--blue); }
+  .door.feedback .dorkicker{ color:var(--amber); }
   .dortitle{ font-size:19px; font-weight:700; color:var(--ink); margin-bottom:8px; }
-  .dordesc{ font-size:13.5px; color:var(--dim); line-height:1.5; margin-bottom:18px; }
+  .dordesc{ font-size:13.5px; color:var(--dim); line-height:1.55; margin-bottom:18px; flex:1; }
+  .dordesc code{
+    font-family:'SF Mono',Menlo,monospace; font-size:12.5px;
+    background:rgba(255,255,255,.06); color:var(--ink);
+    padding:1px 5px; border-radius:4px;
+  }
   .dorcta{ font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; }
-  .door.student .dorcta{ color:var(--blue); }
   .door.teacher .dorcta{ color:var(--green); }
+  .door.student .dorcta{ color:var(--blue); }
+  .door.feedback .dorcta{ color:var(--amber); }
   .dorcta .arrow{ transition:transform .15s ease; }
   .door:hover .arrow{ transform:translateX(3px); }
-  footer{ text-align:center; margin-top:44px; font-size:11.5px; color:var(--faint); }
+
+  .aside{
+    margin-top:28px; padding:18px 22px; border:1px solid var(--sep); border-radius:14px;
+    background:rgba(255,255,255,.02);
+    font-size:13px; color:var(--dim); line-height:1.6;
+  }
+  .aside b{ color:var(--ink); font-weight:600; }
+
+  footer{ text-align:center; margin-top:40px; font-size:11.5px; color:var(--faint); line-height:1.8; }
+  footer a{ color:var(--faint); }
 </style>
 </head>
 <body>
@@ -60,25 +102,69 @@
       <div class="word">INFODEMIC</div>
       <div class="tag">the only feed that shows its work</div>
     </div>
-    <h1>Who's playing?</h1>
-    <p class="lede">Pick the door that matches what you're here to do — the two flows don't share a login or a screen.</p>
+
+    <h1>Help us test Infodemic</h1>
+    <p class="lede">
+      Infodemic is a game about working out what's real in a social feed. You and a few other people play
+      together in the same room, each on your own device: you rate a feed of real claims on instinct, then
+      investigate whatever you disagreed about. There's no answer key — a claim only settles when your
+      table can justify the call.
+    </p>
+
+    <div class="facts">
+      <span class="fact">2–4 players</span>
+      <span class="fact">~20 min gameplay</span>
+      <span class="fact">Phone, laptop or tablet</span>
+      <span class="fact">Ages 11+</span>
+    </div>
+
+    <div class="sectionlabel">How a playtest works</div>
+
     <div class="doors">
-      <a class="door student" href="infodemic-multiplayer-prototype.html">
-        <div class="doricon">&#128241;</div>
-        <div class="dorkicker">Student</div>
-        <div class="dortitle">Join a game</div>
-        <div class="dordesc">Enter a room code, rate the feed with your table, and investigate the claims that don't add up.</div>
-        <div class="dorcta">Play now <span class="arrow">&rarr;</span></div>
-      </a>
       <a class="door teacher" href="infodemic-content-pipeline-prototype.html">
-        <div class="doricon">&#128221;</div>
-        <div class="dorkicker">Teacher / Curator</div>
-        <div class="dortitle">Build a Feed Drop</div>
-        <div class="dordesc">Pull headlines, frame them through a tactic lens, and assemble the drop your class will play.</div>
-        <div class="dorcta">Open console <span class="arrow">&rarr;</span></div>
+        <div class="stepnum">1</div>
+        <div class="dorkicker">Set up</div>
+        <div class="dortitle">Build the feed</div>
+        <div class="dordesc">
+          One person picks the topics. The round assembles itself — you don't approve stories one by one.
+          Publishing gives you a single word, like <code>OTTER</code>, to read out to everyone else.
+        </div>
+        <div class="dorcta">Open the console <span class="arrow">&rarr;</span></div>
+      </a>
+
+      <a class="door student" href="infodemic-multiplayer-prototype.html">
+        <div class="stepnum">2</div>
+        <div class="dorkicker">Play</div>
+        <div class="dortitle">Get everyone in</div>
+        <div class="dordesc">
+          Everyone opens the game on their own device. The first player enters their name and just the word,
+          and gets back a full code like <code>OTTER-4213</code>. Everyone else enters their name and that full code.
+        </div>
+        <div class="dorcta">Open the game <span class="arrow">&rarr;</span></div>
+      </a>
+
+      <a class="door feedback" href="https://docs.google.com/forms/d/e/1FAIpQLSeq_sDe6WZ9SYxYOBk271ADGM8owfev6GI_71DawuFJrp_pLA/viewform" target="_blank" rel="noopener">
+        <div class="stepnum">3</div>
+        <div class="dorkicker">Afterwards</div>
+        <div class="dortitle">Tell us what broke</div>
+        <div class="dordesc">
+          Every player fills this in separately — including the kids. Three minutes. Confusing, boring, or
+          broken is the most useful thing you can tell us, so please don't smooth it over.
+        </div>
+        <div class="dorcta">Open the form <span class="arrow">&rarr;</span></div>
       </a>
     </div>
-    <footer>Assembly Code fellowship build &middot; prototype</footer>
+
+    <div class="aside">
+      <b>This is a prototype, and the multiplayer part is new.</b> If the game misbehaves — someone can't join,
+      the screen doesn't update, a code doesn't work — that's exactly what we're trying to find. Note what
+      happened and put it in the form.
+    </div>
+
+    <footer>
+      Assembly Code fellowship build &middot; prototype<br>
+      Open source at <a href="https://github.com/taralif/infodemic">github.com/taralif/infodemic</a>
+    </footer>
   </div>
 </body>
 </html>
