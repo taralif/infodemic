@@ -72,6 +72,74 @@
      element being taught, instead of a generic emoji — literally what you'll see
      and tap, not an abstraction of it. Reuses real colors so it reads as "this
      app," not clip art. */
+  /* ---------- COLD OPEN ART (2026-08-26) ----------
+     Art for the rebuilt round1 tour. Delivered through the existing `mock` field
+     (see OB_*_ART in JS), so these sit alongside .onboardmock rather than replacing it. */
+  .obfeed{
+    width:170px; height:172px; overflow:hidden; position:relative; margin-bottom:22px;
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    mask-image:linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  }
+  .obfeedtrack{display:flex; flex-direction:column; animation:obfeedroll 11s linear infinite;}
+  .obfcard{
+    height:46px; margin-bottom:10px; flex:none; border-radius:10px; background:var(--ios-cardback);
+    border:1px solid rgba(255,255,255,.12); padding:9px 10px; display:flex; flex-direction:column; gap:5px;
+  }
+  .obfline{height:5px; border-radius:3px; background:rgba(255,255,255,.24);}
+  .obfline.short{width:56%;}
+  .obfcard.off{border-color:rgba(255,159,10,.6); animation:obfglow 2.3s ease-in-out infinite;}
+  .obfcard.off .obfline{background:rgba(255,159,10,.7);}
+  @keyframes obfeedroll{from{transform:translateY(0);} to{transform:translateY(-336px);}}
+  @keyframes obfglow{0%,100%{box-shadow:0 0 0 rgba(255,159,10,0);} 50%{box-shadow:0 0 18px rgba(255,159,10,.4);}}
+
+  .obstack{position:relative; width:186px; height:112px; margin-bottom:34px;}
+  .obstackcard{
+    position:absolute; left:0; right:0; height:52px; border-radius:14px; background:var(--ios-cardback);
+    border:1px solid rgba(255,255,255,.13); box-shadow:0 10px 24px rgba(0,0,0,.5);
+    padding:11px 13px; display:flex; flex-direction:column; gap:6px;
+  }
+  .obstackcard:nth-child(1){top:0; transform:scale(.9); opacity:.4;}
+  .obstackcard:nth-child(2){top:24px; transform:scale(.95); opacity:.68;}
+  .obstackcard:nth-child(3){top:50px;}
+  .obstackheat{
+    position:absolute; left:0; right:0; bottom:-22px; height:5px; border-radius:3px;
+    background:linear-gradient(90deg, var(--ios-orange), var(--ios-red));
+    animation:obheat 2.6s ease-in-out infinite alternate; transform-origin:left center;
+  }
+  @keyframes obheat{from{transform:scaleX(.28);} to{transform:scaleX(1);}}
+
+  .obflags{display:flex; justify-content:center; gap:18px; margin:24px 0 6px;}
+  .obflagitem{display:flex; flex-direction:column; align-items:center; gap:10px; width:92px;}
+  /* Same disc as the real vote button in the feed (.stoplightopt), so the tour shows
+     the thing they will actually tap. */
+  .obflagbtn{
+    width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:20px; border:2px solid rgba(255,255,255,.22); box-shadow:0 4px 12px rgba(0,0,0,.45);
+  }
+  .obflagbtn.red{background:var(--ios-red);}
+  .obflagbtn.yellow{background:var(--ios-orange);}
+  .obflagbtn.green{background:var(--ios-green);}
+  .obflaglabel{font-size:12.5px; font-weight:800; line-height:1.25;}
+  .obflaglabel.g{color:var(--ios-green);}
+  .obflaglabel.y{color:var(--ios-orange);}
+  .obflaglabel.r{color:var(--ios-red);}
+
+  .obclock{
+    width:104px; height:104px; border-radius:50%; border:3px solid rgba(255,255,255,.14);
+    display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:26px;
+  }
+  .obclockface{font-size:27px; font-weight:900; letter-spacing:-.5px;}
+  .obclockhand{
+    position:absolute; inset:-3px; border-radius:50%;
+    border:3px solid transparent; border-top-color:var(--ios-blue);
+    animation:obspin 3.6s linear infinite;
+  }
+  @keyframes obspin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion:reduce){
+    .obfeedtrack,.obfcard.off,.obstackheat,.obclockhand{animation:none;}
+  }
+  .lobbymeta{font-size:12.5px; font-weight:700; color:var(--ios-label2); margin:-8px 0 6px;}
+
   .onboardmock{ margin-bottom:22px; position:relative; }
   .onboardmock-card{
     width:180px; height:112px; background:var(--ios-cardback); border-radius:20px;
@@ -604,6 +672,17 @@
   .profilestat .num{ font-size:14.5px; font-weight:800; }
   .profilestat .lbl{ font-size:9.5px; color:var(--ios-label3); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
   .profilejoined{ font-size:11px; color:var(--ios-label3); }
+  /* Build stamp on the lobby. Added 8/25/2026 after three separately-verified fixes
+     all appeared "not to work" on device: the code on disk was correct every time,
+     so the open question was whether the phone was even running that code. A LAN
+     server sends no cache headers and mobile Safari holds onto a 200KB HTML file
+     hard. This makes "which build am I looking at" answerable at a glance instead
+     of by inference. */
+  .buildstamp{
+    position:absolute; bottom:26px; left:0; right:0; text-align:center;
+    font-family:'Space Mono',monospace; font-size:9.5px; letter-spacing:.4px;
+    color:rgba(235,235,245,.28); z-index:50; pointer-events:none;
+  }
   /* "About this account" — the money panel. Styled as platform furniture, not as
      game commentary: same neutral treatment whoever the account is, so a player has
      to actually read it rather than react to its colour. */
@@ -854,6 +933,7 @@ function renderLobby(){
   // game branding — didn't read as "this is INFODEMIC" at a glance. Title leads now.
   html += '<div class="r1startbadge">YOUR TABLE</div>';
   html += '<div class="r1starttitle">INFODEMIC</div>';
+    html += '<div class="lobbymeta">2\u20134 players \u00b7 about 20 minutes</div>';
   html += '<div class="lobbycodelabel">ROOM CODE — SHARE THIS</div>';
   html += '<div class="lobbyroomcode">'+lobbyCode+'</div>';
   html += '<div class="r1startsub">'+(allIn ? "Everyone\'s in — starting…" : "Waiting for your table to join…")+'</div>';
@@ -866,13 +946,20 @@ function renderLobby(){
     if(!joined) html += '<span class="lobbypending">joining…</span>';
     html += '</div>';
   });
+  html += '<div class="buildstamp">build '+BUILD+'</div>';
   html += '</div></div>';
   document.getElementById("screenArea").innerHTML = html;
 }
+// Labels moved onto the SPIN axis 8/26/2026 (Tara) — the question is no longer
+// "is this true" but "how straight is this with you." The three buckets, their
+// internal keys, their colors and all the logic around them are UNCHANGED; only
+// the words shown to players moved. The in-feed vote buttons render emoji only
+// (see the stoplight block in renderRound1), so those are untouched by design —
+// Tara: "keep the buttons in the feed with the same emojis."
 var CALL_META = {
-  misinfo:{emoji:"🚩", label:"Misinfo"},
-  biased:{emoji:"🤔", label:"Biased"},
-  "true":{emoji:"✅", label:"True"}
+  misinfo:{emoji:"🚩", label:"Playing you"},
+  biased:{emoji:"🤔", label:"Spun"},
+  "true":{emoji:"✅", label:"Straight with you"}
 };
 
 // Playtest note (8/18/2026): background used to be one fixed object per claim, but
@@ -1169,6 +1256,9 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // Jackbox-style one-story-at-a-time reveal, shown after Time's Up instead of jumping
 // straight to the sorted feed — gives the table a moment to actually take in each
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
+// Bump this whenever a change ships, so "is the phone running the new file?"
+// is a thing you can read off the lobby instead of guess at.
+var BUILD = "2026-08-26 · cold-open";
 var revealState = {active:false, order:[], index:0};
 var BOARD = {};                // claimId -> {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}
 var heat = {};                 // claimId -> engagement number
@@ -2368,12 +2458,64 @@ function tellGridMock(){
   html += '</div></div>';
   return html;
 }
+// ---------------- COLD OPEN ART (2026-08-26) ----------------
+// Passed to renderOnboard() via each screen's `mock` field. Styles live in the
+// .ob* CSS block next to .onboardmock.
+var OB_FEED_ART = (function(){
+  // A feed scrolling past with one post that isn't right. Two identical sets of 6,
+  // travelling exactly one set's height (6 x 56px = 336px), so the loop has no seam.
+  var set = "";
+  for(var c = 0; c < 6; c++){
+    set += '<div class="obfcard'+(c === 2 ? ' off' : '')+'">'
+         +   '<div class="obfline"></div><div class="obfline short"></div>'
+         + '</div>';
+  }
+  return '<div class="obfeed"><div class="obfeedtrack">'+set+set+'</div></div>';
+})();
+
+var OB_STACK_ART = '<div class="obstack">'
+  + '<div class="obstackcard"><div class="obfline"></div><div class="obfline short"></div></div>'
+  + '<div class="obstackcard"><div class="obfline"></div><div class="obfline short"></div></div>'
+  + '<div class="obstackcard"><div class="obfline"></div><div class="obfline short"></div><div class="obstackheat"></div></div>'
+  + '</div>';
+
+// Built FROM CALL_META in the feed's own order (misinfo/biased/true, red to green)
+// and reusing the real .stoplightopt colors, so the tour can never drift out of sync
+// with the buttons it is teaching.
+var OB_FLAGS_ART = (function(){
+  var order = [["misinfo","red","r"],["biased","yellow","y"],["true","green","g"]];
+  var html = '<div class="obflags">';
+  order.forEach(function(o){
+    html += '<div class="obflagitem">'
+         +    '<div class="obflagbtn '+o[1]+'">'+CALL_META[o[0]].emoji+'</div>'
+         +    '<div class="obflaglabel '+o[2]+'">'+CALL_META[o[0]].label+'</div>'
+         +  '</div>';
+  });
+  return html + '</div>';
+})();
+
+var OB_CLOCK_ART = '<div class="obclock"><div class="obclockhand"></div><div class="obclockface">60</div></div>';
+
 var ONBOARD_CONTENT = {
+  // COLD OPEN, rebuilt 2026-08-26 after the first outside playtest: 3 of 4 players
+  // did not understand the purpose, or that this was a game at all. The four screens
+  // this replaces were ALL rules and zero premise. Copy below was edited line by line
+  // with Tara. Art rides in through the existing `mock` field, so renderOnboard() did
+  // not have to change. Deliberately absent: any "you didn't all see the same feed"
+  // screen — that is a discovery at the first reveal, and screen 4's silence protects it.
   round1: {teamGated:true, screens:[
-    {kicker:"ROUND 1", big:"🎯", title:"Trust your gut", sub:"60 seconds. Call every story."},
-    {big:"🔴", title:"Misinfo", sub:"Made up or false"},
-    {big:"🟡", title:"Biased", sub:"Spun, one-sided"},
-    {big:"🟢", title:"True", sub:"Checks out"}
+    {kicker:"BEFORE YOU SCROLL", title:"Something in this feed is off.",
+      sub:CLAIMS.length+" stories are about to land. Some of them are playing you.",
+      mock:OB_FEED_ART},
+    {kicker:"YOUR JOB", title:"Stop the spread.",
+      sub:"Work out what\u2019s really going on in these news stories.",
+      mock:OB_STACK_ART},
+    {kicker:"ROUND 1 \u00b7 GUT CHECK", title:"How straight is it with you?",
+      sub:"That\u2019s the only call you\u2019re making right now.",
+      mock:OB_FLAGS_ART},
+    {kicker:"🤐 ON YOUR OWN", title:"No talking. No comparing.",
+      sub:"Call all "+CLAIMS.length+" of them yourself. You\u2019ll see why in a minute.",
+      mock:OB_CLOCK_ART}
   ]},
   investigate: {teamGated:true, screens:[
     // 8/18/2026 revision, per Tara (mirrored from infodemic-multiplayer-prototype.html):
