@@ -1255,7 +1255,7 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-08-26 · cold-open";
+var BUILD = "2026-08-26 · cold-open-2";
 var revealState = {active:false, order:[], index:0};
 var BOARD = {};                // claimId -> {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}
 var heat = {};                 // claimId -> engagement number
@@ -2842,7 +2842,7 @@ var ONBOARD_CONTENT = {
   // screen — that is a discovery at the first reveal, and screen 4's silence protects it.
   round1: {teamGated:true, screens:[
     {kicker:"BEFORE YOU SCROLL", title:"Something in this feed is off.",
-      sub:CLAIMS.length+" stories are about to land. Some of them are playing you.",
+      sub:function(){ return CLAIMS.length+" stories are about to land. Some of them are playing you."; },
       mock:OB_FEED_ART},
     {kicker:"YOUR JOB", title:"Stop the spread.",
       sub:"Work out what\u2019s really going on in these news stories.",
@@ -2851,7 +2851,7 @@ var ONBOARD_CONTENT = {
       sub:"That\u2019s the only call you\u2019re making right now.",
       mock:OB_FLAGS_ART},
     {kicker:"🤐 ON YOUR OWN", title:"No talking. No comparing.",
-      sub:"Call all "+CLAIMS.length+" of them yourself. You\u2019ll see why in a minute.",
+      sub:function(){ return "Call all "+CLAIMS.length+" of them yourself. You\u2019ll see why in a minute."; },
       mock:OB_CLOCK_ART}
   ]},
   investigate: {teamGated:true, screens:[
@@ -3034,7 +3034,11 @@ function renderOnboard(){
   if(s.kicker) html += '<div class="onboard-kicker">'+s.kicker+'</div>';
   html += s.mock ? s.mock : ('<div class="onboard-big">'+s.big+'</div>');
   html += '<div class="onboard-title">'+s.title+'</div>';
-  html += '<div class="onboard-sub">'+s.sub+'</div>';
+  // `sub` may be a function so a screen can read state that isn't known when
+  // ONBOARD_CONTENT is built — CLAIMS is REASSIGNED later (live-deck upgrade,
+  // and again per room in loadDropForRoom), so a story count baked in at parse
+  // time would show the default deck's number for every pipeline drop.
+  html += '<div class="onboard-sub">'+(typeof s.sub === "function" ? s.sub() : s.sub)+'</div>';
   if(isLast){
     html += '<div class="onboard-cta" onclick="event.stopPropagation();">';
     if(gate.teamGated){
