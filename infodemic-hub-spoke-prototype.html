@@ -63,7 +63,45 @@
   .onboard-sub{ font-size:15px; color:var(--ios-label2); line-height:1.4; }
   .onboard-cta{ margin-top:32px; cursor:default; }
   .onboard-btn{ background:var(--ios-blue); color:#fff; text-align:center; font-size:16px; font-weight:600; padding:13px 28px; border-radius:14px; cursor:pointer; }
+  /* The "not yet" half of a two-way gate — present and pressable, but never the one
+     the eye lands on first. */
+  .onboard-btn.ghost{ background:transparent; color:var(--ios-label2); border:1px solid rgba(255,255,255,.18);
+    font-size:14.5px; font-weight:600; padding:11px 24px; margin-top:9px; }
   .onboard-waiting{ font-size:13.5px; color:var(--ios-label2); }
+
+  /* THE ROLE CARD (8/31/2026, Tara: "a fun game slide after each player is assigned
+     their role"). One pair of hands only works if everyone knows whose hands — and the
+     handoff strip inside the card was a line of text you could read past. This is the
+     beat: the note lands on you, the card deals in, and you take it. Fires once per
+     role per note, plus on a send-back. */
+  .rolewrap{ width:100%; height:100%; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:36px 26px; text-align:center; cursor:pointer; }
+  .rolekick{ font-size:11.5px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase;
+    color:var(--ios-label3); margin-bottom:18px; animation:rolefade .35s ease both; }
+  .rolecard{ width:100%; max-width:290px; border-radius:22px; padding:26px 22px 24px;
+    background:linear-gradient(165deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+    border:1.5px solid rgba(255,255,255,.16); box-shadow:0 24px 60px rgba(0,0,0,.6);
+    animation:roledeal .5s cubic-bezier(.18,1.3,.4,1) both; }
+  .roleemoji{ font-size:56px; line-height:1; margin-bottom:14px; display:block;
+    animation:rolepop .45s cubic-bezier(.2,1.6,.4,1) .22s both; }
+  .roleyou{ font-size:11.5px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--ios-label3); }
+  .rolename{ font-size:31px; font-weight:900; letter-spacing:-.6px; margin:2px 0 12px;
+    text-transform:uppercase; background:linear-gradient(95deg,#5ac8fa,#0a84ff);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .rolejob{ font-size:15.5px; font-weight:700; line-height:1.35; margin-bottom:9px; }
+  .roledetail{ font-size:13px; color:var(--ios-label2); line-height:1.5; }
+  .rolemoves{ display:flex; gap:6px; justify-content:center; margin-top:14px; }
+  .rolemove{ width:9px; height:9px; border-radius:50%; background:var(--ios-blue); }
+  .rolewatch{ font-size:12.5px; color:var(--ios-label3); margin-top:22px; line-height:1.5;
+    animation:rolefade .35s ease .4s both; }
+  .rolebtn{ margin-top:20px; background:var(--ios-blue); color:#fff; font-size:16px; font-weight:800;
+    padding:14px 34px; border-radius:15px; box-shadow:0 10px 26px rgba(10,132,255,.4);
+    animation:rolefade .3s ease .5s both; }
+  @keyframes roledeal{ from{ opacity:0; transform:translateY(26px) rotate(-4deg) scale(.9); }
+                       to{ opacity:1; transform:none; } }
+  @keyframes rolepop{ from{ opacity:0; transform:scale(.4); } to{ opacity:1; transform:scale(1); } }
+  @keyframes rolefade{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
   .onboard-dots{ position:absolute; bottom:44px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
   .onboard-dot{ width:6px; height:6px; border-radius:3px; background:rgba(255,255,255,.3); }
   .onboard-dot.active{ background:#fff; }
@@ -462,8 +500,9 @@
     padding:9px 14px; border-radius:12px;
   }
   .agreedcta{
-    display:inline-block; margin-top:2px; background:rgba(255,255,255,.12); color:rgba(255,255,255,.7); font-size:13px; font-weight:600;
-    padding:9px 14px; border-radius:12px;
+    display:block; width:fit-content; margin:8px 86px 0 0; background:rgba(255,255,255,.12);
+    color:rgba(255,255,255,.7); font-size:12.5px; font-weight:600;
+    padding:8px 13px; border-radius:12px;
   }
   /* Filed verdict, promoted to the top of the hub card (above the headline) — this is
      now the highest-hierarchy thing on a filed card, not a low pill buried near the
@@ -507,7 +546,7 @@
   .feedcard.justsorted{animation:feedsort .55s cubic-bezier(.2,1,.3,1) both;}
 
   /* ---------- ROUND REVEAL: Jackbox-style, one story at a time ---------- */
-  .reveal{
+  .reveal{ overflow-y:auto; 
     position:absolute; inset:0; z-index:46; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:0 30px;
     background:
@@ -515,6 +554,115 @@
       radial-gradient(ellipse at 80% 90%, #0a2233, transparent 55%),
       linear-gradient(160deg, #0a0a12, #050508 70%);
   }
+
+
+  /* ---------- TRIAGE: five loose, chase two (8/31/2026) ---------- */
+  .triage{position:absolute; inset:0; z-index:46; display:flex; flex-direction:column;
+    background:radial-gradient(ellipse at 30% 12%, #1a1030, transparent 55%),
+               radial-gradient(ellipse at 75% 88%, #0d1f2e, transparent 55%), #000;}
+  .triagescroll{flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:56px 20px 10px; display:flex; flex-direction:column; align-items:center;}
+  .triagetitle{font-size:24px; font-weight:800; letter-spacing:-.4px; text-align:center; margin-bottom:8px;}
+  .triagesub{font-size:13.5px; line-height:1.5; color:var(--ios-label2); text-align:center; margin-bottom:20px; max-width:300px;}
+  .triagecard{width:100%; display:block; text-align:left;
+    background:var(--ios-bg2); border:1.5px solid rgba(255,255,255,.1); border-radius:15px;
+    padding:12px 13px; margin-bottom:9px; cursor:pointer;}
+  .triagecard.picked{border-color:var(--ios-blue); background:rgba(10,132,255,.13);}
+  .triagetick{width:22px; height:22px; border-radius:7px; flex:none; margin-top:2px;
+    border:1.5px solid rgba(255,255,255,.28); display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:#fff;}
+  .triagecard.picked .triagetick{background:var(--ios-blue); border-color:var(--ios-blue);}
+  .triagebody{min-width:0; flex:1 1 auto;}
+  .triagetopic{font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+    color:var(--ios-label3); margin-bottom:4px;}
+  .triagehead{font-size:14px; font-weight:700; line-height:1.35;}
+  .triageflags{display:flex; align-items:center; gap:5px; margin-top:8px;}
+  .triagedot{width:10px; height:10px; border-radius:50%; background:var(--ios-bg3);}
+  .triagedot.green{background:var(--ios-green);} .triagedot.yellow{background:var(--ios-orange);}
+  .triagedot.red{background:var(--ios-red);}
+  .triagemeta{margin-left:6px; font-size:10.5px; font-weight:700; color:var(--ios-label3);}
+
+  .triagerow{display:flex; gap:11px; align-items:flex-start; cursor:pointer;}
+  .triagesplit{font-size:10.5px; font-weight:700; color:var(--ios-orange); margin-top:7px; line-height:1.35;}
+  .triageopen{display:block; font-size:10.5px; font-weight:800; letter-spacing:.3px; color:var(--ios-blue);
+    margin:9px 0 0 33px; cursor:pointer;}
+  .triageversions{margin:8px 0 0 33px; border-top:1px solid rgba(255,255,255,.09); padding-top:8px;}
+  .tvrow{display:flex; gap:9px; align-items:flex-start; padding:6px 0;}
+  .tvfaces{display:flex; flex:none; padding-top:1px;}
+  .tvavatar{width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:9.5px; font-weight:800; color:#0a0a0a; background:var(--ios-bg3); border:1.5px solid rgba(0,0,0,.5);}
+  .tvavatar + .tvavatar{margin-left:-6px;}
+  .tvavatar.green{background:var(--ios-green);} .tvavatar.yellow{background:var(--ios-orange);}
+  .tvavatar.red{background:var(--ios-red);}
+  .tvavatar.none{background:var(--ios-bg3); color:var(--ios-label3);}
+  .tvhead{font-size:12px; line-height:1.4; color:var(--ios-label2); font-weight:600;}
+
+  .triagefoot{flex:0 0 auto; padding:10px 20px 28px; display:flex; flex-direction:column; gap:9px;
+    background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.9) 35%);}
+  .triagecount{font-size:11.5px; font-weight:800; letter-spacing:.4px; color:var(--ios-label3); text-align:center;}
+  .triagebtn{background:var(--ios-blue); color:#fff; font-size:15.5px; font-weight:800; padding:15px 26px;
+    border-radius:16px; box-shadow:0 8px 22px rgba(10,132,255,.3); text-align:center; cursor:pointer;}
+  .triagebtn.off{opacity:.35; box-shadow:none;}
+
+  /* ---------- THE REVEAL, version rows (8/31/2026, ported from the mock) ---------- */
+  .rvprogress{font-size:11.5px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--ios-label3); margin-bottom:18px;}
+  /* The shared fact is stated ONCE, quietly. Everything below it is variation — the
+     layout itself is the lesson: constant on top, spin underneath. */
+  .rvfact{font-size:13.5px; color:var(--ios-label2); text-align:center; line-height:1.45; margin-bottom:8px;}
+  .rvfactsubject{font-size:19px; font-weight:800; color:var(--ios-label); letter-spacing:-.2px;
+    text-align:center; text-wrap:balance; margin-bottom:26px;}
+  .rvrule{width:44px; height:2px; border-radius:2px; background:rgba(255,255,255,.14); margin-bottom:26px;}
+  .rvrows{width:100%; display:flex; flex-direction:column; text-align:left;}
+  .rvrow{display:flex; align-items:center; gap:14px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,.09);}
+  .rvrow:last-of-type{border-bottom:none;}
+  /* A row with a callout hands its divider down to the callout, so the ⚡ line never
+     straddles a rule. */
+  .rvrow.nb{border-bottom:none; padding-bottom:6px;}
+  .rvfaces{width:62px; flex:none; display:flex; align-items:center; justify-content:flex-start;}
+  .rvfacescol{display:flex; flex-direction:column; align-items:flex-start;}
+  .rvfacesrow{display:flex; align-items:center;}
+  .rvavatar{width:31px; height:31px; border-radius:50%; flex:none; display:flex; align-items:center;
+    justify-content:center; font-size:13px; font-weight:800; color:#0a0a0a;
+    border:2px solid rgba(0,0,0,.55); box-shadow:0 3px 9px rgba(0,0,0,.5);}
+  .rvavatar + .rvavatar{margin-left:-9px;}
+  .rvavatar.green{background:var(--ios-green);}
+  .rvavatar.yellow{background:var(--ios-orange);}
+  .rvavatar.red{background:var(--ios-red);}
+  .rvavatar.none{background:var(--ios-bg3); color:var(--ios-label3);}
+  .rvhead{font-size:14.5px; font-weight:600; line-height:1.36; color:var(--ios-label); text-wrap:pretty; text-align:left;}
+  .rvname{font-size:10.5px; font-weight:700; color:var(--ios-label3); margin-top:5px; letter-spacing:.2px;}
+  .rvsame{display:flex; align-items:flex-start; gap:7px; margin:0 0 0 76px; padding-bottom:15px;
+    border-bottom:1px solid rgba(255,255,255,.09);
+    font-size:11.5px; font-weight:700; line-height:1.35; color:var(--ios-orange);}
+  .rvsamebolt{font-size:12px; line-height:1.2;}
+  .rvsummary{font-size:15.5px; font-weight:800; color:var(--ios-label); text-align:center;
+    margin-top:28px; margin-bottom:22px; letter-spacing:-.1px;}
+  .rvbtn{background:var(--ios-blue); color:#fff; font-size:15.5px; font-weight:800; padding:15px 26px;
+    border-radius:16px; box-shadow:0 8px 22px rgba(10,132,255,.3); text-align:center; cursor:pointer;
+    border:none; font-family:inherit;}
+  .anim{opacity:0; animation:rvin .5s cubic-bezier(.2,.9,.3,1) both;}
+  @keyframes rvin{from{opacity:0; transform:translateY(9px);} to{opacity:1; transform:none;}}
+
+  /* THE DISCOVERY (first story only). Players are NOT told up front that their feeds
+     differ — they find out here, once their gut calls are locked in. It waits for a tap
+     and does not time out: nobody should get scrolled past the one moment the whole game
+     is built on. This is also why the no-talking rule in Round 1 is load-bearing. */
+  .rvdiscover{position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:0 36px; gap:14px;
+    background:#000; border:none; color:inherit; font-family:inherit; width:100%; cursor:pointer;
+    animation:rvdiscin .5s ease both; transition:opacity .45s ease, visibility 0s linear .45s;}
+  .rvdiscover.out{opacity:0; visibility:hidden;}
+  .rvdisckicker{font-size:11.5px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase; color:var(--ios-orange);}
+  .rvdiscbig{font-size:27px; font-weight:800; line-height:1.22; letter-spacing:-.4px; text-wrap:balance;}
+  .rvdisctap{position:absolute; bottom:74px; left:0; right:0; font-size:12.5px; font-weight:700;
+    letter-spacing:.6px; color:var(--ios-label3); animation:rvtap 2.1s ease-in-out .6s infinite;}
+  @keyframes rvdiscin{from{opacity:0;} to{opacity:1;}}
+  @keyframes rvtap{0%,100%{opacity:.35;} 50%{opacity:.85;}}
+  /* Everything behind the card is staged but frozen until the tap lands. */
+  .reveal.held .anim{animation-play-state:paused;}
+  @media (prefers-reduced-motion:reduce){ .rvdiscover{animation:none;} .rvdisctap{animation:none; opacity:.7;} }
+
   .revealskip{
     position:absolute; top:22px; right:22px; font-size:12px; font-weight:700; color:var(--ios-label2); cursor:pointer;
     background:rgba(255,255,255,.08); border-radius:999px; padding:7px 13px;
@@ -727,6 +875,240 @@
   .reversemeta{color:var(--ios-label3);}
 
   /* ---------- ASK AI ---------- */
+
+  /* ---------- ROUND 2 SURFACES, 8/31/2026 ----------
+     Tara: "make search and ask ai look more like search results and ai interface so
+     kids 'get' what they're looking at." If the game names a real thing, it should
+     look like that thing — a kid who has used Google and used a chatbot recognises
+     both on sight, with no label explaining what they're in. The game layer (the
+     one + Add to case button) hangs off each result rather than replacing it. */
+  .srchbar{display:flex; align-items:center; gap:8px; background:#fff; border-radius:999px; padding:9px 13px; margin-bottom:9px;}
+  .srchbar .q{flex:1; font-size:13px; color:#202124; font-weight:500; line-height:1.3;}
+  .srchbar .mag{font-size:13px; color:#5f6368;}
+  .srchbar .x{font-size:14px; color:#70757a;}
+  .srchtabs{display:flex; gap:14px; padding:0 4px 8px; border-bottom:1px solid rgba(255,255,255,.1); margin-bottom:10px;}
+  .srchtab{font-size:11.5px; font-weight:700; color:var(--ios-label3);}
+  .srchtab.on{color:#8ab4f8; border-bottom:2px solid #8ab4f8; padding-bottom:6px; margin-bottom:-8px;}
+  .srchcount{font-size:10.5px; color:var(--ios-label3); font-weight:600; margin-bottom:12px;}
+  .sresult{margin-bottom:18px;}
+  .ssite{display:flex; align-items:center; gap:7px; margin-bottom:5px;}
+  .sfav{width:22px; height:22px; border-radius:50%; background:var(--ios-bg3); display:flex; align-items:center; justify-content:center; font-size:11px; flex:none;}
+  .ssitename{font-size:11.5px; font-weight:700; line-height:1.2;}
+  .surl{font-size:10.5px; color:var(--ios-label3); line-height:1.2;}
+  /* The source type is PRINTED, not quizzed for — the old pill row sat between the
+     result and the button and buried the CTA (Tara, 8/31). Background check does
+     source-typing first and better now that it leads the tabs. */
+  .stype{font-size:10px; font-weight:800; letter-spacing:.3px; padding:2px 7px; border-radius:6px;
+    background:rgba(255,255,255,.09); color:var(--ios-label2); margin-left:auto; flex:none;}
+  .stype.inst{background:rgba(48,209,88,.16); color:#9bebb4;}
+  .stype.inf{background:rgba(255,159,10,.16); color:#ffce7a;}
+  .stype.bot{background:rgba(255,69,58,.16); color:#ffb3ae;}
+  .stitle{font-size:14.5px; font-weight:600; line-height:1.35; color:#8ab4f8; margin-bottom:4px;}
+  .ssnip{font-size:12.5px; line-height:1.45; color:var(--ios-label2);}
+  .saddwrap{margin-top:9px;}
+  .sadded{margin-top:9px; font-size:12px; font-weight:800; color:var(--ios-green);}
+
+  .aihdr{display:flex; align-items:center; gap:9px; padding-bottom:11px; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,.1);}
+  .aimark{width:27px; height:27px; border-radius:8px; background:linear-gradient(150deg,#7b61ff,#4dc7ff); display:flex; align-items:center; justify-content:center; font-size:14px; flex:none;}
+  .ainame{font-size:13px; font-weight:800;}
+  .aisub{font-size:10.5px; color:var(--ios-label3); font-weight:700;}
+  .aiuser{max-width:84%; margin-left:auto; background:var(--ios-blue); color:#fff; border-radius:16px 16px 4px 16px; padding:10px 13px; font-size:13px; line-height:1.45; font-weight:600; margin-bottom:15px;}
+  .airow{display:flex; gap:9px; margin-bottom:4px;}
+  .aiav{width:23px; height:23px; border-radius:7px; background:linear-gradient(150deg,#7b61ff,#4dc7ff); display:flex; align-items:center; justify-content:center; font-size:11px; flex:none; margin-top:2px;}
+  .aitxt{font-size:13px; line-height:1.55;}
+  .aiindent{margin-left:32px; margin-bottom:14px;}
+  .aisrcs{display:flex; flex-wrap:wrap; gap:5px; margin:10px 0 0 32px;}
+  .aisrc{font-size:10px; font-weight:700; color:var(--ios-label2); background:var(--ios-bg3); border:1px solid rgba(255,255,255,.12); border-radius:7px; padding:4px 8px;}
+  .aitools{display:flex; gap:13px; margin:10px 0 0 32px; font-size:12.5px; color:var(--ios-label3);}
+  /* The line that does the actual teaching lives in the chrome, not in a tour slide
+     nobody re-reads. */
+  .aidisc{margin-top:15px; font-size:10.5px; line-height:1.45; color:var(--ios-label3); text-align:center; border-top:1px solid rgba(255,255,255,.09); padding-top:10px;}
+  .aicomposer{display:flex; align-items:center; gap:8px; background:var(--ios-bg3); border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:9px 13px; margin-top:11px;}
+  .aicomposer .ph{flex:1; font-size:12px; color:var(--ios-label3); font-weight:600;}
+  .aicomposer .send{width:22px; height:22px; border-radius:50%; background:var(--ios-blue); display:flex; align-items:center; justify-content:center; font-size:11px; flex:none;}
+
+  /* Taught once, at the moment it lands — the CTA problem for middle schoolers, solved
+     without adding standing instruction copy to every screen (Tara, 8/31). */
+  .casetoast{position:absolute; left:16px; right:16px; bottom:26px; z-index:80;
+    background:rgba(20,20,22,.97); border:1px solid rgba(48,209,88,.5); border-radius:14px;
+    padding:11px 13px; display:none; align-items:center; gap:9px; box-shadow:0 12px 30px rgba(0,0,0,.6);
+    opacity:0; transition:opacity .25s ease;}
+  .casetoast.show{display:flex; opacity:1;}
+  .casetoast .tk{font-size:12px; font-weight:800; color:#9bebb4; flex:none;}
+  .casetoast .ts{font-size:11.5px; font-weight:600; color:var(--ios-label2); line-height:1.35;}
+
+
+
+  /* ---------- the drafting beat: prompt, shared clock, who's in ---------- */
+  .r3drafthead{display:flex; align-items:center; gap:10px; margin-bottom:9px;}
+  .r3draftkicker{font-size:11px; font-weight:800; letter-spacing:1.3px; text-transform:uppercase; color:var(--ios-orange);}
+  .r3clock{margin-left:auto; font-family:'Space Mono',monospace; font-size:17px; font-weight:700;
+    color:var(--ios-green); background:var(--ios-bg2); padding:4px 11px; border-radius:9px;}
+  .r3clock.urgent{color:var(--ios-red); animation:blink .8s infinite;}
+
+  /* THE SPOTTER — three posts, one slash each. These are the real feed posts, whole and
+     in context: same gradient, handle, engagement, sentence intact. A slash only reads
+     while the sentence around it survives (9/1/2026 — the extracted-word "pile" was
+     built and rejected for exactly this). It must NOT look like the note. */
+  .spotpost{border:1px solid rgba(255,255,255,.1); border-radius:15px;
+    padding:12px 13px; margin-bottom:10px;}
+  .spotpost.live{border-color:rgba(255,159,10,.55); box-shadow:0 0 0 1px rgba(255,159,10,.2);}
+  .spotpost.done{border-color:rgba(48,209,88,.35);}
+  .spothead{display:flex; align-items:center; gap:7px; margin-bottom:8px;}
+  .spotav{width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,.16);
+    display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex:0 0 auto;}
+  .spothandle{font-size:11.5px; font-weight:700; color:rgba(255,255,255,.82);}
+  .spotgot{margin-left:auto; display:flex;}
+  .spotgot .tvavatar + .tvavatar{margin-left:-6px;}
+  .spotbody{font-size:14px; line-height:1.8; font-weight:700;}
+  .spottok{border-radius:5px; padding:1px 3px; cursor:pointer;}
+  .spottok:active{background:rgba(255,159,10,.25);}
+  .spottok.live{background:rgba(255,159,10,.32);}
+  .spottok.slashed{text-decoration:line-through; text-decoration-color:var(--ios-orange);
+    text-decoration-thickness:2px; color:rgba(255,255,255,.45);}
+  .spotstats{margin-top:8px; font-size:10.5px; font-weight:600; color:var(--ios-label3);}
+  .spotstraight{margin-top:9px; font-size:11.5px; font-weight:700; color:var(--ios-label2);
+    background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+    border-radius:10px; padding:8px 10px; cursor:pointer; text-align:center;}
+  .spotname{margin-top:11px; border-top:1px solid rgba(255,255,255,.14); padding-top:10px;}
+  .spotinput{width:100%; box-sizing:border-box; background:rgba(0,0,0,.35); color:#fff;
+    border:1px solid rgba(255,255,255,.16); border-radius:11px; padding:10px 12px;
+    font-size:14px; font-family:inherit; outline:none;}
+  .spotchips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px;}
+  .spotchip{font-size:11px; font-weight:700; padding:6px 9px; border-radius:9px; cursor:pointer;
+    background:rgba(255,69,58,.15); border:1px solid rgba(255,69,58,.32); color:#ff9f96;}
+  .spotcalled{margin-top:9px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+    font-size:12.5px; font-weight:700; color:var(--ios-orange);}
+  .spotcalled.straight{color:var(--ios-green);}
+  .spotcalledlbl{font-size:9.5px; font-weight:800; letter-spacing:.9px; text-transform:uppercase;
+    color:var(--ios-label3); flex:0 0 auto;}
+  .spotundo{font-size:10.5px; font-weight:700; color:var(--ios-blue); cursor:pointer;}
+  .r3mine{font-size:14px; line-height:1.45; font-weight:600; background:var(--ios-bg3);
+    border-radius:12px; padding:11px 12px; margin-top:9px;}
+  .r3whosin{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:10px;}
+  .r3inpip{font-size:10.5px; font-weight:800; padding:4px 9px; border-radius:999px;
+    background:rgba(255,255,255,.07); color:var(--ios-label3);}
+  .r3inpip.in{background:rgba(48,209,88,.18); color:#9bebb4;}
+  .r3incount{margin-left:auto; font-size:10.5px; font-weight:800; color:var(--ios-label3);}
+  .sectionhead.clickable{cursor:pointer;}
+  .evchev{color:var(--ios-label3); font-size:11px;}
+  .r3blocked{font-size:10.5px; font-weight:700; color:var(--ios-orange); margin-top:5px;}
+  .r3srctype{color:var(--ios-label3); font-weight:700;}
+
+  /* ---------- ROUND 3: the community note on the card (8/31/2026) ---------- */
+  .r3ask{font-size:14px; font-weight:700; line-height:1.4;}
+  .r3hint{font-size:11.5px; line-height:1.45; color:var(--ios-label3); font-weight:600; margin-top:7px;}
+  .r3handoff{font-size:12px; font-weight:700; color:var(--ios-label2); background:rgba(10,132,255,.13);
+    border:1px solid rgba(10,132,255,.32); border-radius:11px; padding:8px 10px; margin-bottom:9px;}
+  .r3handoff b{color:#7cc0ff; text-transform:uppercase; letter-spacing:.4px; font-size:11px;}
+  .r3back{font-size:11.5px; font-weight:700; color:var(--ios-orange); margin-bottom:8px;}
+  .r3draft{background:var(--ios-bg2); border:1.5px solid rgba(255,255,255,.12); border-radius:12px;
+    padding:10px 12px; margin-bottom:8px; font-size:13px; line-height:1.4; cursor:pointer;}
+  .r3draft:hover{border-color:rgba(255,255,255,.3);}
+  .r3draftlabel{display:block; font-size:10px; font-weight:800; letter-spacing:.6px; color:var(--ios-label3); margin-bottom:4px;}
+  .r3moves{display:flex; align-items:center; gap:5px; font-size:10.5px; font-weight:800; letter-spacing:.4px;
+    text-transform:uppercase; color:var(--ios-label3); margin-bottom:8px;}
+  .r3pip{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.2);}
+  .r3pip.on{background:var(--ios-blue);}
+  .r3note{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.13); border-radius:13px; padding:12px;}
+  .r3notelabel{font-size:9.5px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:7px;}
+  .r3body{font-size:14px; line-height:1.55; font-weight:600;}
+  /* Contributions stay tinted by author, so the note visibly belongs to four people. */
+  .r3tok{display:inline; border-radius:4px;}
+  .r3-you{color:#3ddc84;} .r3-maya{color:#5ac8fa;} .r3-diego{color:#ff9f5a;} .r3-priya{color:#c583ff;}
+  .r3tok.cut{text-decoration:line-through; opacity:.35;}
+  .r3tok.tapme{cursor:pointer; border-bottom:1px dashed rgba(255,255,255,.25);}
+  .r3tok.tapme:hover{background:rgba(10,132,255,.22);}
+  .r3tok.editing{background:rgba(10,132,255,.3);}
+  .r3srcs{margin-top:10px; padding-top:9px; border-top:1px solid rgba(255,255,255,.1);}
+  .r3src{font-size:11.5px; line-height:1.4; font-weight:600; color:var(--ios-label2); margin-top:5px;}
+  .r3exh{font-size:9.5px; font-weight:800; letter-spacing:.6px; color:var(--ios-blue); margin-right:6px;}
+  .r3word{width:100%; margin-top:9px; border-radius:10px; padding:9px 10px; background:var(--ios-bg3);
+    border:1.5px solid var(--ios-blue); color:var(--ios-label); font-family:inherit; font-size:14px;}
+  .r3word:focus{outline:none;}
+  .r3exhibit{background:var(--ios-bg2); border:1.5px solid rgba(255,255,255,.12); border-radius:12px;
+    padding:10px 12px; margin-bottom:8px; cursor:pointer;}
+  .r3exhibit.sel{border-color:var(--ios-blue); background:rgba(10,132,255,.15);}
+  .r3exhibit.dead{opacity:.25; pointer-events:none;}
+  .r3votes{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;}
+  .r3vote{font-size:10.5px; font-weight:800; padding:5px 9px; border-radius:8px; background:rgba(255,255,255,.07); color:var(--ios-label3);}
+  .r3vote.ship{background:rgba(48,209,88,.18); color:#9bebb4;}
+  .r3vote.not{background:rgba(255,159,10,.18); color:#ffce7a;}
+  .r3filed{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px;}
+  .r3rac{font-size:13.5px; font-weight:800;}
+  .r3racsub{font-size:11px; color:var(--ios-label3); margin-bottom:10px;}
+  .btnfilled.warn{background:var(--ios-orange); color:#241400;}
+  .btnfilled.ghost{background:rgba(255,255,255,.09); color:var(--ios-label2);}
+  .filebtn.ghost{background:rgba(255,255,255,.09); color:var(--ios-label2); box-shadow:none;}
+
+  /* the four roles, in the note tour */
+  .r3rolerow{display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap;}
+  .r3role{background:var(--ios-bg3); border:1px solid rgba(255,255,255,.12); border-radius:14px;
+    padding:9px 8px; min-width:74px; display:flex; flex-direction:column; align-items:center; gap:2px;}
+  .r3roleemoji{font-size:19px; line-height:1;}
+  .r3rolename{font-size:10.5px; font-weight:800; text-transform:capitalize;}
+  .r3rolejob{font-size:9px; font-weight:600; color:var(--ios-label2); text-align:center; line-height:1.25;}
+  .r3roleto{font-size:12px; color:var(--ios-label3); font-weight:800;}
+
+  /* the filed note, riding on the post in the feed */
+  .hubnote{background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.28); border-radius:14px;
+    padding:10px 11px; margin-bottom:10px; cursor:pointer;}
+  .hubnotehead{display:flex; align-items:center; gap:6px; font-size:10.5px; font-weight:800;
+    letter-spacing:.4px; margin-bottom:5px;}
+  .hubnotechk{margin-left:auto; color:var(--ios-green); letter-spacing:1px;}
+  .hubnotebody{font-size:12.5px; line-height:1.45; font-weight:600;}
+  .hubnotefoot{display:flex; margin-top:7px; font-size:10px; font-weight:700; color:rgba(255,255,255,.62);}
+  .hubnotego{margin-left:auto; color:#7cc0ff; font-weight:800;}
+
+  /* the per-story summary screen */
+  /* The button used to sit at the end of a column taller than the phone, so on a real
+     device it was simply out of reach (Tara: "back to feed button at end not working").
+     The rows scroll; the button is pinned. */
+  /* Opaque in its own right. The scrim behind it is rgba(0,0,0,.94), which was enough
+     while this screen was a dense column of tell rows; the quieter version lets the lit
+     card underneath bleed through the whitespace. */
+  .storywrap{position:absolute; inset:0; display:flex; flex-direction:column; text-align:center;
+    background:linear-gradient(180deg,#0b1210 0%, #05070a 55%, #000 100%);}
+  .storyscroll{flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:46px 22px 12px; display:flex; flex-direction:column; align-items:center; gap:9px;}
+  .storyfoot{flex:0 0 auto; padding:12px 22px 30px; background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.85) 40%);}
+  .storykick{font-size:10.5px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; color:var(--ios-green);}
+  .storytitle{font-size:22px; font-weight:800; letter-spacing:-.3px; line-height:1.2;}
+  .storysub{font-size:13px; font-weight:600; color:var(--ios-label2); line-height:1.45; margin-bottom:6px;}
+  .storynote{width:100%; text-align:left; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.13);
+    border-radius:14px; padding:12px; margin-top:4px;}
+  .storybtn{width:100%; background:var(--ios-blue); color:#fff; font-size:15px; font-weight:800;
+    padding:13px 26px; border-radius:14px; cursor:pointer;}
+
+  /* THE STOP (9/1/2026). The session spends its whole length saying heat climbs on its
+     own while a story sits loose. This is the one moment a player gets to SEE it stop,
+     so it's a drawn line rather than a number: red climbing, a marker where the note
+     landed, green flat after. Timed so the climb finishes before the flat starts —
+     the pause between them is the point. */
+  .stopviz{position:relative; width:100%; max-width:300px; margin:10px 0 2px;}
+  .stopviz svg{width:100%; height:116px; display:block; overflow:visible;}
+  .stopfill{opacity:0; animation:stopfillin .5s ease .35s both;}
+  .stopclimb{stroke-dasharray:260; stroke-dashoffset:260; animation:stopdraw .95s cubic-bezier(.5,0,.8,.35) both;}
+  .stopflat{stroke-dasharray:120; stroke-dashoffset:120; animation:stopdraw .5s ease 1.25s both;}
+  .stopdot{opacity:0; transform-origin:186px 18px; animation:stoppop .45s cubic-bezier(.2,1.7,.4,1) 1.05s both;}
+  .stopmark{position:absolute; right:0; top:-4px; font-size:10.5px; font-weight:800; letter-spacing:.4px;
+    color:var(--ios-green); opacity:0; animation:stopfillin .4s ease 1.35s both;}
+  @keyframes stopdraw{ to{ stroke-dashoffset:0; } }
+  @keyframes stopfillin{ from{opacity:0;} to{opacity:1;} }
+  @keyframes stoppop{ from{opacity:0; transform:scale(.2);} to{opacity:1; transform:scale(1);} }
+  .stopbig{font-size:40px; font-weight:900; letter-spacing:-1.4px; line-height:1;
+    opacity:0; animation:stopfillin .45s ease 1.6s both;}
+  .stopunit{font-size:14px; font-weight:800; color:var(--ios-label3); margin-left:7px; letter-spacing:0;}
+
+  /* The transfer line. Not about the game — about their feed tonight. */
+  .pausecard{width:100%; text-align:left; margin-top:18px; border-radius:16px; padding:15px 16px;
+    background:linear-gradient(160deg, rgba(10,132,255,.14), rgba(255,255,255,.04));
+    border:1px solid rgba(10,132,255,.28); opacity:0; animation:stopfillin .5s ease 1.9s both;}
+  .pausekick{font-size:10.5px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--ios-blue); margin-bottom:9px;}
+  .pauseline{font-size:17px; font-weight:800; line-height:1.3; margin-bottom:9px;}
+  .pausesub{font-size:13px; font-weight:600; color:var(--ios-label2); line-height:1.5;}
+
   .chatbubble{display:table; max-width:86%; padding:11px 14px; border-radius:16px; font-size:14px; line-height:1.42; margin-bottom:10px;}
   .chatbubble.user{background:var(--ios-blue); color:#fff; margin-left:auto; margin-right:0; border-bottom-right-radius:4px;}
   .chatbubble.ai{background:var(--ios-bg2); color:var(--ios-label); margin-right:auto; margin-left:0; border-bottom-left-radius:4px;}
@@ -754,6 +1136,10 @@
   .trchip.red{ background:rgba(255,159,10,.15); color:var(--ios-orange); }
   .trchip.green{ background:rgba(10,132,255,.15); color:var(--ios-blue); }
   .trchip.none{ background:rgba(255,255,255,.05); color:var(--ios-label3); font-style:italic; font-weight:600; }
+  .trcalled{display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; margin:7px 0 2px;
+    font-size:12.5px; font-weight:700; color:var(--ios-green);}
+  .trcalledlbl{font-size:9.5px; font-weight:800; letter-spacing:.9px; text-transform:uppercase;
+    color:var(--ios-label3);}
   .trdesc{ font-size:11.5px; color:var(--ios-label2); line-height:1.5; margin-top:9px; }
 
   /* ---------- BOARD: determination + reveal ---------- */
@@ -864,6 +1250,9 @@
     </div>
     <div class="screen-area" id="screenArea"></div>
     <div class="onboard-scrim" id="onboardScrim"></div>
+    <div class="onboard-scrim" id="storyScrim"></div>
+    <div class="onboard-scrim" id="roleScrim"></div>
+    <div class="casetoast" id="caseToast"><span class="tk">✓ In your case file</span><span class="ts">Round 3 can only cite what's in here.</span></div>
     <div class="home-indicator" onclick="goHome()"></div>
   </div>
 <!-- Design notes (was the on-page .footnote until 8/24/2026, removed so the page
@@ -959,7 +1348,7 @@ function renderLobby(){
 var CALL_META = {
   misinfo:{emoji:"🚩", label:"Playing you"},
   biased:{emoji:"🤔", label:"Spun"},
-  "true":{emoji:"✅", label:"Straight with you"}
+  "true":{emoji:"✅", label:"Straight up"}   // 8/31/2026: was "Straight with you" — the thesis lives in the card headline instead
 };
 
 // Playtest note (8/18/2026): background used to be one fixed object per claim, but
@@ -973,7 +1362,7 @@ var CALL_META = {
 // sync in the first place) — see the normalization loop right after this array,
 // which derives it from `background.handle` so the two can't disagree again.
 var CLAIMS = [
-  {id:1, subject:"Tech", hue:195, sourceUrl:"tiktok.com/@ecofactsdaily/video/74123", wired:true,
+  {id:1, subject:"Tech", topic:"AI and water use", hue:195, sourceUrl:"tiktok.com/@ecofactsdaily/video/74123", wired:true,
     hook:"It's got a scary specific number attached — but where does that stat actually trace back to, and is anyone else reporting it the same way?",
     npcVotes:{maya:"misinfo", diego:"true", priya:"biased"},
     variants:[
@@ -990,7 +1379,7 @@ var CLAIMS = [
           bio:"📚 science news, summarized fast | links to the actual paper every time",
           verified:true, followers:"540K", following:"210", posts:"7,802", joined:"Joined Nov 2018"}}
     ]},
-  {id:2, subject:"Science", hue:150, sourceUrl:"tiktok.com/@climaterealtalk/video/74556", wired:true,
+  {id:2, subject:"Science", topic:"a climate chart going around", hue:150, sourceUrl:"tiktok.com/@climaterealtalk/video/74556", wired:true,
     hook:"A chart moving fast doesn't mean it's the full picture — worth seeing where this version of the data comes from and how other people are reading it.",
     npcVotes:{maya:"misinfo", diego:"biased", priya:"misinfo"},
     variants:[
@@ -1007,7 +1396,7 @@ var CLAIMS = [
           bio:"✅ fact-checking viral claims, sources linked every time",
           verified:true, followers:"780K", following:"180", posts:"5,940", joined:"Joined Mar 2019"}}
     ]},
-  {id:3, subject:"Sports", hue:30, sourceUrl:"instagram.com/worldcupuncut/p/c9x2k", wired:true,
+  {id:3, subject:"Sports", topic:"one World Cup photo", hue:30, sourceUrl:"instagram.com/worldcupuncut/p/c9x2k", wired:true,
     hook:"Something about this framing feels curated — worth looking at the original photo and what other angles turned up.",
     npcVotes:{maya:"biased", diego:"biased", priya:"biased"},
     variants:[
@@ -1024,7 +1413,7 @@ var CLAIMS = [
           bio:"📸 behind-the-scenes sports coverage, every angle",
           verified:false, followers:"156K", following:"420", posts:"6,120", joined:"Joined Jan 2022"}}
     ]},
-  {id:4, subject:"Health", hue:340, sourceUrl:"instagram.com/wellnesswithmara/p/c8m1q", wired:true,
+  {id:4, subject:"Health", topic:"the measles vaccine", hue:340, sourceUrl:"instagram.com/wellnesswithmara/p/c8m1q", wired:true,
     hook:"Personal stories spread fast and feel convincing — worth checking what the confirmed data actually says, and who else is weighing in.",
     npcVotes:{maya:"misinfo", diego:"true", priya:"true"},
     variants:[
@@ -1041,7 +1430,7 @@ var CLAIMS = [
           bio:"🩺 health news, straight from the source data",
           verified:true, followers:"920K", following:"140", posts:"8,410", joined:"Joined May 2017"}}
     ]},
-  {id:5, subject:"Politics", hue:0, sourceUrl:"x.com/breakingpoliticsnow/status/19834", wired:true,
+  {id:5, subject:"Politics", topic:"a clip from a protest", hue:0, sourceUrl:"x.com/breakingpoliticsnow/status/19834", wired:true,
     hook:"\"Breaking\" is doing a lot of work in that caption — worth checking when this clip is actually from and who's saying what about it.",
     npcVotes:{maya:"misinfo", diego:"misinfo", priya:"true"},
     variants:[
@@ -1258,9 +1647,68 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-08-26 · cold-open";
-var revealState = {active:false, order:[], index:0};
-var BOARD = {};                // claimId -> {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}
+var BUILD = "2026-09-01 · you stopped this one";
+var revealState = {active:false, order:[], index:0, discovered:false};
+// ---------------- TRIAGE (8/31/2026) ----------------
+// Replaces the old "you may only investigate what you disagreed about" gate. The table
+// picks the stories it will actually chase; the rest stay in the feed and keep heating.
+// Tara, 8/31: "teams decide which story to tackle, any of them should be investigatable"
+// — so disagreement no longer decides what's open. Nothing is locked: triage is a
+// commitment, not a fence. The cost of not picking one is the spread meter, which is
+// exactly what the rewritten spread tour now says out loud.
+// TEACHER SETTING (Tara, 8/31/2026: "up to the teacher in settings"). This is the
+// pipeline's "This session they play N of M" / "By stories — ends when they've filed
+// the stories you picked", read into the game. It counts CASES FILED, and the opening
+// story is one of them, so SESSION_CASES = 2 means "the one everybody does, plus one
+// the table chooses." Hard-coded here until the drop carries it.
+//
+// NOTE FOR THE PIPELINE PORT: the console currently has ONE number (session length in
+// stories) and prices every story at ~10 minutes because it assumes each one gets
+// filed. Triage breaks that assumption — an un-chased story costs a gut flag, not ten
+// minutes — so the console needs TWO numbers (stories in the feed, cases they file)
+// and a time estimate built from the second. See infodemic-pipeline-blooket-redesign.
+var SESSION_CASES = 2;
+// stage: "pre" before the reveal ends · "pending" while the opening story is on the
+// table and triage is waiting for it to be filed · "active" while the picker is up ·
+// "done" once the table has committed. The session cannot end before "done".
+var triageState = {active:false, stage:"pre", picked:[], open:{}};
+// How many more cases the table still has to commit to, and how many it has chosen.
+function triageQuota(){
+  var filed = CLAIMS.filter(function(c){ return getBoard(c.id).filed; }).length;
+  return Math.max(0, SESSION_CASES - filed);
+}
+function triageChosen(){
+  return triageState.picked.filter(function(id){ return !getBoard(id).filed; }).length;
+}
+function toggleTriageOpen(claimId){ triageState.open[claimId] = !triageState.open[claimId]; render(); }
+function triagePicked(claimId){ return triageState.picked.indexOf(claimId) >= 0; }
+function toggleTriage(claimId){
+  if(getBoard(claimId).filed) return;          // the opening story is already spent
+  var i = triageState.picked.indexOf(claimId);
+  if(i >= 0) triageState.picked.splice(i, 1);
+  else if(triageChosen() < triageQuota()) triageState.picked.push(claimId);
+  render();
+}
+function finishTriage(){
+  if(triageChosen() < triageQuota()) return;
+  triageState.active = false;
+  triageState.stage = "done";
+  roundState.justEnded = true;                 // the feed re-sorts chasing-first
+  // The story they just filed is still flipped open behind the picker — landing back
+  // on a finished case reads as "nothing happened". Close everything and put the story
+  // they just committed to at the top of the screen. Not auto-flipped: they've opened
+  // a card once already, and the choice they just made deserves to be theirs to enter.
+  claimFlipped = {};
+  var next = CLAIMS.filter(function(c){ return triagePicked(c.id) && !getBoard(c.id).filed; })[0];
+  if(currentApp==="round1") render();
+  if(next){
+    setTimeout(function(){
+      var el = document.getElementById("slide-"+next.id);
+      if(el && typeof el.scrollIntoView === "function") el.scrollIntoView({behavior:"smooth", block:"start"});
+    }, 60);
+  }
+}
+var BOARD = {};                // claimId -> {board:[], filed:false, filedAt:null, caseNo:null, r3:{...}}
 var heat = {};                 // claimId -> engagement number
 
 // ---------------- SESSION END ----------------
@@ -1300,9 +1748,14 @@ function recordFiling(claimId){
   r.looseMs = roundState.endedAt ? (Date.now() - roundState.endedAt) : null;
 }
 function contestedClaims(){
-  return CLAIMS.filter(function(c){ return claimStatus(c)==="contested"; });
+  // What the table took on. Before triage runs this is empty, which is correct —
+  // nothing has been committed to yet.
+  return CLAIMS.filter(function(c){ return triagePicked(c.id); });
 }
 function allCasesFiled(){
+  // Before triage has run, picked = [the opening story] — filing it would otherwise
+  // read as "every committed case is filed" and end the session one story in.
+  if(triageState.stage !== "done") return false;
   var contested = contestedClaims();
   return contested.length>0 && contested.every(function(c){ return getBoard(c.id).filed; });
 }
@@ -1325,14 +1778,14 @@ function endSession(){
   }, 1700);
 }
 function openEndReport(){ sessionState.showingEnd = true; render(); }
-function dismissEndReport(){ sessionState.showingEnd = false; render(); }
+function dismissEndReport(){ sessionState.showingEnd = false; endScreenKey = null; render(); }
 function endStats(){
   var contested = contestedClaims();
   var rows = contested.map(function(c){
     var r = getReach(c.id);
     var b = getBoard(c.id);
     return {id:c.id, headline:variantForPlayer(c,"you").headline, subject:c.subject,
-            peak:r.peak||0, shares:Math.round(r.shares||0), looseMs:r.looseMs, call:b.teamCall};
+            peak:r.peak||0, shares:Math.round(r.shares||0), looseMs:r.looseMs, note:r3NoteText(b)};
   }).sort(function(a,b){ return b.shares - a.shares; });
   var totalShares = 0, looseSum = 0, looseN = 0, maxShares = 1;
   rows.forEach(function(r){
@@ -1347,31 +1800,39 @@ function endStats(){
     avgLooseMs: looseN ? looseSum/looseN : 0,
     contestedN: contested.length,
     filedN: contested.length,
-    agreedN: CLAIMS.filter(function(c){ return claimStatus(c)==="agreed"; }).length,
+    leftN: CLAIMS.filter(function(c){ return !getBoard(c.id).filed; }).length,
     skippedN: CLAIMS.filter(function(c){ return claimStatus(c)==="skipped"; }).length,
     sessionMs: roundState.startedAt ? ((sessionState.endedAt||Date.now()) - roundState.startedAt) : 0
   };
 }
+var endScreenKey = null;
 function renderEndScreen(){
   var s = endStats();
   var worst = s.rows[0];
+  // The report is a settled thing — it fades in, the title springs once and the balance
+  // bar sweeps to green exactly once. Any later render() pass that rebuilt it reset the
+  // bar to its pre-sweep width and replayed the spring, which read as a bounce.
+  var key = s.filedN + ":" + s.leftN + ":" + Math.round(s.totalShares);
+  if(key === endScreenKey && document.querySelector(".endwrap")) return;
+  endScreenKey = key;
   var html = '<div class="endwrap"><div class="endscroll">';
   html += '<div class="endhero">';
   html += '<div class="endkicker">Session complete</div>';
-  html += '<div class="endtitle">Every case is filed.</div>';
+  html += '<div class="endtitle">Your cases are filed.</div>';
   html += '<div class="endsub">' + s.contestedN + ' ' + (s.contestedN===1?'story':'stories') + ' closed in ' +
-          fmtDuration(s.sessionMs) + ', start to finish. Nothing on this feed is still spreading — ' +
-          'here\'s how far it all got first.</div>';
+          fmtDuration(s.sessionMs) + ', start to finish' +
+          (s.leftN>0 ? '. The other ' + s.leftN + ' are still out there' : '') +
+          ' — here\'s how far it all got.</div>';
   html += '</div>';
 
   // 1. The meter they've watched all session, finally all the way green. It animates
   //    from wherever it stood just before the last case was filed, so the ending is a
   //    movement they can see, not a static 100%.
   html += '<div class="endcard">';
-  html += '<div class="endcardtag">The feed is quiet</div>';
+  html += '<div class="endcardtag">'+(s.leftN>0 ? 'Where the feed landed' : 'The feed is quiet')+'</div>';
   html += '<div class="endbar"><div class="r" id="endbar-r" style="width:' + sessionState.lastLiveRedPct + '%"></div>' +
           '<div class="g" id="endbar-g" style="width:' + (100 - sessionState.lastLiveRedPct) + '%"></div></div>';
-  html += '<div class="endbarkeys"><span style="color:var(--ios-label3);">0 still spreading</span>' +
+  html += '<div class="endbarkeys"><span style="color:var(--ios-label3);">' + s.leftN + ' still spreading</span>' +
           '<span style="color:var(--ios-green);">' + s.filedN + ' contained</span></div>';
   html += '</div>';
 
@@ -1379,7 +1840,7 @@ function renderEndScreen(){
   html += '<div class="endcard">';
   html += '<div class="endcardtag">Before you stopped it</div>';
   html += '<div class="endbignum">' + formatCount(s.totalShares) + '<span class="endbigunit">shares</span></div>';
-  html += '<div class="endbigsub">collected while these stories sat un-filed. Average time from "this one\'s contested" to "case filed": ' +
+  html += '<div class="endbigsub">collected while these stories sat un-filed. Average time from "we\'re taking this one" to "case filed": ' +
           fmtDuration(s.avgLooseMs) + '. Every second of that was reach.</div>';
   html += '</div>';
 
@@ -1391,7 +1852,9 @@ function renderEndScreen(){
     html += '<div class="endrowbar"><span data-w="' + pct + '"></span></div>';
     html += '<div class="endrowmeta">' + formatCount(r.shares) + ' shares' +
             (r.looseMs!=null ? ' · loose ' + fmtDuration(r.looseMs) : '') + '</div>';
-    if(r.call) html += '<div class="endrowverdict">Filed as ' + CALL_META[r.call].emoji + ' ' + CALL_META[r.call].label + '</div>';
+    // Was "Filed as 🚩 Misinfo" — a determination that no longer exists. The note's own
+    // line is both truer and more legible: it says what the table concluded, in their words.
+    if(r.note) html += '<div class="endrowverdict">📝 ' + r.note + '</div>';
     html += '</div></div>';
   });
   html += '</div>';
@@ -1407,13 +1870,17 @@ function renderEndScreen(){
     html += '<div class="endcard"><div class="endcardtag">Never called</div>';
     html += '<div class="endnote">' + s.skippedN + ' ' + (s.skippedN===1?'story':'stories') +
             ' ran out the clock with nobody calling ' + (s.skippedN===1?'it':'them') +
-            ' either way. Not agreed on \u2014 just never answered.</div></div>';
+            ' either way. Nobody called them \u2014 which isn\'t the same as them being fine.</div></div>';
   }
-  if(s.agreedN > 0){
-    html += '<div class="endcard"><div class="endcardtag">Never investigated</div>';
-    html += '<div class="endnote">' + s.agreedN + ' ' + (s.agreedN===1?'story':'stories') +
-            ' your table agreed on straight away, so ' + (s.agreedN===1?'it':'they') +
-            ' never got looked at. Worth saying out loud now that it\'s over: was agreeing the same thing as being right?</div></div>';
+  // Was "your table agreed on it straight away, so it never got looked at" — consensus
+  // framing, retired 8/31/2026. Under triage the honest version is simpler: you chose,
+  // and these are the ones you left.
+  if(s.leftN > 0){
+    html += '<div class="endcard"><div class="endcardtag">Still out there</div>';
+    html += '<div class="endnote">' + s.leftN + ' ' + (s.leftN===1?'story':'stories') +
+            ' never got looked at, so nothing happened to ' + (s.leftN===1?'it':'them') +
+            ' \u2014 ' + (s.leftN===1?'it\'s':'they\'re') + ' still going. Worth saying out loud now that it\'s over: was leaving ' +
+            (s.leftN===1?'it':'them') + ' the same thing as ' + (s.leftN===1?'it':'them') + ' being fine?</div></div>';
   }
 
   html += '</div><div class="endfoot">';
@@ -1438,6 +1905,10 @@ function renderEndScreen(){
 // so the file-stamp animation plays exactly once and never replays on a later
 // unrelated re-render (e.g. the heat tick).
 var justFiledClaimId = null;
+// The per-story summary (8/30/2026, Tara: "per story summary that fires after filing").
+// Its own screen, one story, fired a beat after the FILED stamp lands — not a section of
+// the board, not a row on the card, not deferred to the end report.
+var pendingStory = null;
 // Background Check is a 4th investigation mode, authored as a short "account
 // snapshot" per claim. Rather than build a parallel evidence system for it, each
 // one is injected as a regular entry into CLIPS[claimId] (source:"background") —
@@ -1468,7 +1939,7 @@ Object.keys(CLIPS).forEach(function(id){
 var reverseOpen = {};
 var aiRevealed = {};
 var unlockedTells = {};
-var seenOnboard = {round1:false, investigate:false, tells:false, board:false, spread:false};
+var seenOnboard = {round1:false, investigate:false, tells:false, note:false, spread:false};
 var pendingOnboard = null;
 // See the ONBOARDING section further down for what these do — onboardScreenIdx is
 // which screen of the current tour is showing, onboardReady/onboardNpcScheduled
@@ -1489,7 +1960,7 @@ function toggleSource(claimId){ sourceExpanded[claimId] = !sourceExpanded[claimI
 function handleSourceTap(claimId){
   var claim = claimById(claimId);
   var board = getBoard(claimId);
-  if(roundState.ended && claimStatus(claim)==="contested" && !board.filed && seenOnboard.investigate){
+  if(roundState.ended && !board.filed && seenOnboard.investigate){
     openSpoke(claimId, "background");
   } else {
     toggleSource(claimId);
@@ -1533,7 +2004,148 @@ function maybeUnlock(clipId){
   if(!pendingTells[owner]) pendingTells[owner] = {};
   pendingTells[owner][clip.tell] = true;
 }
-function getBoard(id){ if(!BOARD[id]) BOARD[id] = {board:[], teamCall:null, confirmed:false, filed:false, filedAt:null}; return BOARD[id]; }
+function getBoard(id){ if(!BOARD[id]) BOARD[id] = {board:[], filed:false, filedAt:null, caseNo:null}; return BOARD[id]; }
+// ---------------- ROUND 3: THE COMMUNITY NOTE (8/31/2026) ----------------
+// Replaces the determination bucket entirely — no teamCall, no confirm checkbox, no
+// free-text justification box. The note IS the artifact, and it's built by a chain of
+// one-operator-at-a-time roles. Ported from infodemic-note-roles-harness.html after it
+// survived a bench play; see project memory infodemic-round3-role-chain-harness.
+// This file has no real multiplayer, so it plays the way Tara asked the demo to play:
+// YOU take the operator seat every beat, and the three simulated teammates draft,
+// talk and vote around you.
+// SPOTTER replaces SKEPTIC in the third seat (8/31/2026, Tara, from "The Spotter"
+// artifact 098189f1-4d73-4ad5-9df3-231e55491f02). The chain is otherwise untouched —
+// same handoffs, same role cards, same send-back. The only thing that changed is what
+// the third seat is handed: it no longer touches the table's sentence, it goes back to
+// the POSTS. Tara's constraint, verbatim: **no note** — "the other roles are still
+// working on the community note", so nothing the Spotter does enters it.
+var R3_ROLES = ["editor","translator","spotter","checker"];
+var R3_OPS = ["translator","spotter","checker"];
+var R3_JOB = {
+  editor:"Pick a draft. You can't see who wrote which.",
+  translator:"Simplify it. Two moves — tap a word to swap it for a plainer one.",
+  spotter:"Three posts, one slash each. Tap the part that was working on the reader \u2014 or say the post was straight.",
+  checker:"Cite two exhibits, added by two different people."
+};
+var R3_JOBLINE = {editor:["🎯","picks the line"], translator:["💬","makes it easy to understand"],
+                  spotter:["👀","names the manipulation"], checker:["🔗","cites the proof"]};
+// Suggestions offered on tap — never graded, just alternatives. Unknown words fall
+// through to free text or a cut, so a player is never stuck on a word we didn't guess.
+// What the role card says. R3_JOB is the in-card reminder line and stays terse; this is
+// the moment you're handed the job, so it gets to be a little louder. `detail` is the
+// rule you'd otherwise learn by failing at it.
+var R3_CARD = {
+  editor:    {emoji:"\ud83c\udfaf", job:"Pick the line the table builds on.",
+              detail:"Four drafts, no names on them. You can't see who wrote which \u2014 pick the one that says what happened."},
+  translator:{emoji:"\ud83d\udcac", job:"Make it easy to understand.",
+              detail:"Tap a word to swap it for a plainer one, or cut it. Two moves \u2014 spend them where the sentence is hardest."},
+  // "Manipulating", not "doing to us" — the sharper word, and already player-facing:
+  // screen 1 of the Tells tour opens on "How can you tell you're being manipulated?"
+  // This is where a kid answers that question out loud instead of reading it.
+  spotter:   {emoji:"\ud83d\udc40", job:"How was each version manipulating us?",
+              detail:"Three posts, one slash each. Not the note \u2014 the posts. Cross out the part that was working on the reader, and say what it was doing."},
+  checker:   {emoji:"\ud83d\udd17", job:"Back it with two exhibits.",
+              detail:"Both have to come from the case file, and they have to be found by two different people."}
+};
+// Which role card is waiting to be shown, and for which story. Null when none.
+var pendingRole = null;
+function showRoleCard(claimId, role){ pendingRole = {claimId:claimId, role:role}; }
+function dismissRoleCard(){ pendingRole = null; render(); }
+var roleCardKey = null;
+function renderRoleCard(){
+  var el = document.getElementById("roleScrim");
+  if(!el) return;
+  if(!pendingRole){ roleCardKey = null; el.className = "onboard-scrim"; el.innerHTML = ""; return; }
+  // Rebuilding this node is what replays roledeal/rolepop. Only do it when the card
+  // is actually a different card.
+  var r0 = getR3(pendingRole.claimId);
+  var key = pendingRole.claimId + ":" + pendingRole.role + ":" + (r0.returnRole?"back":"first") +
+            ":" + (r0.moves[pendingRole.role]||0);
+  if(key === roleCardKey) return;
+  roleCardKey = key;
+  var role = pendingRole.role, c = R3_CARD[role];
+  var r = getR3(pendingRole.claimId);
+  var back = !!r.returnRole;
+  var moves = (role==="translator" || role==="spotter") ? (r.moves[role]||0) : 0;
+  var html = '<div class="rolewrap" onclick="dismissRoleCard()">';
+  // Name the person who bounced it — "it came back" is an event, "Diego said not yet"
+  // is somebody at the table disagreeing with you, which is the thing worth feeling.
+  var sender = back && r.notBy ? r3Name(r.notBy) : null;
+  html += '<div class="rolekick">'+(back ? (sender ? sender+" said not yet" : "It came back to you") : "The note comes to you")+'</div>';
+  html += '<div class="rolecard">';
+  html += '<span class="roleemoji">'+c.emoji+'</span>';
+  html += '<div class="roleyou">You\'re the</div>';
+  html += '<div class="rolename">'+role+'</div>';
+  html += '<div class="rolejob">'+c.job+'</div>';
+  html += '<div class="roledetail">'+(back ? "Moves reset \u2014 and this time the whole line is open to rewrite." : c.detail)+'</div>';
+  if(moves){
+    html += '<div class="rolemoves">';
+    for(var i=0;i<moves;i++) html += '<span class="rolemove"></span>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div class="rolewatch">The other three are watching the same sentence.<br>Talk it out \u2014 only you can touch it.</div>';
+  html += '<div class="rolebtn">Take it \u2192</div>';
+  html += '</div>';
+  el.innerHTML = html;
+  el.className = "onboard-scrim active";
+}
+var R3_PLAINER = {aggregate:["all of it together"], negligible:["tiny","very small"], approximately:["about"],
+  consumption:["use"], significant:["big"], substantial:["big"], individual:["one"], query:["question"],
+  queries:["questions"], infrastructure:["the buildings and machines"], straining:["putting pressure on"],
+  footprint:["how much it uses"], methodology:["how they measured it"], demonstrates:["shows"], indicates:["suggests"]};
+var R3_NEUTRAL = {wastes:["uses","needs"], drains:["uses"], destroying:["damaging"], scary:["worth knowing"],
+  huge:["large"], massive:["large"], tiny:["small"], insane:["unusual"], crazy:["unusual"], fake:["not supported"],
+  lies:["is not true"], proves:["shows","suggests"], never:["rarely"], always:["often"], everyone:["a lot of people"],
+  nobody:["few people"], claims:["says"], obviously:["—"], literally:["—"], basically:["roughly","—"],
+  honestly:["—"], just:["—"], totally:["—"], really:["—"], quietly:["—"], actually:["—"], shocking:["surprising"]};
+
+function getR3(id){
+  var b = getBoard(id);
+  if(!b.r3) b.r3 = {phase:"draft", drafts:{}, chosen:null, order:null, toks:[],
+                    moves:{translator:2, spotter:3, checker:2}, opIdx:0, editIdx:null, editVal:"",
+                    // spots: variant headline -> {i: word index, label: what it was doing}
+                    spots:{}, spotIdx:null, spotVer:null,
+                    sources:[], readOut:false, votes:{}, returnRole:null, returnUsed:false, notBy:null};
+  return b.r3;
+}
+// The gate that ends Round 2 and opens Round 3: enough pooled evidence to write from.
+// Same constant the deleted board tour used — it was always the same idea.
+function r3Open(claimId){ return getBoard(claimId).board.length >= BOARD_TOUR_EVIDENCE_THRESHOLD; }
+// The board the note gate is actually about — the story that just crossed the threshold.
+// The table has passed the evidence gate on this story and is writing, not looking.
+function r3Writing(claimId){
+  return r3Open(claimId) && seenOnboard.note && !onboardDeferred.note && !getBoard(claimId).filed;
+}
+function r3GateClaim(){ return CLAIMS.filter(function(c){ return r3Open(c.id) && !getBoard(c.id).filed; })[0]; }
+function r3GateCount(){ var c = r3GateClaim(); return c ? getBoard(c.id).board.length : BOARD_TOUR_EVIDENCE_THRESHOLD; }
+function r3LiveOp(r){ return r.returnRole || R3_OPS[r.opIdx]; }
+function r3RoleNow(r){
+  if(r.phase === "pick") return "editor";
+  if(r.phase === "op") return r3LiveOp(r);
+  return "checker";   // you read it out
+}
+function r3Parts(w){
+  var lead = (w.match(/^[^\w]*/)||[""])[0], trail = (w.match(/[^\w]*$/)||[""])[0];
+  return {lead:lead, core:w.slice(lead.length, w.length-trail.length), trail:trail};
+}
+function r3NoteText(b){
+  if(!b.r3 || !b.r3.toks.length) return "";
+  return b.r3.toks.filter(function(t){ return !t.cut && t.w; }).map(function(t){ return t.w; }).join(" ");
+}
+// The other three write theirs from this claim's own evidence, so a draft is never
+// generic filler: the honest variant's headline, a named-institution clip, an AI answer.
+function r3NpcDrafts(claim){
+  var clips = CLIPS[claim.id] || [];
+  var inst = clips.filter(function(c){ return c.who==="News / institution"; })[0];
+  var ai = clips.filter(function(c){ return c.source==="ai"; })[0];
+  var honest = claim.variants[claim.variants.length-1];
+  return {
+    maya: honest ? honest.headline : "The story is less dramatic than the post makes it sound.",
+    diego: inst ? inst.text : "There's a named source that says something narrower than the post.",
+    priya: ai ? ai.text : "The post overstates what anyone has actually shown."
+  };
+}
 function claimNumber(id){ return "INF-" + String(4000 + id*137).slice(-5); }
 function letterFor(i){ return String.fromCharCode(65+i); }
 function toggleReverse(id){ reverseOpen[id] = !reverseOpen[id]; render(); }
@@ -1625,6 +2237,16 @@ function castVote(claimId, call){
   // Picking a color (not un-picking one) bounces you straight to the next card —
   // keeps the gut-check moving instead of making players manually scroll each time.
   if(claimVotes[claimId] !== null) scrollToNextCard(claimId);
+  maybeEndEarly();
+}
+// A timer is a ceiling, not a duration (Tara, 8/31/2026): the moment every call is
+// in, the round ends — nobody should sit watching a clock run out on a decision the
+// table has already made. The 60s cap still exists for the table that stalls.
+// Single-player file, so "everyone" is you: every claim carries a call.
+function maybeEndEarly(){
+  if(!roundState.started || roundState.ended || roundState.showingTimesUp) return;
+  var allIn = CLAIMS.every(function(c){ return !!claimVotes[c.id]; });
+  if(allIn) setTimeout(forceTimesUp, 500);   // a beat, so the last tap is seen landing
 }
 // scrollAnimUntil guards the engagement-gravity tick below from rebuilding the
 // feed mid-scroll — mirrors the same fix in infodemic-multiplayer-prototype.html
@@ -1665,8 +2287,10 @@ function goHome(){ currentApp = "round1"; render(); }
 // elsewhere (e.g. the Spread's "top contested claim" tile) means: go back to the
 // feed, flip that card open straight to its Board tab, and scroll it into view.
 function openClaim(id){
-  var claim = claimById(id);
-  if(claimStatus(claim)!=="contested") return;
+  // Was gated on claimStatus === "contested" — the last of the three consensus gates,
+  // and the one that made the Spread's "top spreading right now" tile silently do
+  // nothing for a story the table happened to agree about. Any unfiled story opens.
+  if(!roundState.ended || !seenOnboard.investigate) return;
   currentApp = "round1";
   openSpoke(id, "board");
   setTimeout(function(){
@@ -1681,8 +2305,10 @@ function openApp(name){ currentApp = name; render(); }
 // Filed claims can still flip (to review the read-only board/receipt), they just
 // can't reach Search/Ask AI anymore — renderCardBack enforces that, not this.
 function flipCard(claimId){
-  var claim = claimById(claimId);
-  if(claimStatus(claim)!=="contested") return;
+  // No status gate any more. Triage decides what the table AGREED to chase; it does not
+  // decide what anyone is allowed to look at (Tara, 8/31/2026: "any of them should be
+  // investigatable"). A story nobody picked is still one tap from its tools.
+  if(!roundState.ended) return;
   if(!seenOnboard.investigate) return; // whole table clears the Investigate tour before anyone can flip a card open
   claimFlipped[claimId] = !claimFlipped[claimId];
   render();
@@ -1693,8 +2319,7 @@ function flipCard(claimId){
 // means "investigate" reopens wherever you last left off, or the move-menu the very
 // first time — see renderCardBack/renderMoveMenu.
 function openSpoke(claimId, mode){
-  var claim = claimById(claimId);
-  if(claimStatus(claim)!=="contested") return;
+  if(!roundState.ended) return;   // same open-to-all rule as flipCard
   if(!seenOnboard.investigate) return; // same gate as flipCard — finalizeOnboard() flips this true before its own hand-off call
   claimFlipped[claimId] = true;
   if(mode) cardMode[claimId] = mode;
@@ -1722,7 +2347,12 @@ function renderRound1TimesUp(){
   html += '<span class="r1timesupclose" onclick="dismissTimesUp()">✕</span>';
   html += '<div class="r1timesupbig">⏰ TIME\'S UP</div>';
   html += '<div class="r1timesuptitle">Let\'s see where you landed</div>';
-  html += '<div class="r1timesupsub">Tap continue to go through each story, one at a time — how it was called, and where your table agreed or split.</div>';
+  // Was: "go through each story, one at a time — how it was called, and where your table
+  // agreed or split." Both halves went stale on 8/31/2026 — the reveal plays ONE story
+  // now, and agreed/split stopped being a thing the game says anywhere. Deliberately
+  // does not tip the discovery ("you didn't all see the same post") — that card is the
+  // whole point of the next screen and shouldn't be spoiled by a loading caption.
+  html += '<div class="r1timesupsub">Pens down. We\'ll start with one story, and how each of you called it.</div>';
   html += '<div class="r1timesupbtn" onclick="dismissTimesUp()">Continue</div>';
   html += '</div>';
   document.getElementById("screenArea").innerHTML = html;
@@ -1738,7 +2368,16 @@ function startRoundReveal(){
   endRound1(); // locks in final vote tallies so claimStatus/claimVotesFor are stable through the reveal
   revealState.active = true;
   revealState.index = 0;
-  revealState.order = CLAIMS.slice();
+  revealState.discovered = false;   // story 1 opens on the discovery card, once per session
+  // ONE story, not five (8/31/2026, Tara: "it sticks after one"). The reveal's job is
+  // the discovery — we did not see the same post — and that lands exactly once. Running
+  // it five times spends the format of a revelation on what is, by story three,
+  // reference material: four repeats of a punchline the table already got, and about
+  // 75 seconds of watching right after a 60-second silent round. The other four stories
+  // still show their spread — inside the triage cards, where it is what it actually is:
+  // information for a choice. Reinforcement comes later and better, at each story
+  // summary after filing, where a tell gets named against a version they worked on.
+  revealState.order = CLAIMS.slice(0, 1);
   if(currentApp==="round1") render();
 }
 function revealNext(){
@@ -1750,7 +2389,27 @@ function revealNext(){
   }
 }
 function skipRoundReveal(){ finishRoundReveal(); }
+// The reveal no longer hands off to the picker (8/31/2026, Tara: "you all got a story
+// about x, different version rows, what really happened? then maybe triage happens
+// after you've filed the first story"). The question the reveal asks gets answered on
+// the story it just asked it about — same object, no screen in between — and the whole
+// table does that one together, so the tour, the roles and the note all land on shared
+// ground. Triage waits until they've felt what chasing a story actually costs; see
+// dismissStory().
 function finishRoundReveal(){
+  revealState.active = false;
+  var opening = revealState.order[0];
+  triageState.picked = opening ? [opening.id] : [];
+  triageState.open = {};
+  triageState.stage = "pending";
+  roundState.justEnded = true;   // feed shuffles, opening story to the front
+  if(currentApp==="round1") render();
+  setTimeout(function(){
+    roundState.readyForR2Popup = true;
+    if(currentApp==="round1") maybeShowOnboard();   // the Investigate tour
+  }, 900);
+}
+function finishRoundRevealOld(){
   revealState.active = false;
   roundState.justEnded = true; // still shows the feed's shuffle-into-place animation
   if(currentApp==="round1") render();
@@ -1761,41 +2420,166 @@ function finishRoundReveal(){
     if(currentApp==="round1") maybeShowOnboard();
   }, 900);
 }
+// ---------------- THE REVEAL, REBUILT AROUND VERSIONS (8/31/2026) ----------------
+// Ported from infodemic-reveal-mock.html, which Tara reviewed at real size on device
+// (8/26) and which had never been merged. The old version animated per-player vote
+// avatars against an invisible shared story and ended on "Table agreed / Contested" —
+// which asked players to care about consensus before they knew the thing worth caring
+// about: they were not reading the same post.
+//
+// Rows are VERSIONS, not people. The shared fact is stated once at the top; everything
+// under it is variation, so the layout itself is the lesson — constant on top, spin
+// underneath. Avatars sit in the left gutter of the version their player was served,
+// coloured by how that player flagged it.
+//
+// No tells here. Rule 4 of the reveal rules still holds: Round 1 shows versions and gut
+// flags only; the post-file story summary is where a tell gets named.
+function revealRows(claim){
+  var rows = [];
+  PLAYERS.forEach(function(pl){
+    var variant = variantForPlayer(claim, pl.id);
+    var row = rows.filter(function(r){ return r.headline === variant.headline; })[0];
+    if(!row){ row = {headline:variant.headline, who:[]}; rows.push(row); }
+    row.who.push({p:pl, flag:claimVotesFor(claim)[pl.id]});
+  });
+  return rows;
+}
+var FLAG_CLASS = {misinfo:"red", biased:"yellow", "true":"green"};
+// Fires ONLY when two players got the identical version and flagged it differently —
+// same evidence, different read, the one argument the table can't dodge. Deliberately
+// silent when they agree.
+function revealSplit(row){
+  if(row.who.length < 2) return null;
+  var flags = row.who.map(function(w){ return w.flag; });
+  var distinct = flags.filter(function(f, i){ return f && flags.indexOf(f) === i; });
+  if(distinct.length < 2) return null;
+  return row.who.map(function(w){ return w.p.isYou ? "You" : w.p.name; });
+}
 function renderRoundReveal(){
   var claim = revealState.order[revealState.index];
-  var variant = variantForPlayer(claim, "you");
-  var v = claimVotesFor(claim);
-  var status = claimStatus(claim);
   var isLast = revealState.index === revealState.order.length - 1;
+  var isFirst = revealState.index === 0;
+  var rows = revealRows(claim);
+  var held = isFirst && !revealState.discovered;
 
-  var html = '<div class="reveal">';
+  var html = '<div class="reveal'+(held?' held':'')+'">';
   html += '<span class="revealskip" onclick="skipRoundReveal()">Skip ✕</span>';
-  html += '<div class="revealprogress">Story '+(revealState.index+1)+' of '+revealState.order.length+'</div>';
-  html += '<div class="revealsubject">'+claim.subject+'</div>';
-  html += '<div class="revealheadline">'+variant.headline+'</div>';
 
-  html += '<div class="revealvotes">';
-  PLAYERS.forEach(function(p, i){
-    var vote = v[p.id];
-    var cls = vote || "none";
-    html += '<div class="revealvoteitem" style="animation-delay:'+(i*160)+'ms;">';
-    html += '<div class="revealavatar '+cls+'">'+(vote ? CALL_META[vote].emoji : "—")+'</div>';
-    html += '<div class="revealvotename">'+(p.isYou?"You":p.name)+'</div>';
+  var off = 0;
+  html += '<div class="rvprogress anim" style="animation-delay:'+off+'ms;">The first story</div>';
+  html += '<div class="rvfact anim" style="animation-delay:'+(off+60)+'ms;">You all got a story about</div>';
+  html += '<div class="rvfactsubject anim" style="animation-delay:'+(off+60)+'ms;">'+(claim.topic || claim.subject)+'</div>';
+  html += '<div class="rvrule anim" style="animation-delay:'+(off+120)+'ms;"></div>';
+
+  html += '<div class="rvrows">';
+  var delay = off + 260;
+  rows.forEach(function(row){
+    var split = revealSplit(row);
+    html += '<div class="rvrow'+(split?' nb':'')+' anim" style="animation-delay:'+delay+'ms;">';
+    html += '<div class="rvfaces"><div class="rvfacescol"><div class="rvfacesrow">';
+    row.who.forEach(function(w){
+      html += '<div class="rvavatar '+(FLAG_CLASS[w.flag]||"none")+'">'+(w.p.isYou?"Y":w.p.name.charAt(0))+'</div>';
+    });
     html += '</div>';
+    if(row.who.length === 1) html += '<div class="rvname">'+(row.who[0].p.isYou?"You":row.who[0].p.name)+'</div>';
+    html += '</div></div>';
+    html += '<div class="rvhead">'+row.headline+'</div>';
+    html += '</div>';
+    if(split){
+      html += '<div class="rvsame anim" style="animation-delay:'+(delay+120)+'ms;">';
+      html += '<span class="rvsamebolt">⚡</span><span>'+split[0]+' and '+split[1]+' saw the exact same post.</span></div>';
+    }
+    delay += 150;
   });
   html += '</div>';
 
-  var verdictDelay = PLAYERS.length*160 + 250;
-  if(status==="skipped"){
-    html += '<div class="revealverdict skipped" style="animation-delay:'+verdictDelay+'ms;">⏭️ Nobody called this one</div>';
-  } else if(status==="agreed"){
-    html += '<div class="revealverdict agreed" style="animation-delay:'+verdictDelay+'ms;">✅ Table agreed</div>';
-  } else {
-    html += '<div class="revealverdict contested" style="animation-delay:'+verdictDelay+'ms;">⚡ Contested — worth a closer look</div>';
-  }
+  // "All of them held up" only when nobody flagged anything as spun or worse — on a
+  // true/false axis the honest story was a dead card; on a spin axis it still says something.
+  var anySpin = rows.some(function(r){ return r.who.some(function(w){ return w.flag && w.flag !== "true"; }); });
+  var summary = rows.length + (rows.length===1 ? " version." : " versions.");
+  summary = anySpin ? ("Same story. " + summary) : (summary + " All of them held up.");
+  var tail = off + 260 + rows.length*150;
+  html += '<div class="rvsummary anim" style="animation-delay:'+(tail+120)+'ms;">'+summary+'</div>';
+  // The question that runs through the rest of the game: asked here, answered by the
+  // note in Round 3.
+  // Hands off to triage, where the same question gets asked of the whole feed.
+  html += '<button class="rvbtn anim" style="animation-delay:'+(tail+240)+'ms;" onclick="revealNext()">So what actually happened? →</button>';
 
-  html += '<div class="revealnextbtn" onclick="revealNext()">'+(isLast ? "See Round 2 →" : "Next →")+'</div>';
+  // The discovery, first story only. It waits for a tap — it does NOT time out. Nothing
+  // should let a table get scrolled past the one moment the game is built on, and
+  // everything behind it is staged but frozen until the tap lands.
+  if(held){
+    html += '<button class="rvdiscover" id="rvdiscover" onclick="dismissDiscovery()">';
+    html += '<div class="rvdisckicker">⚡ Hold on</div>';
+    html += '<div class="rvdiscbig">You didn\'t all see the same post.</div>';
+    html += '<div class="rvdisctap">Tap to see what everyone got</div>';
+    html += '</button>';
+  }
   html += '</div>';
+  document.getElementById("screenArea").innerHTML = html;
+}
+function dismissDiscovery(){
+  var card = document.getElementById("rvdiscover");
+  if(card) card.className = "rvdiscover out";
+  var reveal = document.querySelector(".reveal");
+  if(reveal) reveal.className = "reveal";     // unfreezes the staged rows behind it
+  revealState.discovered = true;
+}
+
+// One screen, fired off the first filed story's summary: here's what's still loose,
+// and here's how many more you can take. Deliberately shows every remaining story —
+// including the ones nobody flagged — because the choice is the lesson, and a table
+// that only ever chases what it already doubted isn't triaging, it's confirming.
+function renderTriage(){
+  var left = CLAIMS.filter(function(c){ return !getBoard(c.id).filed; });
+  var quota = triageQuota();
+  var chosen = triageChosen();
+  var stays = left.length - quota;
+  var html = '<div class="triage"><div class="triagescroll">';
+  html += '<div class="rvprogress">What\'s still out there</div>';
+  html += '<div class="triagetitle">'+left.length+' stories left. You can chase '+quota+'.</div>';
+  html += '<div class="triagesub">That one took your whole table. You\'ve got time for '+
+          (quota===1 ? 'one more' : quota+' more')+' — the other '+stays+
+          (stays===1 ? ' stays in the feed, and keeps' : ' stay in the feed, and keep')+' spreading.</div>';
+  left.forEach(function(claim){
+    var picked = triagePicked(claim.id);
+    var open = !!triageState.open[claim.id];
+    var rows = revealRows(claim);
+    var flags = [];
+    rows.forEach(function(r){ r.who.forEach(function(w){ flags.push(w.flag); }); });
+    var spun = flags.filter(function(f){ return f && f !== "true"; }).length;
+    var split = rows.map(revealSplit).filter(Boolean)[0];
+    html += '<div class="triagecard'+(picked?' picked':'')+'">';
+    html += '<div class="triagerow" onclick="toggleTriage('+claim.id+')">';
+    html += '<div class="triagetick">'+(picked?'✓':'')+'</div>';
+    html += '<div class="triagebody"><div class="triagetopic">'+(claim.topic||claim.subject)+'</div>';
+    html += '<div class="triagehead">'+variantForPlayer(claim, "you").headline+'</div>';
+    html += '<div class="triageflags">'+PLAYERS.map(function(pl){
+      var f = claimVotesFor(claim)[pl.id];
+      return '<span class="triagedot '+(FLAG_CLASS[f]||"none")+'"></span>';
+    }).join("")+'<span class="triagemeta">'+(spun ? spun+" of "+flags.length+" called it spun or worse" : "nobody flagged this one")+'</span></div>';
+    // The ⚡ split is the strongest single reason to chase a story, so it shows without
+    // having to open anything: same post, two different reads.
+    if(split) html += '<div class="triagesplit">⚡ '+split[0]+' and '+split[1]+' saw the exact same post.</div>';
+    html += '</div></div>';
+    // The versions live here — one tap, for a table that wants to argue before choosing.
+    html += '<div class="triageopen" onclick="toggleTriageOpen('+claim.id+')">'+(open?'▾ hide the versions':'▸ what everyone else got')+'</div>';
+    if(open){
+      html += '<div class="triageversions">';
+      rows.forEach(function(row){
+        html += '<div class="tvrow"><div class="tvfaces">'+row.who.map(function(w){
+          return '<span class="tvavatar '+(FLAG_CLASS[w.flag]||"none")+'">'+(w.p.isYou?"Y":w.p.name.charAt(0))+'</span>';
+        }).join("")+'</div><div class="tvhead">'+row.headline+'</div></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div><div class="triagefoot">';
+  html += '<div class="triagecount">'+chosen+' of '+quota+' picked</div>';
+  html += '<div class="triagebtn'+(chosen<quota?' off':'')+'" onclick="finishTriage()">'+
+          (quota===1 ? 'Go after it →' : 'Take them on →')+'</div>';
+  html += '</div></div>';
   document.getElementById("screenArea").innerHTML = html;
 }
 
@@ -1803,16 +2587,15 @@ function renderRound1(){
   if(!roundState.started){ renderRound1Start(); return; }
   if(roundState.showingTimesUp){ renderRound1TimesUp(); return; }
   if(revealState.active){ renderRoundReveal(); return; }
+  if(triageState.active){ renderTriage(); return; }
   var justSorted = roundState.justEnded;
   roundState.justEnded = false;
 
-  var contested = CLAIMS.filter(function(c){ return claimStatus(c)==="contested"; });
-  var agreed = CLAIMS.filter(function(c){ return claimStatus(c)==="agreed"; });
+  // Sorted by what the table committed to, not by whether they disagreed (8/31/2026).
+  var chasing = CLAIMS.filter(function(c){ return triagePicked(c.id); });
+  var loose = CLAIMS.filter(function(c){ return !triagePicked(c.id); });
   var voting = CLAIMS.filter(function(c){ return claimStatus(c)==="voting"; });
-  // Skipped sits last: not contested (nothing to investigate), but not a decision
-  // either, so it shouldn't be mixed in among the cards the table actually settled.
-  var skipped = CLAIMS.filter(function(c){ return claimStatus(c)==="skipped"; });
-  var order = roundState.ended ? contested.concat(agreed).concat(skipped) : voting;
+  var order = roundState.ended ? chasing.concat(loose) : voting;
 
   // Preserve scroll position across re-renders (timer ticks, vote taps) so scrolling
   // through the feed isn't reset every 250ms. The one exception is right after the
@@ -1835,7 +2618,8 @@ function renderRound1(){
   var pr = s.total>0 ? Math.round(100*s.redHeat/s.total) : 0;
   var html = '<div class="r1topbar"><div><div class="r1toptitle">For You</div>';
   var topsub = roundState.ended
-    ? (sessionState.ended ? 'Session complete · '+contested.length+' cases filed' : contested.length+' contested · '+agreed.length+' agreed')
+    ? (sessionState.ended ? 'Session complete · '+CLAIMS.filter(function(c){ return getBoard(c.id).filed; }).length+' cases filed'
+                          : chasing.length+' on your table · '+loose.length+' still out there')
     : 'Round 1 · Gut check';
   html += '<div class="r1topsub">'+topsub+'</div></div>';
   html += '<div class="r1toptools">';
@@ -1895,7 +2679,7 @@ function renderFeedCard(claim, justSorted, idx){
     html += '<div class="railitem"><span class="railicon">⏭️</span><span class="raillabel skipped">skipped</span></div>';
   }
   if(roundState.ended && status==="agreed"){
-    html += '<div class="railitem"><span class="railicon">✅</span><span class="raillabel agreed">agreed</span></div>';
+    html += '<div class="railitem"><span class="railicon">✅</span><span class="raillabel agreed">same call</span></div>';
   }
   html += '<div class="raildisc">🎵</div>';
   html += '</div>';
@@ -1905,7 +2689,7 @@ function renderFeedCard(claim, justSorted, idx){
   // on the card, not hidden behind one generic flip icon). Still deliberately quiet —
   // small glassy circles with a soft pulse, not a loud full-width red CTA — modeled on
   // flashcard-app / card-game corners, just now two of them side by side.
-  if(roundState.ended && status==="contested" && !board.filed){
+  if(roundState.ended && !board.filed){
     var invLocked = !seenOnboard.investigate;
     html += '<div class="flipcluster'+(invLocked?' locked':'')+'">';
     html += '<div class="flipnub-wrap" onclick="openSpoke('+claim.id+')"><div class="flipnub">'+(invLocked?'🔒':'🔍')+'</div><div class="flipnub-label">'+(invLocked?'wait':'dig in')+'</div></div>';
@@ -1925,8 +2709,19 @@ function renderFeedCard(claim, justSorted, idx){
   // first real information you hit. The gut-check votes still render below (readonly
   // stoplight + "see who voted"), so seeing both together on the same card IS the
   // then/now comparison — no separate delta table needed elsewhere.
-  if(roundState.ended && status==="contested" && board.filed){
-    html += '<div class="hubfiled" onclick="openSpoke('+claim.id+',\'board\')"><span class="hubstamp">FILED ✓</span><span class="hubverdict">'+CALL_META[board.teamCall].emoji+' '+CALL_META[board.teamCall].label+'</span></div>';
+  if(roundState.ended && board.filed){
+    // 8/31/2026: the strip used to read FILED ✓ + the table's determination. There is no
+    // determination any more, and the note is the better thing to put here anyway — a
+    // real Community Note rides on the post, so the correction travels with the story.
+    // The manipulated headline still renders underneath: the post isn't corrected out of
+    // existence, it's corrected in place.
+    var noteLine = r3NoteText(board);
+    var srcLetters = (board.r3 && board.r3.sources || []).map(function(cid){ return "Exh "+letterFor(board.board.indexOf(cid)); }).join(", ");
+    html += '<div class="hubnote" onclick="openSpoke('+claim.id+',\'board\')">';
+    html += '<div class="hubnotehead">📝 READERS ADDED CONTEXT<span class="hubnotechk">FILED ✓</span></div>';
+    html += '<div class="hubnotebody">'+(noteLine || "Context added by your table.")+'</div>';
+    html += '<div class="hubnotefoot"><span>'+(srcLetters||"filed")+'</span><span class="hubnotego">See the case →</span></div>';
+    html += '</div>';
   }
   html += '<div class="headline">'+variant.headline+'</div>';
   html += '<div class="cardstats"><span>❤️ '+likes+'</span><span>💬 '+comments+'</span></div>';
@@ -1964,20 +2759,22 @@ function renderFeedCard(claim, justSorted, idx){
       });
       html += '</div>';
     }
-    if(status==="contested"){
-      // Filed verdict now shows up top (see hubfiled, above the headline) instead of
-      // here — this spot stays reserved for unfiled contested claims, which show
-      // nothing extra: the corner cluster is their investigate/case board trigger.
+    // Was contested/agreed. Triage replaced that split (8/31/2026): a story is either
+    // one the table committed to chase or one still loose in the feed — and "loose"
+    // is an invitation, not a closed door.
+    if(triagePicked(claim.id)){
+      // Filed note shows up top (see hubnote, above the headline); a picked, unfiled
+      // story shows nothing extra here — the corner cluster is its trigger.
     } else {
-      html += '<div class="agreedcta">✅ Table agreed — set aside</div>';
+      html += '<div class="agreedcta">Still out there — dig in anyway</div>';
     }
   }
   html += '</div>'; // end feedbottom
   html += '</div>'; // end cardface-front
 
-  // ---- BACK FACE: inline investigation, only meaningful for contested claims ----
+  // ---- BACK FACE: inline investigation, open on every story once the round ends ----
   html += '<div class="cardface cardface-back">';
-  if(status==="contested") html += renderCardBack(claim, variant);
+  if(roundState.ended) html += renderCardBack(claim, variant);
   html += '</div>';
 
   html += '</div>'; // end cardflip-inner
@@ -1991,7 +2788,7 @@ function renderCardBack(claim, variant){
   var board = getBoard(claim.id);
   var html = '<div class="cardback-head">';
   html += '<span class="cardback-flipclose" onclick="flipCard('+claim.id+')">↩</span>';
-  html += '<div class="cardback-titlewrap"><div class="cardback-subject">'+claim.subject+' · investigating</div><div class="cardback-headline">'+variant.headline+'</div></div>';
+  html += '<div class="cardback-titlewrap"><div class="cardback-subject">'+claim.subject+' · '+(board.filed ? 'case filed' : (r3Writing(claim.id) ? 'writing the note' : 'investigating'))+'</div><div class="cardback-headline">'+variant.headline+'</div></div>';
   html += '</div>';
   html += '<div class="cardback-scroll" id="cardback-scroll-'+claim.id+'">';
   if(board.filed){
@@ -2002,9 +2799,17 @@ function renderCardBack(claim, variant){
     // First entry into this story's workspace: an explicit choice of how to dig in,
     // rather than silently defaulting into Search — this is the "more agency" moment.
     html += renderMoveMenu(claim);
+  } else if(r3Writing(claim.id)){
+    // Tara, 8/31/2026: "the UX for the whole community note section is weird because you
+    // don't need the other tabs anymore, you really just need that evidence board."
+    // She's right — Round 3 can only cite what's already in the case file, so Search,
+    // Ask AI and Background check have no job left. Deciding you're done looking is
+    // exactly what the evidence gate asks, so once that's answered the tools go away
+    // and the card is the note plus the evidence it's built from.
+    html += renderClaimBoard(claim);
   } else {
     html += '<div class="cardmodetabs">';
-    [["search","🔍"],["ai","🤖"],["background","🕵️"],["board","🗂️"]].forEach(function(pair){
+    [["background","🕵️"],["search","🔍"],["ai","✨"],["board","🗂️"]].forEach(function(pair){
       var badge = (pair[0]==="board" && board.board.length>0) ? ' ('+board.board.length+')' : '';
       html += '<div class="cardmodetab'+(mode===pair[0]?' active':'')+'" onclick="setCardMode('+claim.id+',\''+pair[0]+'\')">'+pair[1]+badge+'</div>';
     });
@@ -2030,9 +2835,9 @@ function renderMoveMenu(claim){
   html += '<div class="moveintro">How do you wanna dig in?</div>';
   html += '<div class="movegrid">';
   [
-    ["search","move-search","🔍","Search the web","Pull up what's out there."],
-    ["ai","move-ai","🤖","Ask AI","Get a take, then question it."],
     ["background","move-bg","🕵️","Background check","Who's really behind this post?"],
+    ["search","move-search","🔍","Search the web","Pull up what's out there."],
+    ["ai","move-ai","✨","Ask AI","Get a take, then question it."],
     ["board","move-board","🤝","Compare notes","See what your table's found — and file when ready."]
   ].forEach(function(m){
     html += '<div class="movecard '+m[1]+'" onclick="setCardMode('+claim.id+',\''+m[0]+'\')">';
@@ -2047,69 +2852,102 @@ function navbarBack(title, backFn){
   window.__navback = backFn;
   return '<div class="navbar"><span class="navback" onclick="window.__navback()">‹</span><span class="navtitle">'+title+'</span><span style="width:30px;"></span></div>';
 }
+// How each source type presents itself in the results list. Derived from the clip's
+// own `who` so no content had to be re-authored — the type is printed on the result
+// where a real results page prints the site.
+var SRC_LOOK = {
+  "News / institution":     {fav:"\ud83d\udcf0", site:"published report",  cls:"inst"},
+  "Influencer":             {fav:"\ud83d\udcf1", site:"social post",        cls:"inf"},
+  "Can't tell — bot or AI?":{fav:"\u2753",        site:"unverified account", cls:"bot"},
+  "Friend":                 {fav:"\ud83d\udc64", site:"shared with you",    cls:""}
+};
 function renderClaimSearch(claim){
   var html = "";
   if(!claim.wired){ return html + '<div class="emptystate">No results yet for this claim.</div>'; }
   var clips = CLIPS[claim.id].filter(function(c){ return c.source!=="ai" && c.source!=="background"; });
   var addedCount = clips.filter(function(c){ return clipState[c.id].shared; }).length;
-  html += '<div class="sectionhead">Results · '+addedCount+' added to your case</div>';
-  html += '<div class="groupcard">';
+  // Search-page chrome. Most of the "this is a search page" work is done here, before
+  // a single result renders.
+  html += '<div class="srchbar"><span class="mag">\ud83d\udd0d</span><span class="q">'+searchQueryFor(claim)+'</span><span class="x">\u2715</span></div>';
+  html += '<div class="srchtabs"><span class="srchtab on">All</span><span class="srchtab">Images</span><span class="srchtab">News</span><span class="srchtab">Videos</span></div>';
+  html += '<div class="srchcount">About '+clips.length+' results \u00b7 '+addedCount+' added to your case</div>';
   clips.forEach(function(c){
     var s = clipState[c.id];
-    html += '<div class="resultrow">' + renderClipImage(c) + '<div class="resulttext">'+c.text+'</div>' + renderReverseBlock(c);
-    if(!s.revealed){
-      html += '<div class="pillrow">';
-      ["Friend","Influencer","News / institution","Can't tell — bot or AI?"].forEach(function(opt){
-        html += '<span class="pillbtn" onclick="revealClip(\''+c.id+'\',\''+opt.replace(/'/g,"\\'")+'\')">'+opt+'</span>';
-      });
-      html += '</div>';
-    } else if(!s.shared){
-      // No "skip"/reject action anymore — 2026-08-12, Tara's call: players just add
-      // what they want to their case, nothing to explicitly dismiss. Leaving a clip
-      // alone IS the "doesn't hold up" signal now, no button needed for it.
-      html += '<div class="revealtext">'+c.detail+'</div>';
-      html += '<div class="rowctrl"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
+    var look = SRC_LOOK[c.who] || SRC_LOOK["Friend"];
+    html += '<div class="sresult">';
+    html += '<div class="ssite"><div class="sfav">'+look.fav+'</div><div style="min-width:0"><div class="ssitename">'+look.site+'</div></div>'
+         +  '<span class="stype '+look.cls+'">'+c.who+'</span></div>';
+    html += '<div class="stitle">'+c.text+'</div>';
+    if(c.detail) html += '<div class="ssnip">'+c.detail+'</div>';
+    html += renderClipImage(c) + renderReverseBlock(c);
+    // One tap per result, the same tap, in the same place. Repetition is the
+    // instruction — nothing else on a result is tappable.
+    if(!s.shared){
+      html += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
     } else {
-      html += '<div class="resolvedtext"><span>✓ Added to case</span></div>';
+      html += '<div class="sadded">\u2713 Added to case</div>';
     }
     html += '</div>';
   });
-  html += '</div>';
   return html;
 }
-function revealClip(id, guess){ clipState[id].who = guess; clipState[id].revealed = true; render(); }
+// The query a player would plausibly have typed, from the headline they were served.
+function searchQueryFor(claim){
+  var h = variantForPlayer(claim, "you").headline.toLowerCase();
+  return h.replace(/[".,!?]/g,"").split(/\s+/).slice(0,9).join(" ");
+}
+var caseToastShown = false, caseToastTimer = null;
+// Taught once, at the moment it makes sense, then never again — see .casetoast.
+function showCaseToast(){
+  if(caseToastShown) return;
+  caseToastShown = true;
+  var el = document.getElementById("caseToast");
+  if(!el) return;
+  el.className = "casetoast show";
+  clearTimeout(caseToastTimer);
+  caseToastTimer = setTimeout(function(){ el.className = "casetoast"; }, 3600);
+}
 function addToBoard(claimId, clipId){
   clipState[clipId].shared = true;
+  showCaseToast();
   maybeUnlock(clipId);
   var b = getBoard(claimId);
   if(b.board.indexOf(clipId)===-1) b.board.push(clipId);
+  // A new exhibit is the table saying "we weren't done" — so the note gate gets to ask
+  // again, with one more piece on the board than last time.
+  if(onboardDeferred.note){ onboardDeferred.note = false; render(); maybeShowOnboard(); return; }
   render();
 }
 // skipClip removed 2026-08-12 — no more explicit reject action, see renderClaimSearch.
 
 function renderClaimAI(claim){
-  var html = '<div class="chatbubble user">Is this true?<br>"'+variantForPlayer(claim,"you").headline+'"</div>';
+  var html = '<div class="aihdr"><div class="aimark">\u2728</div><div><div class="ainame">Ask AI</div>'
+           + '<div class="aisub">answers can be wrong \u2014 check them</div></div></div>';
+  html += '<div class="aiuser">Is this true? "'+variantForPlayer(claim,"you").headline+'"</div>';
   if(!aiRevealed[claim.id]){
-    html += '<div class="chatbubble ai typing"><span class="typingdots">● ● ●</span></div>';
+    html += '<div class="airow"><div class="aiav">\u2728</div><div class="aitxt typingdots">\u25cf \u25cf \u25cf</div></div>';
     setTimeout(function(){
       aiRevealed[claim.id] = true;
-      if(currentApp==="round1" && claimFlipped[claim.id] && (cardMode[claim.id]||"search")==="ai") render();
+      if(currentApp==="round1" && claimFlipped[claim.id] && cardMode[claim.id]==="ai") render();
     }, 1100);
     return html;
   }
   var aiClips = (CLIPS[claim.id]||[]).filter(function(c){ return c.source==="ai"; });
-  if(aiClips.length===0) return html + '<div class="chatbubble ai">I don\'t have anything specific on this one yet.</div>';
-  var addedCount = aiClips.filter(function(c){ return clipState[c.id].shared; }).length;
-  html += '<div class="sectionhead">AI response · '+addedCount+' added to your case</div>';
+  if(aiClips.length===0) return html + '<div class="airow"><div class="aiav">\u2728</div><div class="aitxt">I don\'t have anything specific on this one yet.</div></div>';
   aiClips.forEach(function(c){
     var s = clipState[c.id];
-    html += '<div class="chatbubble ai">'+c.text+'</div>';
+    html += '<div class="airow"><div class="aiav">\u2728</div><div class="aitxt">'+c.text+'</div></div>';
     if(!s.shared){
-      html += '<div class="rowctrl"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
+      html += '<div class="aiindent"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
     } else {
-      html += '<div class="resolvedtext"><span>✓ Added to case</span></div>';
+      html += '<div class="aiindent sadded" style="margin-top:6px">\u2713 Added to case</div>';
     }
   });
+  // Chat-app furniture. It is doing real work: the tools row and the composer are what
+  // make a kid read this as "a chatbot", which is the thing being taught about.
+  html += '<div class="aitools">\ud83d\udccb &nbsp; \ud83d\udc4d &nbsp; \ud83d\udc4e &nbsp; \u21bb</div>';
+  html += '<div class="aidisc">A confident answer isn\'t a source. It didn\'t look this up for you.</div>';
+  html += '<div class="aicomposer"><span class="ph">Ask a follow-up\u2026</span><span class="send">\u2191</span></div>';
   return html;
 }
 
@@ -2166,8 +3004,15 @@ function renderClaimBoard(claim){
   if(justFiled) justFiledClaimId = null;
   var html = "";
   if(b.filed) html += '<div class="stamp'+(justFiled?' justfiled':'')+'">FILED ✓</div>';
-  html += '<div class="sectionhead">Evidence ('+b.board.length+')</div>';
-  html += '<div class="groupcard">';
+  // While the note is being written the evidence is context, not the work — it folds
+  // away so the note gets the screen (Tara, 8/31). Open by default before Round 3
+  // opens, closed once it does, and always one tap either way.
+  var writing = !b.filed && r3Open(claim.id);
+  var evOpen = writing ? !!getR3(claim.id).evOpen : true;
+  html += '<div class="sectionhead' + (writing ? ' clickable" onclick="r3ToggleEvidence('+claim.id+')' : '') + '">' +
+          (writing ? '<span class="evchev">'+(evOpen?"▾":"▸")+'</span> ' : '') +
+          'Evidence ('+b.board.length+')</div>';
+  html += '<div class="groupcard"'+(evOpen?'':' style="display:none"')+'>';
   // The post itself is always the first exhibit — everything else in this list is
   // context gathered about it. This also retires the separate "compare everyone's
   // version" section further down: the post is already right here, no need to repeat
@@ -2195,50 +3040,239 @@ function renderClaimBoard(claim){
   }
   html += '</div>';
 
-  html += '<div class="sectionhead">Table determination</div>';
-  html += '<div class="groupcard">';
-  ["misinfo","biased","true"].forEach(function(v){
-    html += '<div class="radiorow" onclick="setTeamCall('+claim.id+',\''+v+'\')"><span class="radiocircle'+(b.teamCall===v?' selected':'')+'"></span><span>'+CALL_META[v].emoji+' '+CALL_META[v].label.toUpperCase()+'</span></div>';
-  });
-  html += '</div>';
-
-  // Community note (2026-08-12): the table justifying its own call in a sentence or
-  // two, not an authored "correct answer" — same spirit as the confirm checkbox, just
-  // an actual written exercise instead of a click. Required to file, same as teamCall
-  // and confirmed. Uses oninput (direct DOM writes, no render()) rather than re-rendering
-  // on every keystroke — this file has a documented history of full re-renders stealing
-  // focus/cursor position out from under an in-progress interaction (see the Round 1
-  // timer tick comments above), so this follows the same targeted-update pattern.
-  html += '<div class="sectionhead">Community note <span class="requiredmark">*</span></div>';
-  if(!b.filed){
-    html += '<textarea class="communitynote" id="notebox-'+claim.id+'" placeholder="Explain why your table called this the way you did — this gets filed alongside your determination." oninput="onNoteInput('+claim.id+', this.value)" onblur="onNoteBlur('+claim.id+')">'+escapeHtml(b.note||"")+'</textarea>';
-  } else {
-    html += '<div class="groupcard" style="padding:12px 14px; font-size:13.5px; line-height:1.5; color:var(--ios-label);">'+(b.note ? escapeHtml(b.note) : '<span style="color:var(--ios-label3); font-style:italic;">No note was written.</span>')+'</div>';
-  }
-
-  if(!b.filed){
-    html += '<div class="confirmrow" onclick="toggleConfirm('+claim.id+')"><span class="checkbox'+(b.confirmed?' checked':'')+'">'+(b.confirmed?'✓':'')+'</span><span class="confirmtext">I confirm this reflects the table\'s review of the attached evidence.</span></div>';
-    html += '<button class="filebtn" id="filebtn-'+claim.id+'" onclick="fileBoard('+claim.id+')" '+(!b.teamCall||!b.confirmed||!(b.note&&b.note.trim())?'disabled':'')+'>File Case — Stop the Spread</button>';
-  } else {
-    html += '<div class="receiptcard">';
-    html += '<div class="receiptrow"><span>Case number</span><span>'+claimNumber(claim.id)+'</span></div>';
-    html += '<div class="receiptrow"><span>Determination</span><span>'+CALL_META[b.teamCall].label+'</span></div>';
-    html += '<div class="receiptrow"><span>Evidence attached</span><span>'+b.board.length+'</span></div>';
-    html += '<div class="receiptrow"><span>Filed</span><span>'+b.filedAt+'</span></div>';
-    html += '</div>';
-  }
-
+  // ---------------- ROUND 3 LIVES HERE ----------------
+  // Was: Table determination radios + a free-text community note + a confirm checkbox.
+  // All three are gone (8/31/2026). What replaces them is the role chain that actually
+  // writes the note. See getR3/r3* above.
+  html += b.filed ? renderFiledNote(claim, b) : renderRound3(claim);
   // "Compare everyone's version" is back (8/24/2026) — but only after filing, which
   // is the whole point of the reveal rule. Before the case is filed this board stays
   // focused on evidence + the team's single determination; the then/now vote
   // comparison still lives on the hub card once you flip back.
-  if(b.filed) html += renderTellReveal(claim);
+  // renderTellReveal is NOT drawn here any more — it is the story summary screen that
+  // fires after filing (Tara, 8/30: "on the filed card we don't need the tells").
+  return html;
+}
+
+// ---------------- ROUND 3: THE SCREENS ----------------
+function renderRound3(claim){
+  // Deferred: the table said "still investigating", so the board keeps a door open
+  // instead of making them add an exhibit they don't need just to get the gate back.
+  if(r3Open(claim.id) && !seenOnboard.note && onboardDeferred.note){
+    return '<div class="sectionhead">The note</div><div class="groupcard" style="padding:13px;">' +
+      '<div class="r3hint" style="margin-bottom:9px;">' + getBoard(claim.id).board.length +
+      ' exhibits on the board. Whenever your table\'s ready to say what happened.</div>' +
+      '<button class="filebtn" onclick="undeferNote()">We know what happened</button></div>';
+  }
+  if(!r3Open(claim.id)){
+    var need = BOARD_TOUR_EVIDENCE_THRESHOLD - getBoard(claim.id).board.length;
+    return '<div class="sectionhead">The note</div><div class="groupcard"><div class="resultrow">' +
+      '<span style="color:var(--ios-label2); font-size:13px;">' + need + ' more exhibit' + (need===1?'':'s') +
+      ' and your table can write the note.</span></div></div>';
+  }
+  var r = getR3(claim.id), role = r3RoleNow(r);
+  var html = '<div class="sectionhead">Round 3 · the community note</div>';
+
+  if(r.phase === "draft"){
+    // The trigger. Four people typing at the same moment doesn't happen because a
+    // screen invites it — it happens because a clock started and everyone can see
+    // who hasn't finished. So: a hard prompt, a shared countdown, and a row of pips
+    // that fill as each person's line lands. Same rule as Round 1's clock — the 60s
+    // is a ceiling, not a duration (see r3DraftTick).
+    r3StartDraftClock(claim.id);
+    var inCount = Object.keys(r.drafts).length, mine = !!r.drafts.you;
+    html += '<div class="r3drafthead">';
+    html += '<div class="r3draftkicker">Everyone, right now</div>';
+    html += '<div class="r3clock'+(r.secondsLeft<=10?' urgent':'')+'" id="r3clock-'+claim.id+'">'+r3Clock(r.secondsLeft)+'</div>';
+    html += '</div>';
+    html += '<div class="groupcard" style="padding:14px;">';
+    html += '<div class="r3ask">What actually happened?</div>';
+    html += '<div class="r3hint" style="margin-top:4px">One sentence, in your own words. Nobody sees the others until they\'re all in.</div>';
+    if(!mine){
+      html += '<textarea class="communitynote" id="r3draft-'+claim.id+'" placeholder="what actually happened…" oninput="r3Typing('+claim.id+', this.value)">'+(r.typing||"")+'</textarea>';
+      html += '<button class="filebtn" onclick="r3SubmitDraft('+claim.id+')">That\'s mine</button>';
+    } else {
+      html += '<div class="r3mine">'+r.drafts.you+'</div>';
+      html += '<div class="r3hint">In. Waiting on the rest of the table.</div>';
+    }
+    html += '</div>';
+    html += '<div class="r3whosin">'+PLAYERS.map(function(pl){
+      return '<span class="r3inpip'+(r.drafts[pl.id]?' in':'')+'">'+(pl.isYou?"You":pl.name)+'</span>';
+    }).join("")+'<span class="r3incount">'+inCount+' of '+PLAYERS.length+' in</span></div>';
+    return html;
+  }
+
+  // Not in the read phase: nobody has the note any more, it's the table's. Leaving the
+  // last role's hand-off banner up there made the ship screen read like the Checker
+  // still had a job to do.
+  if(r.phase !== "read")
+    html += '<div class="r3handoff">'+R3_JOBLINE[role][0]+' Passed to you — <b>'+role+'</b>, '+R3_JOBLINE[role][1]+'</div>';
+  else
+    html += '<div class="r3handoff">📢 It\'s the table\'s now — read it out loud</div>';
+
+  if(r.phase === "pick"){
+    html += '<div class="r3hint" style="margin-bottom:8px;">'+R3_JOB.editor+'</div>';
+    r.order.forEach(function(who, i){
+      html += '<div class="r3draft" onclick="r3PickDraft('+claim.id+',\''+who+'\')">'+
+        '<span class="r3draftlabel">Draft '+String.fromCharCode(65+i)+'</span>'+r.drafts[who]+'</div>';
+    });
+    return html;
+  }
+
+  if(r.phase === "op"){
+    var op = r3LiveOp(r), back = !!r.returnRole;
+    if(back && r.notBy) html += '<div class="r3back">'+PLAYERS.filter(function(pp){return pp.id===r.notBy;})[0].name+' said not yet — it came back to the '+op+'.</div>';
+    if(op !== "checker") html += r3MovesHTML(r, op);
+    // "but with no note ... the other roles are still working on the community note"
+    // (Tara, 8/31/2026). The Spotter's screen must not show the table's sentence at
+    // all — seeing it is what would tempt a player to edit it, and it isn't theirs.
+    if(op !== "spotter") html += r3NoteHTML(claim, r, op!=="checker");
+    if(op === "spotter"){
+      html += r3SpotterHTML(claim, r);
+      var spotted = Object.keys(r.spots).length;
+      html += '<button class="filebtn ghost" onclick="r3Pass('+claim.id+')">'+
+        (back ? "Send it back out" : (spotted < 3 ? "Pass it on early" : "Pass it on"))+'</button>';
+      return html;
+    }
+    if(op === "translator"){
+      if(r.editIdx !== null) html += r3WordMenu(claim, r, op);
+      else if(r.moves[op] > 0) html += '<div class="r3hint">Tap a word in the note — '+(op==="skeptic"?"cut it, or swap it for something that isn\'t doing the persuading.":"swap it for a plainer one, or cut it.")+'</div>';
+      if(back) html += '<div class="groupcard" style="padding:12px;"><div class="r3hint">Or rewrite the whole line — words you leave alone keep whose they were.</div>'+
+        '<textarea class="communitynote" id="r3rewrite-'+claim.id+'">'+r3NoteText(getBoard(claim.id))+'</textarea>'+
+        '<button class="filebtn" onclick="r3Rewrite('+claim.id+')">Use this line</button></div>';
+      html += '<button class="filebtn ghost" onclick="r3Pass('+claim.id+')">'+(back?"Send it back out":(r.moves[op]>0?"Pass it on early":"Pass it on"))+'</button>';
+    }
+    if(op === "checker"){
+      html += '<div class="r3hint">'+R3_JOB.checker+' Once you take one, that person\'s other exhibits close.</div>';
+      var b = getBoard(claim.id), clips = CLIPS[claim.id]||[];
+      b.board.forEach(function(clipId, idx){
+        var clip = clips.filter(function(c){ return c.id===clipId; })[0];
+        if(!clip) return;
+        var who = r3AddedBy(claim.id, clipId);
+        var taken = r.sources.indexOf(clipId) >= 0;
+        var blocked = r.sources.length===1 && r3AddedBy(claim.id, r.sources[0])===who && !taken;
+        // What a reader needs to judge a citation is WHERE it came from, not which
+        // teammate happened to clip it (Tara, 8/31). The two-different-people rule
+        // still governs what you can take — it just isn't the label any more; a
+        // blocked exhibit says why in its own line.
+        html += '<div class="r3exhibit'+(taken?' sel':'')+(blocked?' dead':'')+'" onclick="r3Source('+claim.id+',\''+clipId+'\')">'+
+          '<span class="exhibitlabel">EXHIBIT '+letterFor(idx)+' · '+(clip.who||"source")+'</span>'+
+          '<div class="resulttext" style="margin-top:3px; font-size:13px;">'+clip.text+'</div>'+
+          (blocked ? '<div class="r3blocked">Same person found your first source — cite someone else\'s</div>' : '')+
+          '</div>';
+      });
+      html += '<button class="filebtn" onclick="r3Pass('+claim.id+')" '+(r.sources.length===2?'':'disabled')+'>Cite these two</button>';
+    }
+    return html;
+  }
+
+  // read it out, then ship it
+  html += r3NoteHTML(claim, r, false);
+  if(!r.readOut){
+    html += '<div class="r3hint">Read it out loud, exactly as it stands.</div>';
+    html += '<button class="filebtn" onclick="r3ReadOut('+claim.id+')">I read it out</button>';
+  } else {
+    html += '<div class="r3votes">'+["maya","diego","priya"].map(function(q){
+      var v = r.votes[q];
+      return '<span class="r3vote'+(v==="ship"?" ship":"")+(v==="not"?" not":"")+'">'+r3Name(q)+': '+(v?(v==="ship"?"ship it":"not yet"):"…")+'</span>';
+    }).join("")+'</div>';
+    // The note used to file itself the moment the third simulated vote landed, so the
+    // last thing that happens to a note your table spent ten minutes on was something
+    // you watched (Tara, 8/31/2026: "you should be able to click that's the one").
+    // Shipping is a decision, and the tour promises it — "Read it out, then ship it."
+    // The button only appears once the table has actually agreed; a pending "not yet"
+    // can't be clicked past.
+    var allShip = ["maya","diego","priya"].every(function(q){ return r.votes[q]==="ship"; });
+    var anyNot  = ["maya","diego","priya"].some(function(q){ return r.votes[q]==="not"; });
+    if(allShip) html += '<button class="filebtn" onclick="fileBoard('+claim.id+')">That\'s the one — file it</button>';
+    else if(!anyNot) html += '<div class="r3hint">Waiting on the rest of your table…</div>';
+  }
+  return html;
+}
+function r3Name(id){
+  var p = PLAYERS.filter(function(x){ return x.id===id; })[0];
+  return p ? p.name : "You";
+}
+var R3_MOVE_TOTAL = {translator:2, spotter:3, checker:2};
+function r3MovesHTML(r, role){
+  var left = r.moves[role], total = R3_MOVE_TOTAL[role] || 2, pips = "";
+  for(var i=0;i<total;i++) pips += '<span class="r3pip'+(i<left?' on':'')+'"></span>';
+  return '<div class="r3moves">'+pips+'<span>'+(left===0?"no moves left":left+" move"+(left>1?"s":"")+" left")+'</span></div>';
+}
+function r3NoteHTML(claim, r, tappable){
+  var html = '<div class="r3note"><div class="r3notelabel">The note, as it stands</div><div class="r3body">';
+  html += r.toks.map(function(t, i){
+    var cls = 'r3tok r3-'+t.by + (t.cut?' cut':'') + (tappable && !t.cut ? ' tapme':'') + (r.editIdx===i?' editing':'');
+    var on = (tappable && !t.cut) ? ' onclick="r3Tap('+claim.id+','+i+')"' : '';
+    return '<span class="'+cls+'"'+on+'>'+t.w+'</span> ';
+  }).join("");
+  html += '</div>';
+  if(r.sources.length){
+    html += '<div class="r3srcs"><div class="r3notelabel">Sources</div>';
+    var b = getBoard(claim.id), clips = CLIPS[claim.id]||[];
+    r.sources.forEach(function(cid){
+      var clip = clips.filter(function(c){ return c.id===cid; })[0];
+      html += '<div class="r3src"><span class="r3exh">EXH '+letterFor(b.board.indexOf(cid))+'</span>'+
+              '<span>'+(clip?clip.text:"")+(clip&&clip.who?' <span class="r3srctype">'+clip.who+'</span>':'')+'</span></div>';
+    });
+    html += '</div>';
+  }
+  return html + '</div>';
+}
+function r3WordMenu(claim, r, role){
+  var t = r.toks[r.editIdx], sug = r3Suggest(claim.id);
+  var html = '<div class="groupcard" style="padding:12px;">';
+  html += '<div class="r3ask">“'+r3Parts(t.w).core+'”</div>';
+  if(sug.length){
+    html += '<div class="r3hint" style="margin:6px 0 2px;">Plainer:</div>';
+    html += sug.map(function(x){ return '<div class="r3draft" onclick="r3Apply('+claim.id+', this.dataset.v)" data-v="'+x+'">'+(x==="—"?"just cut it":x)+'</div>'; }).join("");
+  }
+  html += '<input class="r3word" id="r3word-'+claim.id+'" value="'+r3Parts(t.w).core+'">';
+  html += '<div class="rowctrl" style="margin-top:8px;"><button class="btnfilled" onclick="r3ApplyInput('+claim.id+')">Use this</button>'+
+          '<button class="btnfilled warn" onclick="r3Cut('+claim.id+')">Cut it</button>'+
+          '<button class="btnfilled ghost" onclick="getR3('+claim.id+').editIdx=null;render()">Never mind</button></div>';
+  return html + '</div>';
+}
+// A filed case board is exactly three things: the stamp (drawn above), the note, the receipt.
+function renderFiledNote(claim, b){
+  var r = b.r3 || {toks:[], sources:[]};
+  var html = '<div class="sectionhead">The note</div>';
+  html += '<div class="r3filed"><div class="r3rac">Readers added context</div><div class="r3racsub">Your table, on this story</div>';
+  html += '<div class="r3body">'+r.toks.filter(function(t){return !t.cut && t.w;}).map(function(t){
+    return '<span class="r3tok r3-'+t.by+'">'+t.w+'</span>'; }).join(" ")+'</div>';
+  if(r.sources.length){
+    html += '<div class="r3srcs"><div class="r3notelabel">Sources</div>';
+    var clips = CLIPS[claim.id]||[];
+    r.sources.forEach(function(cid){
+      var clip = clips.filter(function(c){ return c.id===cid; })[0];
+      html += '<div class="r3src"><span class="r3exh">EXH '+letterFor(b.board.indexOf(cid))+'</span>'+
+              '<span>'+(clip?clip.text:"")+(clip&&clip.who?' <span class="r3srctype">'+clip.who+'</span>':'')+'</span></div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  var letters = r.sources.map(function(cid){ return "Exh "+letterFor(b.board.indexOf(cid)); }).join(", ");
+  html += '<div class="receiptcard">';
+  html += '<div class="receiptrow"><span>Case number</span><span>'+(b.caseNo||claimNumber(claim.id))+'</span></div>';
+  html += '<div class="receiptrow"><span>Exhibits attached</span><span>'+b.board.length+'</span></div>';
+  html += '<div class="receiptrow"><span>Sources cited</span><span>'+(letters||"—")+'</span></div>';
+  html += '<div class="receiptrow"><span>Filed</span><span>'+b.filedAt+'</span></div>';
+  html += '</div>';
   return html;
 }
 // Drawn only once a case is filed — see the reveal rules in tells-taxonomy.md.
 // Every player saw this same story told a different way; this is the first and only
 // place the game names the tell behind each version. Motive, not falsity: the copy
 // says how the story reached you, never who was right.
+// What the Spotter said about a given version, if the table named that one. This is
+// the ONLY place the Spotter's work surfaces — by design it stays out of the note.
+function r3CallFor(claim, headline){
+  var b = getBoard(claim.id);
+  if(!b.r3 || !b.r3.spots) return null;
+  var rows = revealRows(claim), hit = null;
+  rows.forEach(function(row, vi){ if(row.headline === headline && b.r3.spots[vi]) hit = b.r3.spots[vi].label; });
+  return hit;
+}
 function renderTellReveal(claim){
   // In the multiplayer build PLAYERS is empty until a room is joined \u2014 an empty
   // reveal header with no rows under it is worse than no reveal at all.
@@ -2272,6 +3306,8 @@ function renderTellReveal(claim){
             (g.players.length>1 ? " \u2014 same version" : "")+'</span>';
     html += '</div>';
     html += '<div class="trheadline">\u201c'+g.v.headline+'\u201d</div>';
+    var myCall = r3CallFor(claim, g.v.headline);
+    if(myCall) html += '<div class="trcalled"><span class="trcalledlbl">You called it</span>'+myCall+'</div>';
     if(t){
       html += '<span class="trchip '+t.kind+'">'+t.emoji+' '+t.name+'</span>';
       html += '<div class="trdesc">'+t.desc+'</div>';
@@ -2284,36 +3320,344 @@ function renderTellReveal(claim){
   return html;
 }
 
-function setTeamCall(claimId, v){
-  var b = getBoard(claimId);
-  if(b.filed) return;
-  b.teamCall = (b.teamCall===v) ? null : v;
+// ---------------- ROUND 3 ACTIONS ----------------
+// Direct DOM writes on keystroke (no render()) so the draft box never loses the cursor
+// mid-sentence — the same pattern the old community-note textarea used, and for the
+// same documented reason (full re-renders steal focus out from under a live input).
+function r3ToggleEvidence(claimId){ var r = getR3(claimId); r.evOpen = !r.evOpen; render(); }
+function r3Typing(claimId, value){ getR3(claimId).typing = value; }
+function r3Clock(sec){ var m = Math.floor(sec/60), s2 = sec%60; return m+":"+(s2<10?"0":"")+s2; }
+// One 60-second clock for the whole table's drafting beat. Started once, ticks the
+// badge directly rather than re-rendering (a full render would eat the cursor out of
+// the draft box mid-sentence — the same documented trap as Round 1's timer).
+function r3StartDraftClock(claimId){
+  var r = getR3(claimId);
+  if(r.draftEndsAt) return;
+  r.draftEndsAt = Date.now() + 60000;
+  r.secondsLeft = 60;
+  // The other three land theirs across the window, so "who's in" actually moves and
+  // the last ten seconds feel like something.
+  ["maya","diego","priya"].forEach(function(pid, i){
+    setTimeout(function(){
+      var rr = getR3(claimId);
+      if(rr.phase !== "draft" || rr.drafts[pid]) return;
+      rr.drafts[pid] = r3NpcDrafts(CLAIMS.filter(function(c){ return c.id===claimId; })[0])[pid];
+      r3MaybeCloseDrafting(claimId);
+      render();
+    }, 9000 + i*11000 + Math.random()*5000);
+  });
+  r.draftTimer = setInterval(function(){ r3DraftTick(claimId); }, 250);
+}
+function r3DraftTick(claimId){
+  var r = getR3(claimId);
+  if(r.phase !== "draft"){ clearInterval(r.draftTimer); r.draftTimer = null; return; }
+  r.secondsLeft = Math.max(0, Math.round((r.draftEndsAt - Date.now())/1000));
+  var badge = document.getElementById("r3clock-"+claimId);
+  if(badge){
+    badge.textContent = r3Clock(r.secondsLeft);
+    badge.className = "r3clock" + (r.secondsLeft<=10 ? " urgent" : "");
+  }
+  if(r.secondsLeft <= 0){
+    clearInterval(r.draftTimer); r.draftTimer = null;
+    // Time's up: whatever you typed goes in. An empty box means you sat this one out —
+    // the table still has three lines to pick from, which is better than a stall.
+    var el = document.getElementById("r3draft-"+claimId);
+    var typed = (((el && el.value) ? el.value : r.typing) || "").trim();
+    if(typed && !r.drafts.you) r.drafts.you = typed;
+    var claim = CLAIMS.filter(function(c){ return c.id===claimId; })[0];
+    var npc = r3NpcDrafts(claim);
+    Object.keys(npc).forEach(function(k){ if(!r.drafts[k]) r.drafts[k] = npc[k]; });
+    r3CloseDrafting(claimId);
+    render();
+  }
+}
+// Everyone answered — move on, don't sit and watch the clock run out.
+function r3MaybeCloseDrafting(claimId){
+  var r = getR3(claimId);
+  if(PLAYERS.every(function(pl){ return r.drafts[pl.id]; })) setTimeout(function(){ r3CloseDrafting(claimId); render(); }, 600);
+}
+function r3CloseDrafting(claimId){
+  var r = getR3(claimId);
+  if(r.phase !== "draft") return;
+  if(r.draftTimer){ clearInterval(r.draftTimer); r.draftTimer = null; }
+  r.phase = "pick";
+  r.order = PLAYERS.map(function(pl){ return pl.id; }).filter(function(id){ return r.drafts[id]; })
+                   .sort(function(){ return Math.random()-0.5; });
+  showRoleCard(claimId, "editor");
+}
+function r3SubmitDraft(claimId){
+  var claim = CLAIMS.filter(function(c){ return c.id===claimId; })[0];
+  var r = getR3(claimId);
+  var el = document.getElementById("r3draft-"+claimId);
+  // Prefer the live field, but fall back to the last keystroke we recorded — a
+  // re-render between typing and tapping would otherwise silently eat the draft.
+  var v = (((el && el.value) ? el.value : r.typing) || "").trim();
+  if(!v) return;
+  r.drafts.you = v; r.typing = "";
+  // No longer force-fills the other three: they land across the 60s window on their
+  // own (r3StartDraftClock), so "3 of 4 in" means something while you're waiting.
+  r3MaybeCloseDrafting(claimId);
   render();
 }
-function toggleConfirm(claimId){
-  var b = getBoard(claimId);
-  if(b.filed) return;
-  b.confirmed = !b.confirmed;
+function r3PickDraft(claimId, who){
+  var r = getR3(claimId);
+  r.chosen = who;
+  r.toks = r.drafts[who].trim().split(/\s+/).map(function(w){ return {w:w, by:who, cut:false}; });
+  r.phase = "op"; r.opIdx = 0;
+  showRoleCard(claimId, R3_OPS[0]);
   render();
 }
-// Direct DOM update on every keystroke (no render()) so the textarea never loses
-// focus/cursor position mid-sentence — see the comment in renderClaimBoard.
-function onNoteInput(claimId, value){
-  var b = getBoard(claimId);
-  if(b.filed) return;
-  b.note = value;
-  var btn = document.getElementById("filebtn-"+claimId);
-  if(btn) btn.disabled = !(b.teamCall && b.confirmed && b.note && b.note.trim());
+function r3Tap(claimId, i){
+  var r = getR3(claimId), role = r3LiveOp(r);
+  if(role !== "translator") return;   // the Spotter taps posts, not the note — see r3Spot
+  if(r.moves[role] <= 0) return;
+  r.editIdx = i; r.editVal = r3Parts(r.toks[i].w).core;
+  render();
 }
-// Only sync (and only in the multiplayer build, where syncBoard actually exists) once
-// the player's done typing, not on every keystroke — no point round-tripping to
-// Supabase mid-word.
-function onNoteBlur(claimId){
-  if(typeof syncBoard === "function") syncBoard(claimId);
+// ---------------- THE SPOTTER ----------------
+// Three posts, one slash each. Nothing here touches r.toks: the note is the other three
+// roles' work and the Spotter never writes into it (Tara, 8/31/2026 — "but with no note").
+//
+// The posts render WHOLE AND IN CONTEXT — gradient, handle, engagement, the sentence
+// intact — because the slash only reads while the sentence around it survives. The
+// extracted-word "pile" was built and killed on 9/1/2026 ("the words are weirdly pulled
+// out of context and don't mean anything"): never lift marked words out of their post
+// into a chip list, a pool, or a summary row. See infodemic-markup-the-post-direction.
+//
+// Rows are keyed by INDEX, never by headline text — headlines contain quotes (a viral
+// "cooling" chart) and would break the onclick attribute they'd be inlined into.
+function r3SpotRows(claim){
+  // One row per VERSION actually in play, carrying the variant itself so the post can be
+  // drawn properly. Same grouping as the reveal, which is what these posts are.
+  var rows = [];
+  PLAYERS.forEach(function(pl){
+    var v = variantForPlayer(claim, pl.id);
+    var row = rows.filter(function(r){ return r.v === v; })[0];
+    if(!row){ row = {v:v, who:[]}; rows.push(row); }
+    row.who.push({p:pl, flag:claimVotesFor(claim)[pl.id]});
+  });
+  return rows;
+}
+// The borrowable vocabulary: five reds plus a way to say the post was straight. NOT the
+// 17-item library — that stays open separately, and a picker that long is a reading task
+// (9/1/2026). The green option is load-bearing: one variant per claim is the honest one,
+// and without a "this one's straight" answer the green flag has no play.
+var SPOT_STRAIGHT = "Nothing here is doing work";
+function r3SpotTells(){ return TELLS.filter(function(t){ return t.kind==="red"; }).slice(0,5); }
+function r3SpotTell(claimId, ti){ var t = r3SpotTells()[ti]; if(t) r3SpotName(claimId, t.name); }
+function r3SpotStraight(claimId, vi){
+  // Answering "straight" is a real move, and it needs no word slashed — the whole post
+  // is the answer. Costs a move like any other.
+  var r = getR3(claimId);
+  if(r3LiveOp(r) !== "spotter") return;
+  if(!r.spots[vi] && (r.moves.spotter||0) <= 0) return;
+  var fresh = !r.spots[vi];
+  r.spots[vi] = {i:null, label:SPOT_STRAIGHT, straight:true};
+  if(fresh) r.moves.spotter = Math.max(0, (r.moves.spotter||0) - 1);
+  r.spotVer = null; r.spotIdx = null;
+  render();
+}
+function r3SpotWord(claimId, vi, i){
+  var r = getR3(claimId);
+  if(r3LiveOp(r) !== "spotter") return;
+  if(!r.spots[vi] && (r.moves.spotter||0) <= 0) return;   // out of moves, nothing new
+  r.spotVer = vi; r.spotIdx = i;
+  render();
+}
+function r3SpotCancel(claimId){ var r = getR3(claimId); r.spotVer = null; r.spotIdx = null; render(); }
+// Name it in your own words, or borrow one of the tells. Never graded — which tell the
+// card actually used stays hidden until the case is filed. (The free-text field came in
+// with the 9/1 mock and Tara has not ruled on it; the chips are the sure part.)
+function r3SpotName(claimId, label){
+  var r = getR3(claimId);
+  label = String(label||"").trim();
+  if(!label || r.spotVer === null || r.spotIdx === null) return;
+  var fresh = !r.spots[r.spotVer];
+  r.spots[r.spotVer] = {i:r.spotIdx, label:label};
+  if(fresh) r.moves.spotter = Math.max(0, (r.moves.spotter||0) - 1);
+  r.spotVer = null; r.spotIdx = null;
+  render();
+}
+function r3SpotNameInput(claimId){
+  var el = document.getElementById("r3spotname-"+claimId);
+  r3SpotName(claimId, el ? el.value : "");
+}
+function r3SpotUndo(claimId, vi){
+  var r = getR3(claimId);
+  if(!r.spots[vi]) return;
+  delete r.spots[vi];
+  r.moves.spotter = (r.moves.spotter||0) + 1;
+  r.spotVer = null; r.spotIdx = null;
+  render();
+}
+function r3SpotterHTML(claim, r){
+  var rows = r3SpotRows(claim);
+  var eng = BASE_ENGAGEMENT[claim.id] || 10;
+  var likes = formatCount(Math.round(eng*1000 + claim.id*173));
+  var comments = formatCount(Math.round(eng*180 + claim.id*37));
+  var html = '<div class="r3hint" style="margin-bottom:10px;">'+R3_JOB.spotter+'</div>';
+  rows.forEach(function(row, vi){
+    var spot = r.spots[vi];
+    var words = row.v.headline.split(/\s+/);
+    var naming = (r.spotVer === vi && r.spotIdx !== null);
+    html += '<div class="spotpost'+(spot?" done":"")+(naming?" live":"")+'"'+
+            ' style="background:linear-gradient(200deg, hsl('+claim.hue+',48%,17%), #06070c 78%);">';
+    html += '<div class="spothead"><span class="spotav">'+posterInitial(row.v)+'</span>'+
+            '<span class="spothandle">'+row.v.source+'</span>'+
+            '<span class="spotgot">'+row.who.map(function(w){
+              return '<span class="tvavatar '+(FLAG_CLASS[w.flag]||"none")+'">'+(w.p.isYou?"Y":w.p.name.charAt(0))+'</span>';
+            }).join("")+'</span></div>';
+    html += '<div class="spotbody">'+words.map(function(w, i){
+      var slashed = spot && spot.i === i;
+      var live = (naming && r.spotIdx === i);
+      return '<span class="spottok'+(slashed?" slashed":"")+(live?" live":"")+'"'+
+             ' onclick="r3SpotWord('+claim.id+','+vi+','+i+')">'+w+'</span> ';
+    }).join("")+'</div>';
+    html += '<div class="spotstats">\u2764\ufe0f '+likes+' \u00b7 \ud83d\udcac '+comments+
+            ' \u00b7 '+row.who.map(function(w){ return w.p.isYou?"You":w.p.name; }).join(" \u00b7 ")+' got this one</div>';
+    if(naming){
+      html += '<div class="spotname">';
+      html += '<div class="r3hint" style="margin-bottom:8px;">How was this one manipulating us?</div>';
+      html += '<div class="spotchips">'+r3SpotTells().map(function(t, ti){
+        return '<span class="spotchip" onclick="r3SpotTell('+claim.id+','+ti+')">'+t.emoji+' '+t.name+'</span>';
+      }).join("")+'</div>';
+      html += '<input class="spotinput" id="r3spotname-'+claim.id+'" placeholder="\u2026or say it in your own words"'+
+              ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();r3SpotNameInput('+claim.id+');}">';
+      html += '<button class="filebtn" onclick="r3SpotNameInput('+claim.id+')">That\'s what it was doing</button>';
+      html += '<button class="filebtn ghost" onclick="r3SpotCancel('+claim.id+')">Never mind</button>';
+      html += '</div>';
+    } else if(spot){
+      html += '<div class="spotcalled'+(spot.straight?" straight":"")+'"><span class="spotcalledlbl">You called it</span>'+
+              spot.label+'<span class="spotundo" onclick="r3SpotUndo('+claim.id+','+vi+')">undo</span></div>';
+    } else {
+      html += '<div class="spotstraight" onclick="r3SpotStraight('+claim.id+','+vi+')">\u2705 '+SPOT_STRAIGHT+'</div>';
+    }
+    html += '</div>';
+  });
+  return html;
+}
+function r3Suggest(claimId){
+  var r = getR3(claimId), role = r3LiveOp(r);
+  var c = r3Parts(r.toks[r.editIdx].w).core.toLowerCase();
+  var first = R3_PLAINER[c] || [];
+  var other = R3_NEUTRAL[c] || [];   // kept as the translator's second pass
+  return first.concat(other.filter(function(x){ return first.indexOf(x)<0; })).slice(0,3);
+}
+function r3Apply(claimId, v){
+  var r = getR3(claimId), role = r3LiveOp(r), i = r.editIdx;
+  if(i === null) return;
+  var t = r.toks[i], parts = r3Parts(t.w);
+  v = String(v).trim();
+  if(v === "—") v = "";
+  if(v === parts.core){ r.editIdx = null; render(); return; }
+  if(!v) return r3Cut(claimId);
+  t.w = parts.lead + v + parts.trail; t.by = "you";
+  r.moves[role]--; r.editIdx = null;
+  render();
+}
+function r3ApplyInput(claimId){
+  var el = document.getElementById("r3word-"+claimId);
+  r3Apply(claimId, el ? el.value : "");
+}
+function r3Cut(claimId){
+  var r = getR3(claimId), role = r3LiveOp(r);
+  if(r.editIdx === null) return;
+  r.toks[r.editIdx].cut = true;
+  r.moves[role]--; r.editIdx = null;
+  render();
+}
+// A return isn't a third tap — the role gets its moves back AND the whole line open,
+// because "not yet" usually means the sentence is wrong, not one word.
+function r3Rewrite(claimId){
+  var r = getR3(claimId);
+  var el = document.getElementById("r3rewrite-"+claimId);
+  var v = (el ? el.value : "").trim();
+  if(!v) return;
+  var pool = {};
+  r.toks.filter(function(t){ return !t.cut && t.w; }).forEach(function(t){
+    var k = r3Parts(t.w).core.toLowerCase(); if(!pool[k]) pool[k] = t.by;
+  });
+  r.toks = v.split(/\s+/).map(function(w){
+    var k = r3Parts(w).core.toLowerCase();
+    return {w:w, by:(pool[k] || "you"), cut:false};
+  });
+  r.editIdx = null;
+  render();
+}
+function r3Pass(claimId){
+  var r = getR3(claimId);
+  r.editIdx = null;
+  if(r.returnRole){ r.returnRole = null; r.phase = "read"; r.readOut = false; r.votes = {}; render(); return; }
+  r.opIdx++;
+  if(r.opIdx >= R3_OPS.length){ r.phase = "read"; }
+  else showRoleCard(claimId, R3_OPS[r.opIdx]);   // next pair of hands
+  render();
+}
+function r3Source(claimId, clipId){
+  var r = getR3(claimId), b = getBoard(claimId);
+  var clips = CLIPS[claimId] || [];
+  var clip = clips.filter(function(c){ return c.id===clipId; })[0];
+  if(!clip) return;
+  var by = r3AddedBy(claimId, clipId);
+  // Tapping a cited exhibit again un-cites it (Tara, 9/1/2026). It used to do nothing,
+  // so the only way back was a separate Undo button that popped the LAST pick — which
+  // meant un-picking the first of two cost you the second as well. Toggling is what the
+  // row already looks like it does, and it matches the Spotter's undo.
+  var at = r.sources.indexOf(clipId);
+  if(at >= 0){
+    r.sources.splice(at, 1); r.moves.checker++;
+    render();
+    return;
+  }
+  // Two sources, two different people — enforced by the form, not taught as a rule.
+  if(r.sources.length && r3AddedBy(claimId, r.sources[0]) === by) return;
+  if(r.sources.length >= 2) return;
+  r.sources.push(clipId); r.moves.checker--;
+  render();
+}
+// Who put a given exhibit in the file. This file has no real teammates, so clips the
+// player didn't add are attributed round-robin to the other three — enough for the
+// "two different people" rule to have teeth in the demo.
+function r3AddedBy(claimId, clipId){
+  var b = getBoard(claimId);
+  var idx = b.board.indexOf(clipId);
+  if(idx < 0) return "you";
+  return clipState[clipId] && clipState[clipId].addedByYou ? "you" : ["you","maya","diego","priya"][idx % 4];
+}
+function r3ReadOut(claimId){
+  var r = getR3(claimId);
+  r.readOut = true;
+  // The other three vote on their own. The first pass always carries one "not yet",
+  // so a player meets the return rather than reading about it.
+  ["maya","diego","priya"].forEach(function(pid, i){
+    setTimeout(function(){
+      var rr = getR3(claimId);
+      if(rr.phase !== "read" || !rr.readOut) return;
+      var not = (!rr.returnUsed && i === 1);
+      rr.votes[pid] = not ? "not" : "ship";
+      if(not){ rr.notBy = pid; setTimeout(function(){ if(getR3(claimId).phase==="read") r3SendBack(claimId, "translator"); }, 1200); }
+      // No auto-file any more — the last tap is the table's. renderRound3 puts up
+      // "That's the one — file it" as soon as all three have said ship.
+      render();
+    }, 900 + i*800);
+  });
+  render();
+}
+function r3SendBack(claimId, role){
+  var r = getR3(claimId);
+  r.returnRole = role; r.returnUsed = true; r.moves[role] = 2;
+  if(role === "checker") r.sources = [];
+  r.phase = "op"; r.editIdx = null;
+  showRoleCard(claimId, role);
+  render();
 }
 function fileBoard(claimId){
   var b = getBoard(claimId);
-  if(!b.teamCall || !b.confirmed || !(b.note && b.note.trim())) return;
+  // No determination to check any more (8/31/2026) — the gate is simply that the note
+  // exists. Submitting it files the case and stamps it.
+  if(!r3NoteText(b)) return;
+  b.r3.phase = "filed";
+  b.caseNo = claimNumber(claimId);
   // Where the live spread meter stands the instant BEFORE this case lands — the end
   // report's balance bar animates down from here, which it can't do once the last
   // contested claim has already flipped to filed and the meter reads zero.
@@ -2330,29 +3674,44 @@ function fileBoard(claimId){
   recordFiling(claimId);
   // The reveal unlocks here and nowhere earlier.
   commitTells(claimId);
+  // ...and it now gets its own screen, a beat later, so the FILED stamp lands first.
+  // The tells are NOT on the filed card and NOT in the note (Tara, 8/30) — the note
+  // says what happened, this says what was done to each of you.
+  setTimeout(function(){ pendingStory = claimId; render(); }, 2000);
   render();
   // Filing the last contested case is the end of the game.
   if(allCasesFiled()) endSession();
 }
 
 // ---------------- SPREAD ----------------
+// Did anybody at the table read this one as spun or worse? This is the spin axis
+// ([[manipulation-axis-reframe]]: straight up → spun → playing you), not consensus.
+// Consensus stopped being a thing the game says anywhere on 8/31/2026 — a story two
+// people happened to agree about was never "settled", it was just unexamined.
+function tableFlagged(claim){
+  var v = claimVotesFor(claim);
+  return PLAYERS.some(function(pl){ return v[pl.id] && v[pl.id] !== "true"; });
+}
 function spreadStats(){
-  var redHeat = 0, greenHeat = 0, contestedN = 0, agreedN = 0, filedN = 0, skippedN = 0;
+  var redHeat = 0, greenHeat = 0, playingN = 0, straightN = 0, filedN = 0, skippedN = 0;
   CLAIMS.forEach(function(c){
-    var status = claimStatus(c);
     var b = getBoard(c.id);
     var h = heat[c.id] || 0;
-    if(status==="contested" && !b.filed){ redHeat += h; contestedN++; }
-    else if(b.filed){ greenHeat += h; filedN++; }
-    else if(status==="agreed"){ greenHeat += h*0.3; agreedN++; }
-    else if(status==="skipped"){ greenHeat += h*0.3; skippedN++; }
+    if(b.filed){ greenHeat += h; filedN++; }
+    else if(tableFlagged(c)){ redHeat += h; playingN++; }
+    else {
+      // Nobody flagged it — low threat, so it burns quietly rather than not at all.
+      greenHeat += h*0.3; straightN++;
+      if(claimStatus(c)==="skipped") skippedN++;   // ...or nobody answered at all
+    }
   });
-  return {redHeat:redHeat, greenHeat:greenHeat, total:Math.max(1, redHeat+greenHeat), contestedN:contestedN, agreedN:agreedN, filedN:filedN, skippedN:skippedN};
+  return {redHeat:redHeat, greenHeat:greenHeat, total:Math.max(1, redHeat+greenHeat),
+          playingN:playingN, straightN:straightN, filedN:filedN, skippedN:skippedN};
 }
 function renderSpread(){
   var s = spreadStats();
   var pr = Math.round(100*s.redHeat/s.total);
-  var top = CLAIMS.filter(function(c){ return claimStatus(c)==="contested" && !getBoard(c.id).filed; })
+  var top = CLAIMS.filter(function(c){ return !getBoard(c.id).filed && tableFlagged(c); })
     .sort(function(a,b){ return (heat[b.id]||0)-(heat[a.id]||0); })[0];
   var html = navbarBack("The Spread", goHome);
   html += '<div class="appbody">';
@@ -2363,8 +3722,12 @@ function renderSpread(){
     html += '<div class="wsub">Tap to reopen the final report</div></div>';
   }
   html += '<div class="wrow3">';
-  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>CONTESTED</div><div class="wnum" style="color:var(--ios-red);">'+s.contestedN+'</div><div class="wsub">still spreading</div></div>';
-  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>AGREED</div><div class="wnum" style="color:var(--ios-label2);">'+s.agreedN+'</div><div class="wsub">set aside'+(s.skippedN?' \u00b7 '+s.skippedN+' skipped':'')+'</div></div>';
+  // Was CONTESTED / AGREED — table consensus, which the game stopped saying on
+  // 8/31/2026 (Tara: "maybe it's playing with you vs straight up"). These now read the
+  // spin axis instead, and count only stories still loose, so the three tiles always
+  // add up to the feed.
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>PLAYING YOU</div><div class="wnum" style="color:var(--ios-red);">'+s.playingN+'</div><div class="wsub">still spreading</div></div>';
+  html += '<div class="wtile"><div class="wtag"><span class="dot"></span>STRAIGHT UP</div><div class="wnum" style="color:var(--ios-label2);">'+s.straightN+'</div><div class="wsub">nobody flagged'+(s.skippedN?' \u00b7 '+s.skippedN+' never called':'')+'</div></div>';
   html += '<div class="wtile"><div class="wtag"><span class="dot"></span>FILED</div><div class="wnum" style="color:var(--ios-green);">'+s.filedN+'</div><div class="wsub">contained</div></div>';
   html += '</div>';
   html += '<div class="wtile"><div class="wtag"><span class="dot"></span>BALANCE</div><div class="wsub">spreading vs. contained attention</div>';
@@ -2375,7 +3738,7 @@ function renderSpread(){
     html += '<div class="topclaim">'+variantForPlayer(top,"you").headline+'</div>';
     html += '<div class="wsub">🔥 '+Math.round(heat[top.id]||0)+' heat · tap to investigate</div></div>';
   }
-  html += '<div style="color:var(--ios-label3); font-size:12px; line-height:1.6; margin-top:6px;">Heat climbs on its own the longer a contested claim sits un-filed — that\'s attention, not accuracy. Filing a case is the only thing that brings it back down. Agreed claims stay quiet in the background.</div>';
+  html += '<div style="color:var(--ios-label3); font-size:12px; line-height:1.6; margin-top:6px;">Heat climbs on its own the longer a story sits un-filed — that\'s attention, not accuracy. Filing a case is the only thing that brings it back down. The ones nobody flagged burn quietly in the background, which isn\'t the same as them being fine.</div>';
   html += '</div>';
   document.getElementById("screenArea").innerHTML = html;
 }
@@ -2496,6 +3859,15 @@ var OB_FLAGS_ART = (function(){
 
 var OB_CLOCK_ART = '<div class="obclock"><div class="obclockhand"></div><div class="obclockface">60</div></div>';
 
+function r3RolesMock(){
+  var html = '<div class="onboardmock"><div class="r3rolerow">';
+  R3_ROLES.forEach(function(r, i){
+    if(i) html += '<div class="r3roleto">→</div>';
+    html += '<div class="r3role"><div class="r3roleemoji">'+R3_JOBLINE[r][0]+'</div>'+
+            '<div class="r3rolename">'+r+'</div><div class="r3rolejob">'+R3_JOBLINE[r][1]+'</div></div>';
+  });
+  return html + '</div></div>';
+}
 var ONBOARD_CONTENT = {
   // COLD OPEN, rebuilt 2026-08-26 after the first outside playtest: 3 of 4 players
   // did not understand the purpose, or that this was a game at all. The four screens
@@ -2505,7 +3877,7 @@ var ONBOARD_CONTENT = {
   // screen — that is a discovery at the first reveal, and screen 4's silence protects it.
   round1: {teamGated:true, screens:[
     {kicker:"BEFORE YOU SCROLL", title:"Something in this feed is off.",
-      sub:CLAIMS.length+" stories are about to land. Some of them are playing you.",
+      sub:function(){ return CLAIMS.length+" stories are about to land. Some of them are playing you."; },
       mock:OB_FEED_ART},
     {kicker:"YOUR JOB", title:"Stop the spread.",
       sub:"Work out what\u2019s really going on in these news stories.",
@@ -2514,27 +3886,28 @@ var ONBOARD_CONTENT = {
       sub:"That\u2019s the only call you\u2019re making right now.",
       mock:OB_FLAGS_ART},
     {kicker:"🤐 ON YOUR OWN", title:"No talking. No comparing.",
-      sub:"Call all "+CLAIMS.length+" of them yourself. You\u2019ll see why in a minute.",
+      sub:function(){ return "Call all "+CLAIMS.length+" of them yourself. You\u2019ll see why in a minute."; },
       mock:OB_CLOCK_ART}
   ]},
   investigate: {teamGated:true, screens:[
-    // 8/18/2026 revision, per Tara (mirrored from infodemic-multiplayer-prototype.html):
-    // the why (title) was landing, the how (sub) wasn't — each sub now names the
-    // literal tap, matching real UI copy where one exists (e.g. "+ Add to case" is
-    // the actual button label on each clip). Same-day follow-up: `mock` replaces the
-    // generic emoji with a small recreation of the actual UI being described — see
-    // the .onboardmock-* CSS block and renderOnboard().
-    {kicker:"ROUND 2", big:"🔄", title:"Investigate", sub:"Tap a card to flip it open",
-      mock:'<div class="onboardmock"><div class="onboardmock-card"><div class="onboardmock-flipcluster"><div class="onboardmock-nub">🔍</div><div class="onboardmock-nub">🗂️</div></div><div class="onboardmock-tap">👆</div></div></div>'},
-    {big:"🔍", title:"Dive deeper", sub:"Tap Search or Ask AI on the card",
-      mock:'<div class="onboardmock"><div class="onboardmock-tabs"><div class="onboardmock-tab active">🔍 Search</div><div class="onboardmock-tab">✨ Ask AI</div></div></div>'},
-    // Tapping the source pill now jumps straight into Background check (see
-    // handleSourceTap) instead of just expanding the domain inline.
-    // Shows both ends of the tap now: the source pill you tap, and the Background
-    // tab it actually lands you on — not just the trigger on its own.
-    {big:"🕵️", title:"Who said it?", sub:"Tap the source — opens background check",
-      mock:'<div class="onboardmock"><div class="onboardmock-flow"><div style="position:relative;"><div class="onboardmock-source">🔗 @AIHypeDaily <span class="onboardmock-chev">▼</span></div><div class="onboardmock-tap" style="right:-6px; bottom:-16px;">👆</div></div><div class="onboardmock-arrow">↓</div><div class="onboardmock-tabs"><div class="onboardmock-tab active">🕵️ Background</div></div></div></div>'},
-    {big:"🗂️", title:"File your evidence", sub:"Tap + Add to case on what holds up",
+    // Reordered 8/31/2026 (Tara): background check FIRST, in the tour and in the UI.
+    // Two reasons beyond ordering taste — it is the only PERSONALISED evidence in the
+    // game (your profile is yours; the search pool is the whole table's), so everyone
+    // starts holding something only they can contribute; and "see who's saying it
+    // before you weigh what they said" is the habit this round is actually teaching.
+    {kicker:"ROUND 2", big:"\ud83d\udd04", title:"Investigate", sub:"Tap a card to flip it open",
+      mock:'<div class="onboardmock"><div class="onboardmock-card"><div class="onboardmock-flipcluster"><div class="onboardmock-nub">\ud83d\udd75\ufe0f</div><div class="onboardmock-nub">\ud83d\uddc2\ufe0f</div></div><div class="onboardmock-tap">\ud83d\udc46</div></div></div>'},
+    {big:"\ud83d\udd75\ufe0f", title:"Who posted it?", sub:"Tap the source \u2014 opens background check",
+      mock:'<div class="onboardmock"><div class="onboardmock-flow"><div style="position:relative;"><div class="onboardmock-source">\ud83d\udd17 @AIHypeDaily <span class="onboardmock-chev">\u25bc</span></div><div class="onboardmock-tap" style="right:-6px; bottom:-16px;">\ud83d\udc46</div></div><div class="onboardmock-arrow">\u2193</div><div class="onboardmock-tabs"><div class="onboardmock-tab active">\ud83d\udd75\ufe0f Background</div></div></div></div>'},
+    {big:"\ud83d\udd0d", title:"Then go looking", sub:"Tap Search or Ask AI on the card",
+      mock:'<div class="onboardmock"><div class="onboardmock-tabs"><div class="onboardmock-tab active">\ud83d\udd0d Search</div><div class="onboardmock-tab">\u2728 Ask AI</div></div></div>'},
+    // Blunter than "File your evidence" was — it never said what the tap was FOR.
+    // Rewritten 8/31/2026 (Tara): a 12-year-old about to be let loose needs the WHY,
+    // and the why is the table, not their own point. "Save what backs up your call"
+    // was rejected for exactly that reason — it teaches gathering ammunition. This
+    // frames the case file as what the table reasons from, and lands on the same
+    // question the reveal asks and the Round 3 note answers.
+    {big:"\ud83d\uddc2\ufe0f", title:"Save what holds up", sub:"Tap + Add to case \u2014 your table works out what happened from these",
       mock:'<div class="onboardmock"><div class="onboardmock-evidbtn">+ Add to case</div></div>'}
   ]},
   // "Where to look" (8/24/2026, expanded same day per Tara: more of an intro about
@@ -2560,22 +3933,43 @@ var ONBOARD_CONTENT = {
       mock:'<div class="onboardmock"><div class="onboardmock-bubble">Studies suggest this is well established \u2014 <b>but no study is named.</b></div></div>'},
     {big:"\ud83d\udd12", title:"Which one was it? File and find out.", sub:"The list stays open the whole game"}
   ]},
-  // Not teamGated (8/18/2026, per Tara — reversed from the first pass, mirrored
-  // from infodemic-multiplayer-prototype.html): shouldn't block anything or make
-  // anyone wait on teammates. Dismisses per-player with "Got it," same as spread,
-  // while everyone keeps clipping evidence freely.
-  board: {teamGated:false, screens:[
-    {kicker:"STOP THE SPREAD", big:"🗂️", title:"One shared board", sub:"Talk it through, agree, file it"},
-    {big:"🤝", title:"Pool it", sub:"Everyone's evidence, one place"},
-    {big:"🎭", title:"Compare versions", sub:"Unlocks the moment you file"},
-    {big:"📝", title:"Write the note", sub:"Explain your call — required to file"},
-    {big:"📮", title:"File to win", sub:"Agreeing files the case"}
+  // The `board` tour was DELETED 8/31/2026 (Tara). It taught mechanics that no longer
+  // exist and one that was explicitly removed: "Compare versions" now happens at the
+  // reveal, "Write the note — required to file" described the old justification box,
+  // and "File to win" contradicts the no-scoring decision outright. Its replacement is
+  // the Round 3 note tour, which is designed but not built — see the project memory
+  // note infodemic-instruction-tour-merge-list. Deliberately left absent rather than
+  // patched: a wrong tour is worse than no tour.
+  // Rewritten 8/31/2026. The old version described an ambient meter you could ignore.
+  // Triage changes what it means: you can only chase two stories, so the ones you leave
+  // keep climbing — the meter is now the thing you are choosing against, and the tour
+  // should say the cost out loud rather than reassuring players that it "never drives."
+  // The Round 3 note tour — replaces the deleted `board` tour. Team-gated like round1
+  // and investigate: the role chain is synchronous, so the table has to be on the same
+  // step before the first draft box opens. Fires on the same gate that opens Round 3
+  // (enough evidence pooled to write from), not on a button tap.
+  note: {teamGated:true, choice:true, screens:[
+    // Tara, 8/31/2026: "we need a more clear transition from adding evidence to writing
+    // what happened… maybe there's an additional slide that's like evidence is in."
+    // Gathering has no natural end — you stop because you decide you're done, and until
+    // something says so out loud the jump from a search results page to a 60-second
+    // drafting clock is a jump-cut. This screen is the beat where the table looks up.
+    {kicker:"EVIDENCE IS IN", big:"🗂️",
+      title:function(){ return r3GateCount()+" exhibits on your board"; },
+      sub:"That's enough to say something. Between you, you've got the pieces — the question now is what they add up to."},
+    {kicker:"ROUND 3 · STOP THE SPREAD", big:"📝", title:"Write the community note",
+      sub:"It goes on the post itself — the correction travels with the story. That's how this one stops."},
+    {big:"✍️", title:"Everyone writes a line",
+      sub:"Your take on what actually happened. All four at once, and nobody sees the others until they're in."},
+    {title:"Then you each get a job", sub:"One of you works at a time. The other three talk.",
+      mock:r3RolesMock()},
+    {big:"📢", title:"Read it out, then ship it", sub:"If it's not right, send it back once — and say which part."}
   ]},
   spread: {teamGated:false, screens:[
-    {kicker:"THE SPREAD", big:"📊", title:"Attention ≠ accuracy", sub:"It grows the longer it sits contested"},
-    {big:"🔥", title:"Heat climbs", sub:"On its own, while it's unfiled"},
-    {big:"🧯", title:"Filing cools it", sub:"Contained, not just correct"},
-    {big:"👀", title:"Check anytime", sub:"It reflects — it never drives"}
+    {kicker:"THE SPREAD", big:"📊", title:"Attention isn't accuracy", sub:"A story spreads whether or not it's true"},
+    {big:"🔥", title:"The ones you skip keep climbing", sub:"Every story you don't take is still out there"},
+    {big:"🧯", title:"Filing a case cools it", sub:"Contained — that's the whole job"},
+    {big:"⚖️", title:"You can't catch them all", sub:"That's the point. Pick the ones worth catching."}
   ]}
 };
 // Board's tour used to auto-chain right after investigate's, both up front before
@@ -2589,12 +3983,14 @@ function onboardKeyFor(){
     if(!roundState.started) return seenOnboard.round1 ? null : "round1";
     if(!roundState.ended) return null;
     if(!roundState.readyForR2Popup) return null; // wait for the shuffle to settle first
-    var hasContested = CLAIMS.some(function(c){ return claimStatus(c)==="contested"; });
-    if(!hasContested) return null;
+    if(triageState.active) return null;   // the picker owns the screen while it's up
     if(!seenOnboard.investigate) return "investigate";
-    if(!seenOnboard.board){
-      var caseReady = CLAIMS.some(function(c){ return getBoard(c.id).board.length >= BOARD_TOUR_EVIDENCE_THRESHOLD; });
-      return caseReady ? "board" : null;
+    // The note tour fires on the gate that opens Round 3 — enough evidence pooled on
+    // some claim to write from. Same constant the deleted board tour used, because it
+    // was always the same idea.
+    if(!seenOnboard.note && !onboardDeferred.note){
+      var noteReady = CLAIMS.some(function(c){ return r3Open(c.id) && !getBoard(c.id).filed; });
+      return noteReady ? "note" : null;
     }
     return null;
   }
@@ -2631,7 +4027,24 @@ function scheduleNpcOnboardReady(key){
     }, 900 + i*700 + Math.random()*500);
   });
 }
+// "Still investigating" closes the gate without marking it seen, so the tour is still
+// owed. It comes back the moment the board grows — addToBoard clears this — which makes
+// the loop honest: go find more, and the question gets asked again with a bigger number.
+// The board also carries its own "We know what happened" button while deferred, so a
+// table that changes its mind doesn't have to add a clip it doesn't need.
+var onboardDeferred = {};
+function deferOnboard(key){
+  onboardDeferred[key] = true;
+  pendingOnboard = null;
+  onboardScreenIdx = 0;
+  render();
+}
+function undeferNote(){
+  onboardDeferred.note = false;
+  if(currentApp==="round1") maybeShowOnboard();
+}
 function onboardMarkReady(key){
+  onboardDeferred[key] = false;
   if((onboardReady[key]||[]).indexOf("you") !== -1) return;
   onboardReady[key] = (onboardReady[key]||[]).concat(["you"]);
   if(isTeamReady(key)) finalizeOnboard(key); else render();
@@ -2645,7 +4058,8 @@ function finalizeOnboard(key){
   // hoping players notice a corner nub on their own, open the first contested story
   // straight to its "how do you wanna dig in" move menu — same agency, guided start.
   if(key==="investigate" && currentApp==="round1"){
-    var firstContested = CLAIMS.find(function(c){ return claimStatus(c)==="contested" && !getBoard(c.id).filed; });
+    var firstContested = CLAIMS.find(function(c){ return triagePicked(c.id) && !getBoard(c.id).filed; }) ||
+                         CLAIMS.find(function(c){ return !getBoard(c.id).filed; });
     if(firstContested){
       openSpoke(firstContested.id);
       setTimeout(function(){
@@ -2682,13 +4096,24 @@ function renderOnboard(){
   var html = '<div class="onboard-full" onclick="onboardTapZone(event)">';
   if(s.kicker) html += '<div class="onboard-kicker">'+s.kicker+'</div>';
   html += s.mock ? s.mock : ('<div class="onboard-big">'+s.big+'</div>');
-  html += '<div class="onboard-title">'+s.title+'</div>';
-  html += '<div class="onboard-sub">'+s.sub+'</div>';
+  html += '<div class="onboard-title">'+(typeof s.title === "function" ? s.title() : s.title)+'</div>';
+  // `sub` may be a function so a screen can read state that isn't known when
+  // ONBOARD_CONTENT is built — CLAIMS is REASSIGNED later (live-deck upgrade,
+  // and again per room in loadDropForRoom), so a story count baked in at parse
+  // time would show the default deck's number for every pipeline drop.
+  html += '<div class="onboard-sub">'+(typeof s.sub === "function" ? s.sub() : s.sub)+'</div>';
   if(isLast){
     html += '<div class="onboard-cta" onclick="event.stopPropagation();">';
     if(gate.teamGated){
       var already = (onboardReady[pendingOnboard]||[]).indexOf("you") !== -1;
-      if(!already){
+      if(!already && gate.choice){
+        // A gate you can only agree with isn't a gate. "I know what happened" has to
+        // cost something to say, which means the other answer has to be available —
+        // and a table that isn't ready gets sent back to the evidence rather than
+        // dropped into a drafting clock they can't answer (Tara, 8/31/2026).
+        html += '<div class="onboard-btn" onclick="onboardMarkReady(\''+pendingOnboard+'\')">We know what happened</div>';
+        html += '<div class="onboard-btn ghost" onclick="deferOnboard(\''+pendingOnboard+'\')">Still investigating</div>';
+      } else if(!already){
         html += '<div class="onboard-btn" onclick="onboardMarkReady(\''+pendingOnboard+'\')">I\'m ready</div>';
       } else {
         var waitingNames = PLAYERS.filter(function(p){ return (onboardReady[pendingOnboard]||[]).indexOf(p.id)===-1; }).map(function(p){ return p.name; });
@@ -2718,6 +4143,86 @@ function render(){
   else if(currentApp==="spread") renderSpread();
   else if(currentApp==="tells") renderTells();
   maybeShowOnboard();
+  renderStorySummary();
+  renderRoleCard();
+}
+
+// The tells live here and nowhere else in Round 3: the note said what happened, this
+// says what was done to each of you. Rows are per VERSION, not per player — that
+// grouping already lives in renderTellReveal, which this screen borrows.
+var storyCardKey = null;
+function renderStorySummary(){
+  var el = document.getElementById("storyScrim");
+  if(!el) return;
+  if(pendingStory === null){ storyCardKey = null; el.className = "onboard-scrim"; el.innerHTML = ""; return; }
+  var claim = CLAIMS.filter(function(c){ return c.id===pendingStory; })[0];
+  if(!claim){ pendingStory = null; storyCardKey = null; el.className = "onboard-scrim"; el.innerHTML = ""; return; }
+  if(storyCardKey === pendingStory) return;    // one-shot: see the entrance-animation rule
+  storyCardKey = pendingStory;
+
+  var bd = getBoard(claim.id);
+  var reach = getReach(claim.id);
+  // Two honest ways to say how far it got, because a fast table makes the share count
+  // tiny and "0 shares before your note landed" reads as broken rather than as a win.
+  // Under 200, the measure is how long it was loose — which is the thing they actually
+  // controlled, and a table that files in twenty seconds should be told so.
+  var rawShares = Math.round(reach.shares || 0);
+  var bigVal, bigUnit, bigSub;
+  if(rawShares >= 200){
+    bigVal = formatCount(rawShares); bigUnit = "shares";
+    bigSub = "before your note landed on it. Then it stopped.";
+  } else {
+    bigVal = fmtDuration(reach.looseMs || 0); bigUnit = "loose";
+    bigSub = "and then your note landed. You got to this one fast.";
+  }
+
+  var html = '<div class="storywrap"><div class="storyscroll">';
+  html += '<div class="storykick">Case filed \u00b7 '+(bd.caseNo||claimNumber(claim.id))+'</div>';
+  html += '<div class="storytitle">You stopped this one.</div>';
+
+  // ---- the visual: reach climbing, then your note, then flat --------------
+  // The whole session has been telling them heat climbs on its own while a story sits
+  // loose. This is the one moment they get to SEE it stop, so it's a drawn line rather
+  // than a number: rising, a marker where the note landed, flat after.
+  html += '<div class="stopviz">';
+  html += '<svg viewBox="0 0 300 116" preserveAspectRatio="none" aria-hidden="true">';
+  html += '<defs><linearGradient id="stopfill" x1="0" y1="0" x2="0" y2="1">'+
+          '<stop offset="0%" stop-color="rgba(255,69,58,.42)"/><stop offset="100%" stop-color="rgba(255,69,58,0)"/>'+
+          '</linearGradient></defs>';
+  // The climb, then the flat. Two paths so they can be timed separately.
+  html += '<path class="stopfill" d="M0,112 C42,104 76,84 104,64 C132,45 156,26 186,18 L300,18 L300,116 L0,116 Z" fill="url(#stopfill)"/>';
+  html += '<path class="stopclimb" d="M0,112 C42,104 76,84 104,64 C132,45 156,26 186,18" fill="none" stroke="var(--ios-red)" stroke-width="3.5" stroke-linecap="round"/>';
+  html += '<path class="stopflat" d="M186,18 L300,18" fill="none" stroke="var(--ios-green)" stroke-width="3.5" stroke-linecap="round"/>';
+  html += '<circle class="stopdot" cx="186" cy="18" r="5.5" fill="var(--ios-green)"/>';
+  html += '</svg>';
+  html += '<div class="stopmark">\ud83e\uddef your note</div>';
+  html += '</div>';
+
+  html += '<div class="stopbig">'+bigVal+'<span class="stopunit">'+bigUnit+'</span></div>';
+  html += '<div class="storysub">'+bigSub+'</div>';
+
+  // ---- the one thing to take out of the room ------------------------------
+  // Tara, 9/1/2026: end on a reminder to pause at your OWN feed, not on how each
+  // version was framed. The framing rows (renderTellReveal) used to live here; they
+  // were the third dense screen in a row, and none of it was about the player's life.
+  html += '<div class="pausecard">';
+  html += '<div class="pausekick">\u270b One thing to take with you</div>';
+  html += '<div class="pauseline">The post that gets you fastest is the one to slow down on.</div>';
+  html += '<div class="pausesub">That feeling \u2014 the one that makes you want to share it before you finish reading \u2014 is somebody\u2019s work. It\u2019ll be in your feed tonight, and nobody\u2019s going to hand you a case file.</div>';
+  html += '</div>';
+
+  html += '</div><div class="storyfoot"><div class="storybtn" onclick="dismissStory()">Back to the feed</div></div>';
+  html += '</div>';
+  el.className = "onboard-scrim active";
+  el.innerHTML = html;
+}
+function dismissStory(){
+  pendingStory = null;
+  if(triageState.stage === "pending"){
+    if(triageQuota() > 0){ triageState.active = true; triageState.stage = "active"; }
+    else { triageState.stage = "done"; }       // SESSION_CASES = 1: one story, done
+  }
+  render();
 }
 
 // engagement gravity tick
@@ -2726,12 +4231,15 @@ setInterval(function(){
   // gather it, and the report underneath must not keep re-rendering.
   if(sessionState.ended) return;
   CLAIMS.forEach(function(c){
-    var status = claimStatus(c);
     var b = getBoard(c.id);
     var cur = heat[c.id] || 0;
-    if(status==="contested" && !b.filed){ heat[c.id] = Math.min(HEAT_CAP, cur + Math.random()*1.6 + 0.4); }
-    else if(b.filed){ heat[c.id] = Math.max(2, cur - 1.2); }
-    else if(status==="agreed" || status==="skipped"){ heat[c.id] = cur<3 ? 3 : cur; }
+    // Was keyed to claimStatus "contested"/"agreed" — so a story the table happened to
+    // agree about sat frozen at 3 heat no matter how long it was left. Under triage the
+    // thing that makes a story climb is being LOOSE and looking like it's working on
+    // someone, which is what the Spread's tiles now say too (8/31/2026).
+    if(b.filed){ heat[c.id] = Math.max(2, cur - 1.2); }
+    else if(tableFlagged(c)){ heat[c.id] = Math.min(HEAT_CAP, cur + Math.random()*1.6 + 0.4); }
+    else { heat[c.id] = cur < 3 ? 3 : cur; }
     // Heat decays after filing, so the high-water mark has to be kept separately,
     // and shares keep totting up for as long as the claim is loose. Both feed the
     // end-of-session report; neither is shown during play.
@@ -2743,7 +4251,12 @@ setInterval(function(){
   // per-story reveal) is up — heat isn't shown on either screen, and re-rendering
   // them just recreates the DOM nodes underneath, which replays their one-shot
   // entrance animations on a loop instead of letting them settle.
-  var onSubScreen = roundState.showingTimesUp || revealState.active;
+  // The role card and the story summary joined this list on 8/31/2026 (Tara: "the
+  // animations for the role cards and the final report are bouncing"). Measured: three
+  // renders in eight seconds, and the .rolecard node was replaced every time, so the
+  // deal-in replayed on a 2.2-second loop. Same failure this guard was written for.
+  var onSubScreen = roundState.showingTimesUp || revealState.active ||
+                    triageState.active || pendingRole !== null || pendingStory !== null;
   // Mirrors the multiplayer file's fix (8/16/2026 playtest): the community note
   // textarea only took a couple characters before losing focus, and the gut-check's
   // card-to-card scroll got cut off mid-animation — both caused by this tick's full
