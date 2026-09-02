@@ -137,6 +137,8 @@
     letter-spacing:0; color:var(--dim); margin-top:18px; line-height:1.6;
   }
   .pullquote small em{ color:var(--faint); font-style:italic; }
+  .pullquote small a{ color:var(--dim); text-decoration:none; border-bottom:1px solid var(--line-soft); }
+  .pullquote small a:hover{ color:var(--ink); border-color:var(--ink); }
 
   /* ---------- beats ---------- */
   .beats{ display:grid; grid-template-columns:repeat(3,1fr); gap:46px; }
@@ -330,6 +332,15 @@
   .credit p b{ color:var(--ink); font-weight:400; }
   .credit p a{ color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); }
   .credit p a:hover{ border-color:var(--ink); }
+
+  .stat{ display:flex; flex-direction:column; }
+  .stat .txt{ margin-bottom:18px; }
+  .stat .src{
+    margin-top:auto; padding-top:13px; border-top:1px solid var(--line-soft);
+    font-size:11px; font-weight:600; letter-spacing:.6px; line-height:1.5; color:var(--faint);
+  }
+  .stat .src a{ color:var(--faint); text-decoration:none; border-bottom:1px solid var(--line-soft); }
+  .stat .src a:hover{ color:var(--dim); border-color:var(--dim); }
 </style>
 </head>
 <body>
@@ -397,21 +408,26 @@
       <div class="stat">
         <div class="num">50%</div>
         <div class="txt">of teens keep up with news <b>passively</b> — it comes to them. Only 15% go looking for it.</div>
+        <div class="src">News Literacy Project, <a href="https://newslit.org/news-and-research/news-literacy-in-america/" target="_blank" rel="noopener"><i>News Literacy in America</i></a> (2024)<br>&ldquo;How do you keep up with news?&rdquo; &middot; n=1,110</div>
       </div>
       <div class="stat">
         <div class="num">18%</div>
         <div class="txt">could tell <b>branded content, opinion and sponsored results</b> apart — all three. Barely half got any one right.</div>
+        <div class="src">News Literacy Project, <a href="https://newslit.org/news-and-research/news-literacy-in-america/" target="_blank" rel="noopener"><i>News Literacy in America</i></a> (2024)<br>Three-part identification task &middot; n=1,110</div>
       </div>
       <div class="stat">
         <div class="num">80%</div>
         <div class="txt">of teens on social media <b>run into conspiracy posts</b>. One in five sees them every day.</div>
+        <div class="src">News Literacy Project, <a href="https://newslit.org/news-and-research/news-literacy-in-america/" target="_blank" rel="noopener"><i>News Literacy in America</i></a> (2024)<br>Social-media users only &middot; n=1,110</div>
       </div>
     </div>
 
     <div class="pullquote">
       94% of teens say schools should teach this. 39% got any instruction at all last year.
       <small>Telling a kid to "check the source" doesn't survive contact with a real feed. Practice might.
-      <br><em>All figures: News Literacy Project, News Literacy in America (2024), 1,110 US teens.</em></small>
+      <br><em>News Literacy Project, <a href="https://newslit.org/news-and-research/news-literacy-in-america/" target="_blank" rel="noopener">News Literacy in America</a> (2024) &mdash;
+      a nationally representative survey of 1,110 US teens aged 13&ndash;18, fielded May 2024, margin of error &plusmn;4.1 points.
+      Every figure on this page comes from it.</em></small>
     </div>
   </section>
 
@@ -579,8 +595,8 @@
     <div class="credit">
       <div class="clabel2">Where it started</div>
       <p>Infodemic began at <a href="https://soraschools.com/" target="_blank" rel="noopener">Sora Schools</a>,
-         a project-based school for grades 6&ndash;12. Everything here comes from watching students take an
-         argument seriously when it was actually theirs to settle.</p>
+         a project-based school for grades 6&ndash;12. The game is what came out of a school built on the idea
+         that students should be doing real work, not answering questions someone already knew the answer to.</p>
     </div>
     <div class="credit">
       <div class="clabel2">Where it's being built</div>
