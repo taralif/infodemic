@@ -3,168 +3,586 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>INFODEMIC</title>
+<title>Infodemic — no one ever taught us to read a feed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0d0d0f; --panel:#17181a; --panel-hover:#1e2022; --sep:#2a2c2e;
-    --ink:#f2f1ea; --dim:#9aa39a; --faint:#5f6362;
-    --blue:#0a84ff; --blue-dim:rgba(10,132,255,.12);
-    --green:#4caf7d; --green-dim:rgba(76,175,125,.12);
-    --amber:#d9a441; --amber-dim:rgba(217,164,65,.12);
+    --bg:#0a0a0b;
+    --panel:#131416;
+    --panel-2:#191a1d;
+    --line:rgba(242,241,234,.13);
+    --line-soft:rgba(242,241,234,.07);
+    --ink:#f2f1ea;
+    --dim:#9a9c98;
+    --faint:#63655f;
+    --blue:#0a84ff;
+    --green:#4caf7d;
+    --amber:#d9a441;
+    --rust:#e0654a;
+    --serif:'Fraunces','Iowan Old Style','Palatino Linotype',Georgia,serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box;}
-  html,body{height:100%;}
   body{
     margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
-    display:flex; align-items:center; justify-content:center;
-    background-image:radial-gradient(circle at 50% 0%, rgba(255,255,255,.04), transparent 60%);
+    font-family:var(--sans); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(ellipse 900px 500px at 50% -5%, rgba(10,132,255,.07), transparent 70%);
   }
-  .wrap{ width:100%; max-width:1000px; padding:48px 24px; }
-  .brand{ text-align:center; margin-bottom:8px; }
-  .brand .word{ font-size:15px; font-weight:800; letter-spacing:5px; color:var(--ink); }
-  .brand .tag{ font-family:'SF Mono',Menlo,monospace; font-size:11.5px; color:var(--faint); letter-spacing:.5px; margin-top:8px; }
-  h1{ text-align:center; font-size:26px; font-weight:700; margin:28px 0 4px; letter-spacing:-.2px; }
-  .lede{ text-align:center; font-size:14.5px; color:var(--dim); max-width:540px; margin:0 auto 18px; line-height:1.6; }
+  .wrap{ width:100%; max-width:1120px; margin:0 auto; padding:0 32px; }
+  @media (max-width:640px){ .wrap{ padding:0 20px; } }
 
-  .facts{
-    display:flex; flex-wrap:wrap; justify-content:center; gap:10px 0;
-    margin:0 auto 38px; max-width:560px;
+  /* ---------- masthead ---------- */
+  .masthead{ display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:40px 0 16px; }
+  .wordmark{
+    font-family:var(--sans); font-size:14px; font-weight:800;
+    letter-spacing:5px; text-transform:uppercase; line-height:1;
   }
+  .masthead .kicker{ font-size:13.5px; color:var(--faint); text-align:right; max-width:290px; line-height:1.5; }
+  .hairline{ height:1px; background:var(--line); }
+  @media (max-width:640px){ .masthead .kicker{ display:none; } .masthead{ padding:32px 0 14px; } }
+
+  /* ---------- hero ---------- */
+  .hero{ display:grid; grid-template-columns:1.08fr .92fr; gap:60px; align-items:center; padding:76px 0 86px; }
+  @media (max-width:900px){ .hero{ grid-template-columns:1fr; gap:56px; padding:52px 0 60px; } }
+  h1{
+    font-family:var(--serif); font-weight:300; font-size:clamp(42px,6.4vw,78px);
+    line-height:1.03; letter-spacing:-2px; margin:0 0 28px; color:var(--ink);
+  }
+  .lede{ font-size:18px; color:var(--dim); max-width:520px; margin:0 0 36px; line-height:1.62; }
+  .lede b{ color:var(--ink); font-weight:600; }
+  .cta-row{ display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+  .btn{
+    display:inline-block; background:var(--blue); color:#fff; text-decoration:none;
+    font-size:15.5px; font-weight:600; padding:15px 30px; border-radius:999px;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .btn:hover{ filter:brightness(1.12); transform:translateY(-1px); }
+  .btn-text{
+    font-size:15.5px; font-weight:600; color:var(--ink); text-decoration:none;
+    border-bottom:1.5px solid var(--line); padding-bottom:4px;
+  }
+  .btn-text:hover{ border-color:var(--ink); }
+
+  /* ---------- hero visual: two phones, same story ---------- */
+  .stage{ display:flex; gap:18px; justify-content:center; align-items:flex-start; }
+  .col{ flex:1; max-width:238px; }
+  .col.offset{ margin-top:44px; }
+  .seat{
+    font-size:10px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--faint); margin:0 0 10px 4px;
+  }
+  .phone{
+    border:1.5px solid rgba(242,241,234,.16); border-radius:26px; background:#000;
+    padding:9px 8px 14px; box-shadow:0 20px 50px rgba(0,0,0,.6);
+  }
+  .notch{ width:44%; height:4px; border-radius:99px; background:rgba(242,241,234,.16); margin:2px auto 11px; }
+  .post{ background:var(--panel-2); border:1px solid var(--line-soft); border-radius:13px; padding:12px 12px 13px; }
+  .post-top{ display:flex; align-items:center; gap:7px; margin-bottom:9px; }
+  .avatar{ width:20px; height:20px; border-radius:50%; flex:none; }
+  .a1{ background:linear-gradient(140deg,#d9a441,#e0654a); }
+  .a2{ background:linear-gradient(140deg,#5b8fbf,#4caf7d); }
+  .handle{ font-size:10.5px; font-weight:600; color:var(--dim); }
+  .handle span{ font-weight:400; color:var(--faint); }
+  .post-text{ font-size:13px; line-height:1.45; font-weight:500; color:var(--ink); }
+  .post-text em{ font-style:normal; border-bottom:1.5px solid rgba(224,101,74,.65); }
+  .skeleton{ height:8px; border-radius:99px; background:rgba(242,241,234,.07); margin-top:10px; }
+  .skeleton.s2{ width:72%; }
+  .stage-note{
+    text-align:center; font-family:var(--serif); font-style:italic; font-weight:300;
+    font-size:15px; color:var(--faint); margin:26px 0 0;
+  }
+
+  /* ---------- section furniture ---------- */
+  section{ padding:82px 0; }
+  @media (max-width:640px){ section{ padding:58px 0; } }
+  .eyebrow{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:11px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
+    color:var(--blue); margin-bottom:36px; padding-bottom:13px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow .count{ color:var(--faint); font-weight:600; letter-spacing:1.2px; }
+  h2{
+    font-family:var(--serif); font-weight:300; font-size:clamp(30px,4.4vw,48px);
+    line-height:1.08; letter-spacing:-1.4px; margin:0 0 16px;
+  }
+  .sub{ font-size:17px; color:var(--dim); max-width:600px; margin:0 0 50px; }
+
+  /* ---------- stats ---------- */
+  .stats{ display:grid; grid-template-columns:repeat(3,1fr); }
+  @media (max-width:860px){ .stats{ grid-template-columns:1fr; } }
+  .stat{ padding:0 36px; border-left:1px solid var(--line-soft); }
+  .stat:first-child{ padding-left:0; border-left:none; }
+  @media (max-width:860px){
+    .stat{ padding:28px 0 0; border-left:none; border-top:1px solid var(--line-soft); }
+    .stat:first-child{ padding-top:0; border-top:none; }
+  }
+  .stat .num{
+    font-family:var(--serif); font-size:70px; font-weight:300; line-height:.94;
+    letter-spacing:-3.5px; color:var(--rust); margin-bottom:18px;
+  }
+  .stat .txt{ font-size:15.5px; color:var(--dim); line-height:1.55; }
+  .stat .txt b{ color:var(--ink); font-weight:600; }
+
+  .pullquote{
+    margin:58px 0 0; padding:36px 0 0; border-top:1px solid var(--line);
+    font-family:var(--serif); font-weight:300; font-size:clamp(21px,2.8vw,30px);
+    line-height:1.3; letter-spacing:-.8px; max-width:860px;
+  }
+  .pullquote small{
+    display:block; font-family:var(--sans); font-weight:400; font-size:14.5px;
+    letter-spacing:0; color:var(--dim); margin-top:18px; line-height:1.6;
+  }
+  .pullquote small em{ color:var(--faint); font-style:italic; }
+
+  /* ---------- beats ---------- */
+  .beats{ display:grid; grid-template-columns:repeat(3,1fr); gap:46px; }
+  @media (max-width:860px){ .beats{ grid-template-columns:1fr; gap:40px; } }
+  .beat .bnum{ font-size:11px; font-weight:700; letter-spacing:1.6px; color:var(--blue); margin-bottom:15px; }
+  .beat h3{ font-family:var(--serif); font-weight:400; font-size:25px; letter-spacing:-.6px; margin:0 0 11px; }
+  .beat p{ font-size:15.5px; color:var(--dim); line-height:1.6; margin:0; }
+
+  .bet{
+    margin-top:62px; background:var(--panel); border:1px solid var(--line-soft);
+    border-radius:22px; padding:42px 46px;
+  }
+  @media (max-width:640px){ .bet{ padding:30px 26px; } }
+  .bet .label{ font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--blue); margin-bottom:16px; }
+  .bet p{ font-family:var(--serif); font-weight:300; font-size:clamp(20px,2.5vw,27px); line-height:1.36; letter-spacing:-.7px; margin:0; }
+  .bet p span{ font-family:var(--sans); font-weight:400; font-size:16.5px; letter-spacing:0; color:var(--dim); display:block; margin-top:18px; line-height:1.62; }
+
+  .facts{ display:flex; flex-wrap:wrap; gap:8px 0; margin-top:46px; justify-content:center; }
   .fact{
-    font-family:'SF Mono',Menlo,monospace; font-size:11px; letter-spacing:.5px;
-    color:var(--faint); text-transform:uppercase; padding:0 14px;
-    border-right:1px solid var(--sep);
+    font-size:11px; font-weight:600; letter-spacing:1.3px; text-transform:uppercase;
+    color:var(--faint); padding:0 18px; border-right:1px solid var(--line-soft);
   }
   .fact:last-child{ border-right:none; }
 
-  .sectionlabel{
-    text-align:center; font-family:'SF Mono',Menlo,monospace; font-size:10.5px;
-    font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
-    color:var(--faint); margin-bottom:18px;
-  }
-
-  .doors{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; }
-  @media (max-width:820px){ .doors{ grid-template-columns:1fr; } }
-  a.door{ text-decoration:none; display:block; }
+  /* ---------- playtest ---------- */
+  .doors{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:860px){ .doors{ grid-template-columns:1fr; } }
+  a.door{ text-decoration:none; color:inherit; display:block; }
   .door{
-    background:var(--panel); border:1px solid var(--sep); border-radius:20px;
-    padding:26px 24px 24px; height:100%;
-    display:flex; flex-direction:column;
-    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+    background:var(--panel); border:1px solid var(--line-soft); border-radius:20px;
+    padding:30px 28px 26px; height:100%; display:flex; flex-direction:column;
+    transition:transform .16s ease, background .16s ease, border-color .16s ease;
   }
-  .door:hover{ transform:translateY(-2px); background:var(--panel-hover); }
-  .door.student:hover{ border-color:rgba(10,132,255,.4); }
-  .door.teacher:hover{ border-color:rgba(76,175,125,.4); }
-  .door.feedback:hover{ border-color:rgba(217,164,65,.4); }
-
-  .stepnum{
-    width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-family:'SF Mono',Menlo,monospace; font-size:13px; font-weight:700;
-    margin-bottom:16px;
+  .door:hover{ transform:translateY(-3px); background:var(--panel-2); }
+  .door.one:hover{ border-color:rgba(76,175,125,.4); }
+  .door.two:hover{ border-color:rgba(10,132,255,.4); }
+  .door.three:hover{ border-color:rgba(217,164,65,.4); }
+  .door .dnum{ font-size:10.5px; font-weight:700; letter-spacing:1.6px; margin-bottom:15px; }
+  .door.one .dnum{ color:var(--green); }
+  .door.two .dnum{ color:var(--blue); }
+  .door.three .dnum{ color:var(--amber); }
+  .door h3{ font-family:var(--serif); font-weight:400; font-size:24px; letter-spacing:-.5px; margin:0 0 11px; }
+  .door p{ font-size:15px; color:var(--dim); line-height:1.58; margin:0 0 22px; flex:1; }
+  .door code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; font-weight:500;
+    background:rgba(242,241,234,.07); padding:2px 6px; border-radius:5px; color:var(--ink);
   }
-  .door.teacher .stepnum{ background:var(--green-dim); color:var(--green); }
-  .door.student .stepnum{ background:var(--blue-dim); color:var(--blue); }
-  .door.feedback .stepnum{ background:var(--amber-dim); color:var(--amber); }
+  .door .go{ font-size:14.5px; font-weight:600; display:flex; align-items:center; gap:7px; }
+  .door.one .go{ color:var(--green); }
+  .door.two .go{ color:var(--blue); }
+  .door.three .go{ color:var(--amber); }
+  .door .arrow{ transition:transform .16s ease; }
+  .door:hover .arrow{ transform:translateX(4px); }
 
-  .dorkicker{ font-family:'SF Mono',Menlo,monospace; font-size:10.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
-  .door.teacher .dorkicker{ color:var(--green); }
-  .door.student .dorkicker{ color:var(--blue); }
-  .door.feedback .dorkicker{ color:var(--amber); }
-  .dortitle{ font-size:19px; font-weight:700; color:var(--ink); margin-bottom:8px; }
-  .dordesc{ font-size:13.5px; color:var(--dim); line-height:1.55; margin-bottom:18px; flex:1; }
-  .dordesc code{
-    font-family:'SF Mono',Menlo,monospace; font-size:12.5px;
-    background:rgba(255,255,255,.06); color:var(--ink);
-    padding:1px 5px; border-radius:4px;
+  .caveat{
+    margin-top:26px; padding:22px 26px; border-radius:16px;
+    background:rgba(10,132,255,.05); border:1px solid rgba(10,132,255,.16);
+    font-size:15px; color:var(--dim); line-height:1.6;
   }
-  .dorcta{ font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; }
-  .door.teacher .dorcta{ color:var(--green); }
-  .door.student .dorcta{ color:var(--blue); }
-  .door.feedback .dorcta{ color:var(--amber); }
-  .dorcta .arrow{ transition:transform .15s ease; }
-  .door:hover .arrow{ transform:translateX(3px); }
+  .caveat b{ color:var(--ink); font-weight:600; }
 
-  .aside{
-    margin-top:28px; padding:18px 22px; border:1px solid var(--sep); border-radius:14px;
-    background:rgba(255,255,255,.02);
-    font-size:13px; color:var(--dim); line-height:1.6;
+  footer{ padding:52px 0 60px; border-top:1px solid var(--line); margin-top:80px; }
+  .footrow{ display:flex; flex-wrap:wrap; gap:14px 32px; justify-content:space-between; font-size:13.5px; color:var(--faint); }
+  footer a{ color:var(--dim); text-decoration:none; border-bottom:1px solid var(--line-soft); }
+  footer a:hover{ color:var(--ink); }
+
+  /* ---------- live demo embed ---------- */
+  .demo-shell{
+    background:var(--panel); border:1px solid var(--line-soft); border-radius:24px;
+    padding:22px; display:flex; justify-content:center;
   }
-  .aside b{ color:var(--ink); font-weight:600; }
+  .demo-frame{
+    width:720px; height:884px; max-width:100%; border:0; border-radius:16px;
+    display:block; background:#0d0d0f;
+  }
+  .poster{
+    width:720px; height:884px; max-width:100%; border-radius:16px;
+    background:#0d0d0f;
+    background-image:radial-gradient(ellipse 420px 300px at 50% 34%, rgba(10,132,255,.13), transparent 70%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:0; cursor:pointer; border:1px solid var(--line-soft);
+    transition:border-color .18s ease;
+  }
+  .poster:hover{ border-color:rgba(10,132,255,.35); }
+  .poster .ghost{
+    width:154px; height:318px; border:1.5px solid rgba(242,241,234,.16); border-radius:26px;
+    position:relative; margin-bottom:38px; background:#000;
+    box-shadow:0 24px 60px rgba(0,0,0,.6);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .poster .ghost::before{
+    content:""; position:absolute; top:9px; left:50%; transform:translateX(-50%);
+    width:46px; height:5px; border-radius:99px; background:rgba(242,241,234,.18);
+  }
+  .poster .play{
+    width:52px; height:52px; border-radius:50%; background:var(--blue);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 10px rgba(10,132,255,.14);
+    transition:transform .18s ease;
+  }
+  .poster:hover .play{ transform:scale(1.07); }
+  .poster .play svg{ margin-left:3px; }
+  .poster .ptitle{
+    font-family:var(--serif); font-weight:300; font-size:32px; letter-spacing:-1px;
+    margin:0 0 12px; text-align:center;
+  }
+  .poster .psub{ font-size:15.5px; color:var(--dim); max-width:390px; text-align:center; margin:0; line-height:1.55; }
+  .poster .phint{
+    font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--blue); margin-top:26px;
+  }
+  .demo-aside{
+    display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;
+    margin-top:20px; font-size:14.5px; color:var(--faint);
+  }
+  .demo-aside a{ color:var(--dim); font-weight:600; text-decoration:none; border-bottom:1px solid var(--line-soft); }
+  .demo-aside a:hover{ color:var(--ink); }
+  .demo-mobile{ display:none; }
+  @media (max-width:860px){
+    .demo-shell{ display:none; }
+    .demo-mobile{
+      display:block; background:var(--panel); border:1px solid var(--line-soft);
+      border-radius:22px; padding:32px 26px; text-align:center;
+    }
+    .demo-mobile p{ font-size:15.5px; color:var(--dim); line-height:1.6; margin:0 0 24px; }
+  }
 
-  footer{ text-align:center; margin-top:40px; font-size:11.5px; color:var(--faint); line-height:1.8; }
-  footer a{ color:var(--faint); }
+  /* ---------- curator band ---------- */
+  .curate{ display:grid; grid-template-columns:.92fr 1.08fr; gap:60px; align-items:center; }
+  @media (max-width:900px){ .curate{ grid-template-columns:1fr; gap:44px; } }
+  .console{
+    background:var(--panel); border:1px solid var(--line-soft); border-radius:20px;
+    padding:22px 22px 24px; box-shadow:0 24px 60px rgba(0,0,0,.45);
+  }
+  .console .src{
+    display:flex; align-items:center; gap:8px; font-size:11px; font-weight:600;
+    letter-spacing:.6px; color:var(--faint); padding-bottom:14px; margin-bottom:18px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .console .src .dot{ width:6px; height:6px; border-radius:50%; background:var(--green); flex:none; }
+  .console .src b{ color:var(--green); font-weight:600; }
+  .console .clabel{
+    font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--blue); margin-bottom:13px;
+  }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+  .chip{
+    font-size:13px; font-weight:600; padding:7px 14px; border-radius:999px;
+    background:rgba(242,241,234,.06); color:var(--dim); border:1px solid transparent;
+  }
+  .chip.on{ background:var(--blue); color:#fff; }
+  .feedrows{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
+  .frow{
+    background:rgba(242,241,234,.04); border:1px solid var(--line-soft); border-radius:11px;
+    padding:11px 13px; display:grid; grid-template-columns:auto auto; gap:3px 9px; align-items:center;
+  }
+  .ftag{
+    font-size:9.5px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase;
+    color:var(--blue); justify-self:start;
+  }
+  .fsrc{ font-size:9.5px; font-weight:600; letter-spacing:1.1px; text-transform:uppercase; color:var(--faint); justify-self:start; }
+  .fhed{ grid-column:1 / -1; font-size:13px; line-height:1.4; color:var(--ink); font-weight:500; }
+  .console .pubrow{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding-top:18px; border-top:1px solid var(--line-soft);
+  }
+  .console .pubrow .cap{ font-size:12.5px; color:var(--faint); }
+  .word{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:19px; font-weight:600;
+    letter-spacing:3px; color:var(--ink); background:rgba(10,132,255,.12);
+    border:1px solid rgba(10,132,255,.3); border-radius:10px; padding:8px 16px;
+  }
+  .points{ display:flex; flex-direction:column; gap:26px; margin-top:6px; }
+  .point h3{ font-family:var(--serif); font-weight:400; font-size:22px; letter-spacing:-.5px; margin:0 0 7px; }
+  .point p{ font-size:15.5px; color:var(--dim); line-height:1.58; margin:0; }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="brand">
-      <div class="word">INFODEMIC</div>
-      <div class="tag">the only feed that shows its work</div>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="wordmark">Infodemic</div>
+    <div class="kicker">A game about working out what's real in a feed. Built for classrooms.</div>
+  </div>
+  <div class="hairline"></div>
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div>
+      <h1>No one ever taught us to read a feed.</h1>
+      <p class="lede">
+        Half of American teens say the news just arrives — on a phone, between a friend's post and an ad,
+        never saying where it came from. <b>Infodemic is a game that makes a room full of kids slow that
+        feed down</b>, check what's in it, and argue their way to one thing they can all stand behind.
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="#demo">Play a round</a>
+        <a class="btn-text" href="#playtest">Run it with a group &rarr;</a>
+      </div>
     </div>
 
-    <h1>Help us test Infodemic</h1>
-    <p class="lede">
-      Infodemic is a game about working out what's real in a social feed. You and a few other people play
-      together in the same room, each on your own device: you rate a feed of real claims on instinct, then
-      investigate whatever you disagreed about. There's no answer key — a claim only settles when your
-      table can justify the call.
-    </p>
+    <div>
+      <div class="stage">
+        <div class="col">
+          <p class="seat">Maya's feed</p>
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="post">
+              <div class="post-top"><div class="avatar a1"></div><div class="handle">Student Voice <span>· 2h</span></div></div>
+              <div class="post-text">BREAKING: they're taking your phone <em>all day</em> in September. Pushed through over break — no student got to speak.</div>
+            </div>
+            <div class="skeleton"></div>
+            <div class="skeleton s2"></div>
+          </div>
+        </div>
+        <div class="col offset">
+          <p class="seat">Devon's feed</p>
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="post">
+              <div class="post-top"><div class="avatar a2"></div><div class="handle">Metro Desk <span>· 2h</span></div></div>
+              <div class="post-text">Board voted 5&ndash;2 to lock phones <em>during class</em> from September. Students keep them at lunch.</div>
+            </div>
+            <div class="skeleton"></div>
+            <div class="skeleton s2"></div>
+          </div>
+        </div>
+      </div>
+      <p class="stage-note">Same story. Different feeds. Now they have to talk.</p>
+    </div>
+  </div>
+
+  <!-- ================= PROBLEM ================= -->
+  <section>
+    <div class="eyebrow"><span>What we're up against</span><span class="count">01</span></div>
+    <h2>The feed is the news now.</h2>
+    <p class="sub">And almost nobody arrives with the habits to read it.</p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="num">50%</div>
+        <div class="txt">of teens keep up with news <b>passively</b> — it comes to them. Only 15% go looking for it.</div>
+      </div>
+      <div class="stat">
+        <div class="num">18%</div>
+        <div class="txt">could tell <b>branded content, opinion and sponsored results</b> apart — all three. Barely half got any one right.</div>
+      </div>
+      <div class="stat">
+        <div class="num">80%</div>
+        <div class="txt">of teens on social media <b>run into conspiracy posts</b>. One in five sees them every day.</div>
+      </div>
+    </div>
+
+    <div class="pullquote">
+      94% of teens say schools should teach this. 39% got any instruction at all last year.
+      <small>Telling a kid to "check the source" doesn't survive contact with a real feed. Practice might.
+      <br><em>All figures: News Literacy Project, News Literacy in America (2024), 1,110 US teens.</em></small>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT PLAYS ================= -->
+  <section id="how">
+    <div class="eyebrow"><span>How it plays</span><span class="count">02</span></div>
+    <h2>Three rounds per story, about ten minutes.</h2>
+    <p class="sub">Everyone's on their own phone. The game happens between them, out loud, in the room.</p>
+
+    <div class="beats">
+      <div class="beat">
+        <div class="bnum">01</div>
+        <h3>Judge on instinct</h3>
+        <p>The whole feed lands in sixty seconds. Thumbs only, no time to think — that's the honest baseline, because it's how everyone reads a feed when nobody's watching.</p>
+      </div>
+      <div class="beat">
+        <div class="bnum">02</div>
+        <h3>Go check</h3>
+        <p>Search it. Ask an AI. Look up who runs the account and who funds them. Everyone digs through the same evidence — and there's no answer key waiting at the end.</p>
+      </div>
+      <div class="beat">
+        <div class="bnum">03</div>
+        <h3>Agree on something</h3>
+        <p>The table writes one community note together, each player holding a different job. It doesn't ship until it survives the skeptic sitting next to them.</p>
+      </div>
+    </div>
+
+    <div class="bet">
+      <div class="label">The bet</div>
+      <p>Every player is handed a different version of the same story.
+        <span>So the disagreement at the table is real rather than staged — and the only way out of it is to go
+        look things up and talk to each other. It's a phone game whose entire point is the conversation in the room.</span>
+      </p>
+    </div>
 
     <div class="facts">
       <span class="fact">2–4 players</span>
-      <span class="fact">~20 min gameplay</span>
+      <span class="fact">~30 min session</span>
       <span class="fact">Phone, laptop or tablet</span>
       <span class="fact">Ages 11+</span>
+      <span class="fact">Free &amp; open source</span>
+    </div>
+  </section>
+
+  <!-- ================= CURATOR ================= -->
+  <section id="curate">
+    <div class="eyebrow"><span>The curator console</span><span class="count">03</span></div>
+    <h2>It's this morning's news, and it's your feed.</h2>
+    <p class="sub">Infodemic isn't a set of canned scenarios that go stale by February. You build the feed
+      from real stories pulled off a live news wire, set how long you've got, and publish the whole thing as
+      one word you read to the room.</p>
+
+    <div class="curate">
+      <div class="console">
+        <div class="src"><span class="dot"></span>Live news &middot; pulled <b>this morning</b></div>
+        <div class="clabel">Your feed &mdash; 3 stories</div>
+        <div class="feedrows">
+          <div class="frow"><span class="ftag">Health</span><span class="fsrc">The Guardian</span>
+            <span class="fhed">Statins can reduce dementia risk by up to 15%, long-term study suggests</span></div>
+          <div class="frow"><span class="ftag">Media</span><span class="fsrc">Newsweek</span>
+            <span class="fhed">Google reveals how &lsquo;Lake America&rsquo; name change will appear on Maps</span></div>
+          <div class="frow"><span class="ftag">Tech</span><span class="fsrc">Slashdot</span>
+            <span class="fhed">BMW blames young people for the loss of real buttons in new cars</span></div>
+        </div>
+        <div class="pubrow">
+          <span class="cap">Read this word to the room &rarr;</span>
+          <span class="word">OTTER</span>
+        </div>
+      </div>
+
+      <div class="points">
+        <div class="point">
+          <h3>Pulled this morning, not written last year</h3>
+          <p>One button pulls fresh headlines off a live news wire, and the game generates each story's
+             framings and the evidence behind them. You aren't writing curriculum at ten at night.</p>
+        </div>
+        <div class="point">
+          <h3>You pick the stories. You never write the spin</h3>
+          <p>What goes in the feed is your call. How each story gets framed — and which player sees which
+             version — is generated at publish time. Nobody can accuse you of stacking the deck when you
+             didn't build the deck.</p>
+        </div>
+        <div class="point">
+          <h3>It tells you when the feed is too easy</h3>
+          <p>If nothing in your feed plays spun, there's nothing for a table to disagree about — and the
+             console says so before you publish, not after the bell.</p>
+        </div>
+        <div class="point">
+          <a class="btn-text" href="infodemic-content-pipeline-prototype.html">Open the curator console &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LIVE DEMO ================= -->
+  <section id="demo">
+    <div class="eyebrow"><span>Try it yourself</span><span class="count">04</span></div>
+    <h2>Play a round right now.</h2>
+    <p class="sub">This is the solo version — one player, no sign-up, about three minutes. The classroom
+      game is the same thing with three other people arguing back.</p>
+
+    <div class="demo-shell">
+      <div class="poster" id="demoPoster" role="button" tabindex="0"
+           aria-label="Start the playable demo">
+        <div class="ghost"><div class="play">
+          <svg width="17" height="19" viewBox="0 0 17 19" fill="none"><path d="M16 8.63397C16.6667 9.01887 16.6667 9.98113 16 10.366L2.5 18.1603C1.83333 18.5452 1 18.0641 1 17.2943L1 1.70577C1 0.935972 1.83333 0.45485 2.5 0.839749L16 8.63397Z" fill="white"/></svg>
+        </div></div>
+        <p class="ptitle">Something in this feed is off.</p>
+        <p class="psub">Five stories are about to land. Some of them are playing you.</p>
+        <div class="phint">Click to start &rarr;</div>
+      </div>
     </div>
 
-    <div class="sectionlabel">How a playtest works</div>
+    <div class="demo-mobile">
+      <p>The demo is built for a full screen — it'll feel cramped inside this page on a phone.
+         Open it on its own instead.</p>
+      <a class="btn" href="infodemic-hub-spoke-prototype.html">Open the demo</a>
+    </div>
+
+    <div class="demo-aside">
+      <span>Solo demo · plays one story end to end · nothing is saved</span>
+      <a href="infodemic-hub-spoke-prototype.html" target="_blank" rel="noopener">Open full screen &#8599;</a>
+    </div>
+  </section>
+
+  <!-- ================= PLAYTEST ================= -->
+  <section id="playtest">
+    <div class="eyebrow"><span>Help us test it</span><span class="count">05</span></div>
+    <h2>It's a prototype. Break it.</h2>
+    <p class="sub">Grab two to four people, give it twenty minutes, then tell us everything that went wrong.</p>
 
     <div class="doors">
-      <a class="door teacher" href="infodemic-content-pipeline-prototype.html">
-        <div class="stepnum">1</div>
-        <div class="dorkicker">Set up</div>
-        <div class="dortitle">Build the feed</div>
-        <div class="dordesc">
-          One person picks the topics. The round assembles itself — you don't approve stories one by one.
-          Publishing gives you a single word, like <code>OTTER</code>, to read out to everyone else.
-        </div>
-        <div class="dorcta">Open the console <span class="arrow">&rarr;</span></div>
+      <a class="door one" href="infodemic-content-pipeline-prototype.html">
+        <div class="dnum">STEP ONE</div>
+        <h3>Build the feed</h3>
+        <p>One person picks the topics. The round assembles itself — you don't approve stories one by one.
+           Publishing gives you a single word, like <code>OTTER</code>, to read out to everyone else.</p>
+        <div class="go">Open the console <span class="arrow">&rarr;</span></div>
       </a>
 
-      <a class="door student" href="infodemic-multiplayer-prototype.html">
-        <div class="stepnum">2</div>
-        <div class="dorkicker">Play</div>
-        <div class="dortitle">Get everyone in</div>
-        <div class="dordesc">
-          Everyone opens the game on their own device. The first player enters their name and just the word,
-          and gets back a full code like <code>OTTER-4213</code>. Everyone else enters their name and that full code.
-        </div>
-        <div class="dorcta">Open the game <span class="arrow">&rarr;</span></div>
+      <a class="door two" href="infodemic-multiplayer-prototype.html">
+        <div class="dnum">STEP TWO</div>
+        <h3>Get everyone in</h3>
+        <p>Everyone opens the game on their own device. The first player enters their name and just the word,
+           and gets back a full code like <code>OTTER-4213</code>. Everyone else enters their name and that full code.</p>
+        <div class="go">Open the game <span class="arrow">&rarr;</span></div>
       </a>
 
-      <a class="door feedback" href="https://docs.google.com/forms/d/e/1FAIpQLSeq_sDe6WZ9SYxYOBk271ADGM8owfev6GI_71DawuFJrp_pLA/viewform" target="_blank" rel="noopener">
-        <div class="stepnum">3</div>
-        <div class="dorkicker">Afterwards</div>
-        <div class="dortitle">Tell us what broke</div>
-        <div class="dordesc">
-          Every player fills this in separately — including the kids. Three minutes. Confusing, boring, or
-          broken is the most useful thing you can tell us, so please don't smooth it over.
-        </div>
-        <div class="dorcta">Open the form <span class="arrow">&rarr;</span></div>
+      <a class="door three" href="https://docs.google.com/forms/d/e/1FAIpQLSeq_sDe6WZ9SYxYOBk271ADGM8owfev6GI_71DawuFJrp_pLA/viewform" target="_blank" rel="noopener">
+        <div class="dnum">STEP THREE</div>
+        <h3>Tell us what broke</h3>
+        <p>Every player fills this in separately — including the kids. Three minutes. Confusing, boring or
+           broken is the most useful thing you can tell us, so please don't smooth it over.</p>
+        <div class="go">Open the form <span class="arrow">&rarr;</span></div>
       </a>
     </div>
 
-    <div class="aside">
-      <b>This is a prototype, and the multiplayer part is new.</b> If the game misbehaves — someone can't join,
-      the screen doesn't update, a code doesn't work — that's exactly what we're trying to find. Note what
-      happened and put it in the form.
+    <div class="caveat">
+      <b>The multiplayer part is new, and it will misbehave.</b> Someone can't join, a screen doesn't update,
+      a code doesn't work — that's exactly what we're trying to find. Note what happened and put it in the form.
     </div>
+  </section>
 
-    <footer>
-      Assembly Code fellowship build &middot; prototype<br>
-      Open source at <a href="https://github.com/taralif/infodemic">github.com/taralif/infodemic</a>
-    </footer>
-  </div>
+  <footer>
+    <div class="footrow">
+      <span>Assembly Code fellowship build · prototype, 2026</span>
+      <span>Open source at <a href="https://github.com/taralif/infodemic">github.com/taralif/infodemic</a></span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var poster = document.getElementById('demoPoster');
+  if(!poster) return;
+  function load(){
+    var f = document.createElement('iframe');
+    f.className = 'demo-frame';
+    f.src = 'infodemic-hub-spoke-prototype.html';
+    f.title = 'Infodemic playable demo';
+    f.setAttribute('allow','fullscreen');
+    poster.replaceWith(f);
+  }
+  poster.addEventListener('click', load);
+  poster.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); load(); }
+  });
+})();
+</script>
 </body>
 </html>

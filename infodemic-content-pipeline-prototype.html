@@ -231,21 +231,12 @@
     width:100%; min-height:180px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
     border-radius:10px; font-family:var(--mono); font-size:11px; padding:10px; line-height:1.5; margin-top:10px;
   }
-  .srcline{font-size:11.5px; color:var(--faint); line-height:1.5;}
-  .srcline b{color:var(--dim); font-weight:600;}
   .pullerr{color:var(--red); font-size:12px; line-height:1.5; margin-top:7px;}
   .notwired{
     font-size:12.5px; line-height:1.6; color:var(--faint); border:1px dashed var(--grid);
     border-radius:12px; padding:13px 14px;
   }
   .notwired b{color:var(--dim);}
-  .footnote{
-    max-width:1180px; margin:0 auto; padding:26px 26px 40px; color:var(--faint);
-    font-size:12.5px; line-height:1.7; border-top:1px solid var(--grid);
-  }
-  .footnote b{color:var(--dim);}
-  .footnote code{font-family:var(--mono); font-size:11.5px; color:var(--dim);}
-
   /* ---- session settings (advisory until the game reads them) ---- */
   .inert-badge{
     font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
@@ -287,7 +278,6 @@
     <div class="brand">INFODEMIC</div>
     <div class="sub">Content pipeline — teacher console</div>
   </div>
-  <div class="srcline" id="pull-tag" style="text-align:right;"></div>
 </header>
 
 <div class="wrap">
@@ -295,13 +285,6 @@
   <div class="steps">
     <button class="step active" id="s1" data-go="1"><span class="n">1</span>Build the feed</button>
     <button class="step" id="s2" data-go="2"><span class="n">2</span>Publish</button>
-  </div>
-
-  <div class="lexicon">
-    <span><b>Story</b> <i>one thing to figure out; a table that chases one spends about 10 minutes on it</i></span>
-    <span><b>Feed</b> <i>the group of stories you build here</i></span>
-    <span><b>Session</b> <i>one class playing your feed — the cases they file are a slice of it</i></span>
-    <span><b>Round</b> <i>a phase inside one story — gut check, investigation, note. Nothing on this screen is a round.</i></span>
   </div>
 
   <!-- ================= STEP 1 ================= -->
@@ -385,7 +368,7 @@
           </select>
           <button class="btn primary big" id="publish-btn">Publish this session →</button>
           <div class="pullerr hide" id="publish-error"></div>
-          <div class="publish-hint">Generates one word your whole table or class uses to join — no separate room step.</div>
+          <div class="publish-hint">Generates one word for the whole room. Each table's first player turns it into that table's own code.</div>
           <div class="export-panel">
             <button class="export-link" id="export-link">View draft for vetting (Markdown) ▾</button>
             <div id="export-panel-body" style="display:none;">
@@ -403,7 +386,7 @@
     <div class="cols">
       <div class="maincol">
         <div class="codebox">
-          <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:14px;">Everyone enters this word</div>
+          <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:14px;">Read this word to the room</div>
           <div class="codeword" id="code">—</div>
           <div class="codesub" id="codesub"></div>
           <button class="btn small" id="copy-code-btn" style="margin-top:14px;">Copy word</button>
@@ -436,19 +419,6 @@
       </aside>
     </div>
   </section>
-</div>
-
-<div class="footnote">
-  <b>Live as of 9/1/2026:</b> Publish writes a real <code>drops</code> row to the shared Supabase
-  project and the word it returns is immediately joinable — enter it in the game
-  (<code>infodemic-multiplayer-prototype.html</code>) and a table spins up with your content.
-  The whole feed publishes — Round 1 serves all of it, and the session settings above are advisory
-  until the game reads them.
-  <b>Pull more stories</b> runs the generation Edge Function (NewsData.io headlines, framings and
-  Round 2 content generated per story) — it takes a minute, and it <i>replaces</i> the candidate
-  pool rather than growing it, so stories you already added to your feed are kept here but older
-  candidates you didn't add won't come back. Publishing is a first draft, not a ship: the vetting
-  pass in <code>curation-charter.md</code> still applies, and the Markdown draft above is there for it.
 </div>
 
 
@@ -792,11 +762,11 @@ function orderedFeed(){ return FEED.slice(); }
 
 // ---- candidate list -------------------------------------------------------
 function renderPullBar(){
-  $("pull-tag").innerHTML = storiesSource === "live"
-    ? "Source: <b>NewsData.io + Claude-generated</b><br>Pulled " + (storiesPulledAt ? new Date(storiesPulledAt).toLocaleString() : "just now")
-    : "Source: <b>mock news feed</b><br>stands in for NewsData.io free tier";
-  $("pull-line").innerHTML = (storiesSource === "live" ? "Generated candidates" : "Mock candidates") +
-    " · <b>" + STORIES.length + " stories</b>" + (refreshing ? " · pulling and generating…" : "");
+  var when = (storiesSource === "live" && storiesPulledAt)
+    ? " · pulled " + new Date(storiesPulledAt).toLocaleString()
+    : "";
+  $("pull-line").innerHTML = "<b>" + STORIES.length + " stories</b> to choose from" + when +
+    (refreshing ? " · pulling and generating…" : "");
   var btn = $("refresh-btn");
   btn.disabled = refreshing;
   btn.textContent = refreshing ? "Pulling + generating…" : "Pull more stories →";
