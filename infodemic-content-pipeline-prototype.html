@@ -267,19 +267,6 @@
   }
   .suggestline b{color:var(--ink);}
   .feednote{font-size:12px; color:var(--faint); line-height:1.55; margin:-2px 0 11px;}
-  .feeditem.picked{border-color:var(--blue-line); background:var(--blue-soft);}
-  .pin{
-    background:none; border:none; cursor:pointer; padding:0 3px; line-height:1; font-size:12px;
-    color:var(--faint); flex:0 0 auto;
-  }
-  .pin:hover:not(:disabled){color:var(--blue);}
-  .pin.on{color:var(--blue);}
-  .pin:disabled{opacity:.25; cursor:default;}
-  .openerflag{
-    font-size:9.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
-    color:var(--blue); flex:0 0 auto;
-  }
-
   /* .cols aligns to flex-start, which on a narrow screen stacks the columns and
      lets each size to its max-content instead of the container — that is what
      pushed the page sideways at 414px. */
@@ -383,8 +370,8 @@
 
           <div class="inertnote">
             <b>Nothing here reaches the game yet.</b> The table currently files two cases and picks the
-            second one itself. These settings shape what you see here and the order stories publish in;
-            wiring them into play is waiting on the multiplayer conversation.
+            second one itself. This number only shapes what you see on this screen; wiring it into play
+            is waiting on the multiplayer conversation.
           </div>
         </div>
 
@@ -427,9 +414,9 @@
           <div id="playlist"></div>
           <div id="savedsummary" class="empty" style="margin-top:10px;"></div>
           <div class="inertnote" style="margin-top:12px;">
-            <b>All of it publishes.</b> Round 1 serves the whole feed; the cases number decides how many
-            of them a table takes all the way through. Stories you picked are first in the order, which is
-            the only part of the setting the game can act on today.
+            <b>All of it publishes.</b> Round 1 serves the whole feed; the cases number is how many of
+            them a table takes all the way through. Which ones those are is the table's call at triage —
+            that choice is the lesson, so it isn't yours to make here.
           </div>
         </div>
       </div>
@@ -744,7 +731,7 @@ var storiesPulledAt = null;
 var refreshing = false;
 var refreshError = null;
 
-var FEED = [];            // [{storyId, subject, source, url, headline, variants, hook, background, clips, picked}]
+var FEED = [];            // [{storyId, subject, source, url, headline, variants, hook, background, clips}]
 var sessionCases = DEFAULT_CASES;
 var touchedCases = false; // once the teacher sets a number, stop tracking the feed
 var minutes = null;       // a period the teacher can pick; only ever a suggestion
@@ -769,8 +756,7 @@ function errText(err){
 function cardFromStory(story){
   return { storyId: story.id, subject: story.subject, source: story.source, url: story.url,
            headline: story.headline, variants: story.lenses || [],
-           hook: story.hook || null, background: story.background || null, clips: story.clips || [],
-           picked: false };
+           hook: story.hook || null, background: story.background || null, clips: story.clips || [] };
 }
 function inFeed(id){
   for (var i=0;i<FEED.length;i++){ if (FEED[i].storyId === id) return i; }
@@ -782,7 +768,6 @@ function inFeed(id){
 // CASES is how many of those a table takes all the way through — the real length
 // lever, and the game's SESSION_CASES. The opening story everybody does together
 // counts as one of them.
-function pickedCards(){ return FEED.filter(function(d){ return d.picked; }); }
 function clampCases(){
   // Until the teacher picks a number it follows the feed — otherwise adding the
   // first story pins the session at one case forever.
@@ -791,8 +776,6 @@ function clampCases(){
   }
   if (sessionCases < 1) sessionCases = 1;
   if (FEED.length && sessionCases > FEED.length) sessionCases = FEED.length;
-  var picks = pickedCards().length;
-  if (sessionCases < picks) sessionCases = picks;
 }
 function estimateMin(){
   if (!FEED.length) return 0;
@@ -803,11 +786,9 @@ function estimateMin(){
 function casesThatFit(m){
   return Math.max(1, Math.floor((m - SWEEP_MIN) / MIN_PER_CASE));
 }
-// Publish order: the stories the teacher picked lead, in their existing order.
-// Card order is the only part of these settings the game can act on today.
-function orderedFeed(){
-  return pickedCards().concat(FEED.filter(function(d){ return !d.picked; }));
-}
+// The whole feed publishes, in the order the curator arranged it. WHICH stories
+// get chased is the table's call at triage — deliberately not a teacher setting.
+function orderedFeed(){ return FEED.slice(); }
 
 // ---- candidate list -------------------------------------------------------
 function renderPullBar(){
@@ -857,26 +838,15 @@ function renderFeed(){
   var has = FEED.length > 0;
   $("fempty").className = has ? "empty hide" : "empty";
   $("fcount").textContent = FEED.length + (FEED.length === 1 ? " story" : " stories");
-  var picks = pickedCards().length;
-  $("feednote").innerHTML = has
-    ? "Round 1 serves all of these. Star the ones you want the table to actually work through — " +
-      (picks ? "<b style=\"color:var(--ink)\">" + picks + " picked</b>, the rest are the table's call." : "leave them all unstarred and the table picks.")
+  $("feednote").textContent = has
+    ? "Round 1 serves all of these in 60 seconds. Which ones the table then works through is their call at triage — that choice is the lesson."
     : "";
   if (!has) return;
 
   FEED.forEach(function(d, idx){
     var row = document.createElement("div");
-    row.className = "feeditem" + (d.picked ? " picked" : "");
+    row.className = "feeditem";
     var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (idx+1);
-
-    var pin = document.createElement("button");
-    pin.className = "pin" + (d.picked ? " on" : "");
-    pin.textContent = d.picked ? "★" : "☆";
-    pin.title = d.picked ? "Leave this one to the table" : "Pick this one to be played";
-    pin.disabled = !d.picked && pickedCards().length >= sessionCases;
-    pin.setAttribute("aria-pressed", d.picked ? "true" : "false");
-    pin.onclick = function(){ d.picked = !d.picked; renderAll(); };
-
     var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
 
     var arr = document.createElement("span"); arr.className = "arrows";
@@ -889,17 +859,16 @@ function renderFeed(){
     var x = document.createElement("button"); x.className = "x"; x.textContent = "×"; x.title = "Take out of the feed";
     x.onclick = function(){ FEED.splice(idx,1); renderAll(); };
 
-    row.appendChild(pos); row.appendChild(pin); row.appendChild(t); row.appendChild(arr); row.appendChild(x);
+    row.appendChild(pos); row.appendChild(t); row.appendChild(arr); row.appendChild(x);
     host.appendChild(row);
   });
 }
 
 function renderSession(){
   var cases = Math.min(sessionCases, FEED.length || sessionCases);
-  var picks = pickedCards().length;
 
   $("nval").textContent = FEED.length ? cases : sessionCases;
-  $("minus").disabled = sessionCases <= 1 || sessionCases <= picks;
+  $("minus").disabled = sessionCases <= 1;
   $("plus").disabled = FEED.length > 0 && sessionCases >= FEED.length;
   $("caseshint").textContent = "";
   $("casesnote").textContent = FEED.length === 0
@@ -907,10 +876,7 @@ function renderSession(){
     : (sessionCases === 1
         ? "One case: the story the whole table does together, and that's the session."
         : "The story everyone does together, plus " + (sessionCases - 1) +
-          (sessionCases - 1 === 1 ? " more" : " more") + ". " +
-          (picks === 0 ? "The table chooses which." :
-           picks >= sessionCases ? "You've picked all of them." :
-           "You've picked " + picks + "; the table chooses the rest."));
+          (sessionCases - 1 === 1 ? " the table chooses at triage." : " they choose at triage."));
 
   Array.prototype.forEach.call(document.querySelectorAll("#minutes button"), function(b){
     b.className = (minutes !== null && +b.getAttribute("data-m") === minutes) ? "on" : "";
@@ -969,9 +935,8 @@ function buildExport(){
   lines.push("*" + cards.length + " stories in the feed · " + Math.min(sessionCases, cards.length) +
              " cases to file · about " + estimateMin() + " min · " +
              flagN + " spun / " + hygN + " straight framings, AI-personalized per player*");
-  var picks = pickedCards();
-  if (picks.length) lines.push("*Picked to be played: " + picks.map(function(d){ return d.headline; }).join(" / ") + "*");
-  lines.push("*Session settings are advisory — the game files 2 cases and picks the second itself until it reads them.*");
+  lines.push("*Which stories get chased is the table's call at triage, not the curator's.*");
+  lines.push("*The cases number is advisory — the game files 2 until it reads the setting.*");
   lines.push("");
   lines.push("| # | Subject | AI-personalized framings (curator did not choose these) |");
   lines.push("|---|---|---|");
@@ -1000,11 +965,6 @@ function renderPublished(){
     var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (i+1);
     var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
     row.appendChild(pos); row.appendChild(t);
-    if (d.picked){
-      var flag = document.createElement("span"); flag.className = "openerflag";
-      flag.textContent = (i === 0 ? "opens" : "picked");
-      row.appendChild(flag);
-    }
     host.appendChild(row);
   });
   $("playsummary").textContent = cards.length + " stories · " + Math.min(sessionCases, cards.length) +
