@@ -245,6 +245,52 @@
   }
   .footnote b{color:var(--dim);}
   .footnote code{font-family:var(--mono); font-size:11.5px; color:var(--dim);}
+
+  /* ---- session settings (advisory until the game reads them) ---- */
+  .inert-badge{
+    font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+    color:var(--gold); background:rgba(255,159,10,.1); border:1px solid rgba(255,159,10,.34);
+    border-radius:7px; padding:3px 8px;
+  }
+  .inertnote{
+    font-size:12px; line-height:1.6; color:var(--faint); border:1px dashed rgba(255,159,10,.3);
+    background:rgba(255,159,10,.04); border-radius:11px; padding:11px 13px; margin-top:12px;
+  }
+  .inertnote b{color:var(--gold);}
+  .sublabel{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; font-weight:700;
+    color:var(--faint); margin:2px 0 8px;
+  }
+  .suggestline{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px;
+    font-size:12.5px; color:var(--dim); line-height:1.5;
+  }
+  .suggestline b{color:var(--ink);}
+  .feednote{font-size:12px; color:var(--faint); line-height:1.55; margin:-2px 0 11px;}
+  .feeditem.picked{border-color:var(--blue-line); background:var(--blue-soft);}
+  .pin{
+    background:none; border:none; cursor:pointer; padding:0 3px; line-height:1; font-size:12px;
+    color:var(--faint); flex:0 0 auto;
+  }
+  .pin:hover:not(:disabled){color:var(--blue);}
+  .pin.on{color:var(--blue);}
+  .pin:disabled{opacity:.25; cursor:default;}
+  .openerflag{
+    font-size:9.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+    color:var(--blue); flex:0 0 auto;
+  }
+
+  /* .cols aligns to flex-start, which on a narrow screen stacks the columns and
+     lets each size to its max-content instead of the container — that is what
+     pushed the page sideways at 414px. */
+  @media (max-width:960px){
+    .cols{align-items:stretch;}
+    .maincol, .rail{width:100%; max-width:100%;}
+  }
+
+  /* console_extra is appended after the base sheet, so its display rules would
+     otherwise beat .hide on equal specificity — keep the toggle authoritative. */
+  .hide{display:none !important;}
 </style>
 </head>
 <body>
@@ -265,9 +311,9 @@
   </div>
 
   <div class="lexicon">
-    <span><b>Story</b> <i>one thing to figure out — about 10 minutes at a table</i></span>
+    <span><b>Story</b> <i>one thing to figure out; a table that chases one spends about 10 minutes on it</i></span>
     <span><b>Feed</b> <i>the group of stories you build here</i></span>
-    <span><b>Session</b> <i>one class playing part of your feed</i></span>
+    <span><b>Session</b> <i>one class playing your feed — the cases they file are a slice of it</i></span>
     <span><b>Round</b> <i>a phase inside one story — gut check, investigation, note. Nothing on this screen is a round.</i></span>
   </div>
 
@@ -291,45 +337,54 @@
             <span class="count" id="fcount">0 stories</span>
           </div>
 
-          <div class="playrow hide" id="playrow">
-            <div class="lbl">This session they play <b id="playn">0</b> of <b id="playtotal">0</b></div>
-            <div class="stepper">
-              <button id="minus" aria-label="Fewer stories this session">−</button>
-              <span class="val" id="nval">0</span>
-              <button id="plus" aria-label="More stories this session">+</button>
-            </div>
-          </div>
-
+          <div class="feednote" id="feednote"></div>
           <div id="feedlist"></div>
-          <div class="empty" id="fempty">Nothing here yet. Add stories from the left and they'll stack up in the order you added them.</div>
+          <div class="empty" id="fempty">Nothing here yet. Add stories from the left — everything you add gets served in Round 1.</div>
           <button class="btn ghost small" id="clearbtn" style="margin-top:11px;width:100%;">Clear the feed</button>
         </div>
 
         <div class="box">
-          <div class="boxhead"><h2 class="sec">When the session ends</h2></div>
-          <div class="endcards">
-            <button class="endcard on" data-end="stories">
-              <div class="t">By stories</div>
-              <div class="d">You pick the number they play.</div>
-            </button>
-            <button class="endcard" data-end="time">
-              <div class="t">By the clock</div>
-              <div class="d">You give it a period; it sizes the session to fit.</div>
-            </button>
+          <div class="boxhead">
+            <h2 class="sec">This session</h2>
+            <span class="inert-badge">not enforced yet</span>
           </div>
-          <div class="segmented hide" id="minutes">
-            <button data-m="30">30 min</button><button data-m="45" class="on">45 min</button>
+
+          <div class="playrow">
+            <div class="lbl">Cases they file<b id="caseshint"></b></div>
+            <div class="stepper">
+              <button id="minus" aria-label="Fewer cases">&minus;</button>
+              <span class="val" id="nval">2</span>
+              <button id="plus" aria-label="More cases">+</button>
+            </div>
+          </div>
+          <div class="zonenote" id="casesnote" style="margin:-6px 0 13px;"></div>
+
+          <div class="sublabel">How long you've got</div>
+          <div class="segmented" id="minutes">
+            <button data-m="30">30 min</button><button data-m="45">45 min</button>
             <button data-m="60">60 min</button><button data-m="90">90 min</button>
           </div>
-          <div class="shapecard">
-            <div><div class="k">Runs about</div><div class="v" id="shape-min">—</div></div>
-            <div><div class="k">Stories</div><div class="v" id="shape-n">—</div></div>
-            <div><div class="k">Per table</div><div class="v">3–5</div></div>
+          <div class="suggestline hide" id="suggest">
+            <span id="suggest-text"></span>
+            <button class="btn small" id="use-suggest">Use it</button>
           </div>
-          <div class="zonenote" style="margin:9px 0 0;">Figuring on about 10 minutes a story — gut check, investigation, then the note. Only the stories in the session get published; the rest stay here for next time.</div>
+
+          <div class="shapecard">
+            <div><div class="k">Runs about</div><div class="v" id="shape-min">&mdash;</div></div>
+            <div><div class="k">Cases</div><div class="v" id="shape-cases">&mdash;</div></div>
+            <div><div class="k">In the feed</div><div class="v" id="shape-feed">&mdash;</div></div>
+          </div>
+          <div class="zonenote" style="margin:9px 0 0;">Round 1 shows the whole feed in 60 seconds. A case they actually chase &mdash; gut check, investigation, note &mdash; runs about 10 minutes.</div>
+
           <div class="warn hide" id="allstraight">
-            <span>⚠</span>
-            <span>Every story in this session plays straight — no two players would see a different version, so there's nothing to disagree about. Add one more story.</span>
+            <span>&#9888;</span>
+            <span>Nothing in this feed plays spun &mdash; no two players would see a different version, so there's nothing to disagree about. Add one more story.</span>
+          </div>
+
+          <div class="inertnote">
+            <b>Nothing here reaches the game yet.</b> The table currently files two cases and picks the
+            second one itself. These settings shape what you see here and the order stories publish in;
+            wiring them into play is waiting on the multiplayer conversation.
           </div>
         </div>
 
@@ -371,6 +426,11 @@
           <div class="boxhead"><h2 class="sec">What they'll play</h2><span class="count" id="playsummary"></span></div>
           <div id="playlist"></div>
           <div id="savedsummary" class="empty" style="margin-top:10px;"></div>
+          <div class="inertnote" style="margin-top:12px;">
+            <b>All of it publishes.</b> Round 1 serves the whole feed; the cases number decides how many
+            of them a table takes all the way through. Stories you picked are first in the order, which is
+            the only part of the setting the game can act on today.
+          </div>
         </div>
       </div>
 
@@ -395,7 +455,8 @@
   <b>Live as of 9/1/2026:</b> Publish writes a real <code>drops</code> row to the shared Supabase
   project and the word it returns is immediately joinable — enter it in the game
   (<code>infodemic-multiplayer-prototype.html</code>) and a table spins up with your content.
-  Only the stories in the session are published; anything saved for later stays in this console.
+  The whole feed publishes — Round 1 serves all of it, and the session settings above are advisory
+  until the game reads them.
   <b>Pull more stories</b> runs the generation Edge Function (NewsData.io headlines, framings and
   Round 2 content generated per story) — it takes a minute, and it <i>replaces</i> the candidate
   pool rather than growing it, so stories you already added to your feed are kept here but older
@@ -671,8 +732,11 @@ var MOCK_STORIES = [
 // never strands what's already been added.
 // ---------------------------------------------------------------------------
 
-var MIN_PER_STORY = 10;   // a table's whole pass through one story
-var DEFAULT_N = 5;
+// Round 1 serves the WHOLE feed in 60s; only the cases a table chases cost real
+// time (gut check -> investigation -> note). See infodemic-triage-and-drafting-beat.
+var MIN_PER_CASE = 10;
+var SWEEP_MIN = 3;        // round 1 + the reveal + the investigate tour, flat
+var DEFAULT_CASES = 2;    // matches the game's SESSION_CASES; includes the shared opening story
 
 var STORIES = MOCK_STORIES.slice();
 var storiesSource = "mock";   // "mock" | "live"
@@ -680,11 +744,10 @@ var storiesPulledAt = null;
 var refreshing = false;
 var refreshError = null;
 
-var FEED = [];            // [{storyId, subject, source, url, headline, variants, hook, background, clips}]
-var sessionN = DEFAULT_N;
-var touchedN = false;
-var endBy = "stories";    // "stories" | "time"
-var minutes = 45;
+var FEED = [];            // [{storyId, subject, source, url, headline, variants, hook, background, clips, picked}]
+var sessionCases = DEFAULT_CASES;
+var touchedCases = false; // once the teacher sets a number, stop tracking the feed
+var minutes = null;       // a period the teacher can pick; only ever a suggestion
 var publishedCode = null;
 var pane = 1;
 
@@ -706,7 +769,8 @@ function errText(err){
 function cardFromStory(story){
   return { storyId: story.id, subject: story.subject, source: story.source, url: story.url,
            headline: story.headline, variants: story.lenses || [],
-           hook: story.hook || null, background: story.background || null, clips: story.clips || [] };
+           hook: story.hook || null, background: story.background || null, clips: story.clips || [],
+           picked: false };
 }
 function inFeed(id){
   for (var i=0;i<FEED.length;i++){ if (FEED[i].storyId === id) return i; }
@@ -714,25 +778,36 @@ function inFeed(id){
 }
 
 // ---- session sizing -------------------------------------------------------
-// Until the curator touches the stepper, the session is "five, or the whole
-// feed if it's shorter", so adding a sixth story doesn't leave the session
-// stuck at whatever the feed happened to be when it had one.
-function syncN(){
-  if (!touchedN){ sessionN = Math.min(DEFAULT_N, FEED.length); return; }
-  if (sessionN > FEED.length) sessionN = FEED.length;
-  if (sessionN < 1) sessionN = Math.min(1, FEED.length);
+// Two numbers, not one. The FEED is what round 1 serves (all of it, 60 seconds).
+// CASES is how many of those a table takes all the way through — the real length
+// lever, and the game's SESSION_CASES. The opening story everybody does together
+// counts as one of them.
+function pickedCards(){ return FEED.filter(function(d){ return d.picked; }); }
+function clampCases(){
+  // Until the teacher picks a number it follows the feed — otherwise adding the
+  // first story pins the session at one case forever.
+  if (!touchedCases){
+    sessionCases = FEED.length ? Math.min(DEFAULT_CASES, FEED.length) : DEFAULT_CASES;
+  }
+  if (sessionCases < 1) sessionCases = 1;
+  if (FEED.length && sessionCases > FEED.length) sessionCases = FEED.length;
+  var picks = pickedCards().length;
+  if (sessionCases < picks) sessionCases = picks;
 }
-function reachInTime(){
-  return Math.max(1, Math.min(FEED.length, Math.floor(minutes / MIN_PER_STORY)));
-}
-// "By the clock" is not a timer the game enforces — it's another way of
-// choosing the number, sized to the period. Either way the session is a
-// definite list of stories, which is what actually gets published.
-function playCount(){
+function estimateMin(){
   if (!FEED.length) return 0;
-  return endBy === "time" ? reachInTime() : Math.min(sessionN, FEED.length);
+  return SWEEP_MIN + Math.min(sessionCases, FEED.length) * MIN_PER_CASE;
 }
-function sessionCards(){ return FEED.slice(0, playCount()); }
+// What fits in a period the teacher named. A suggestion — it never moves the
+// number on its own.
+function casesThatFit(m){
+  return Math.max(1, Math.floor((m - SWEEP_MIN) / MIN_PER_CASE));
+}
+// Publish order: the stories the teacher picked lead, in their existing order.
+// Card order is the only part of these settings the game can act on today.
+function orderedFeed(){
+  return pickedCards().concat(FEED.filter(function(d){ return !d.picked; }));
+}
 
 // ---- candidate list -------------------------------------------------------
 function renderPullBar(){
@@ -781,68 +856,83 @@ function renderFeed(){
   var host = $("feedlist"); host.innerHTML = "";
   var has = FEED.length > 0;
   $("fempty").className = has ? "empty hide" : "empty";
-  $("playrow").className = has ? "playrow" : "playrow hide";
   $("fcount").textContent = FEED.length + (FEED.length === 1 ? " story" : " stories");
+  var picks = pickedCards().length;
+  $("feednote").innerHTML = has
+    ? "Round 1 serves all of these. Star the ones you want the table to actually work through — " +
+      (picks ? "<b style=\"color:var(--ink)\">" + picks + " picked</b>, the rest are the table's call." : "leave them all unstarred and the table picks.")
+    : "";
   if (!has) return;
 
-  var playing = playCount();
-  var saved = FEED.length - playing;
-
-  var h1 = document.createElement("div");
-  h1.className = "zonehead first";
-  h1.textContent = "plays this session";
-  host.appendChild(h1);
-
   FEED.forEach(function(d, idx){
-    if (idx === playing && saved > 0){
-      var h2 = document.createElement("div");
-      h2.className = "zonehead"; h2.textContent = "saved for later · " + saved;
-      host.appendChild(h2);
-      var note = document.createElement("div");
-      note.className = "zonenote";
-      note.textContent = "Still in your feed, just not in this session — they don't get published today and they're here for the next class.";
-      host.appendChild(note);
-    }
     var row = document.createElement("div");
-    row.className = "feeditem" + (idx >= playing ? " saved" : "");
+    row.className = "feeditem" + (d.picked ? " picked" : "");
     var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (idx+1);
+
+    var pin = document.createElement("button");
+    pin.className = "pin" + (d.picked ? " on" : "");
+    pin.textContent = d.picked ? "★" : "☆";
+    pin.title = d.picked ? "Leave this one to the table" : "Pick this one to be played";
+    pin.disabled = !d.picked && pickedCards().length >= sessionCases;
+    pin.setAttribute("aria-pressed", d.picked ? "true" : "false");
+    pin.onclick = function(){ d.picked = !d.picked; renderAll(); };
+
     var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
+
     var arr = document.createElement("span"); arr.className = "arrows";
     var up = document.createElement("button"); up.textContent = "▲"; up.disabled = idx === 0; up.title = "Move up";
     up.onclick = function(){ var v = FEED.splice(idx,1)[0]; FEED.splice(idx-1,0,v); renderAll(); };
     var dn = document.createElement("button"); dn.textContent = "▼"; dn.disabled = idx === FEED.length-1; dn.title = "Move down";
     dn.onclick = function(){ var v = FEED.splice(idx,1)[0]; FEED.splice(idx+1,0,v); renderAll(); };
     arr.appendChild(up); arr.appendChild(dn);
+
     var x = document.createElement("button"); x.className = "x"; x.textContent = "×"; x.title = "Take out of the feed";
     x.onclick = function(){ FEED.splice(idx,1); renderAll(); };
-    row.appendChild(pos); row.appendChild(t); row.appendChild(arr); row.appendChild(x);
+
+    row.appendChild(pos); row.appendChild(pin); row.appendChild(t); row.appendChild(arr); row.appendChild(x);
     host.appendChild(row);
   });
 }
 
 function renderSession(){
-  var playing = playCount();
-  $("playn").textContent = playing;
-  $("playtotal").textContent = FEED.length;
-  $("nval").textContent = playing;
-  $("minus").disabled = endBy === "time" || playing <= 1;
-  $("plus").disabled = endBy === "time" || sessionN >= FEED.length;
+  var cases = Math.min(sessionCases, FEED.length || sessionCases);
+  var picks = pickedCards().length;
 
-  var cards = document.querySelectorAll(".endcard");
-  Array.prototype.forEach.call(cards, function(c){
-    c.className = "endcard" + (c.getAttribute("data-end") === endBy ? " on" : "");
-  });
-  $("minutes").className = endBy === "time" ? "segmented" : "segmented hide";
+  $("nval").textContent = FEED.length ? cases : sessionCases;
+  $("minus").disabled = sessionCases <= 1 || sessionCases <= picks;
+  $("plus").disabled = FEED.length > 0 && sessionCases >= FEED.length;
+  $("caseshint").textContent = "";
+  $("casesnote").textContent = FEED.length === 0
+    ? "Add stories first."
+    : (sessionCases === 1
+        ? "One case: the story the whole table does together, and that's the session."
+        : "The story everyone does together, plus " + (sessionCases - 1) +
+          (sessionCases - 1 === 1 ? " more" : " more") + ". " +
+          (picks === 0 ? "The table chooses which." :
+           picks >= sessionCases ? "You've picked all of them." :
+           "You've picked " + picks + "; the table chooses the rest."));
+
   Array.prototype.forEach.call(document.querySelectorAll("#minutes button"), function(b){
-    b.className = (+b.getAttribute("data-m") === minutes) ? "on" : "";
+    b.className = (minutes !== null && +b.getAttribute("data-m") === minutes) ? "on" : "";
   });
+  var sug = $("suggest");
+  if (minutes === null || !FEED.length){
+    sug.className = "suggestline hide";
+  } else {
+    var fits = Math.min(casesThatFit(minutes), FEED.length);
+    sug.className = "suggestline";
+    $("suggest-text").innerHTML = fits === sessionCases
+      ? "<b>" + minutes + " min</b> fits about <b>" + fits + "</b> — that's what you've got."
+      : "<b>" + minutes + " min</b> fits about <b>" + fits + (fits === 1 ? " case" : " cases") + "</b>.";
+    $("use-suggest").className = fits === sessionCases ? "btn small hide" : "btn small";
+  }
 
-  $("shape-min").textContent = FEED.length === 0 ? "—"
-    : (endBy === "time" ? minutes + " min" : (playing * MIN_PER_STORY) + " min");
-  $("shape-n").textContent = FEED.length === 0 ? "—" : playing;
+  $("shape-min").textContent = FEED.length === 0 ? "—" : estimateMin() + " min";
+  $("shape-cases").textContent = FEED.length === 0 ? "—" : cases;
+  $("shape-feed").textContent = FEED.length === 0 ? "—" : FEED.length;
 
   var anySpun = false;
-  sessionCards().forEach(function(d){
+  FEED.forEach(function(d){
     (d.variants || []).forEach(function(v){ if (v.cat === "red") anySpun = true; });
   });
   $("allstraight").className = (FEED.length > 0 && !anySpun) ? "warn" : "warn hide";
@@ -853,7 +943,7 @@ function renderSession(){
 
 // ---- publish --------------------------------------------------------------
 function cardsForPublish(){
-  return sessionCards().map(function(d){
+  return orderedFeed().map(function(d){
     return {
       id: d.storyId, subject: d.subject, source: d.source, sourceUrl: d.url, headline: d.headline,
       variants: (d.variants || []).map(function(v){ return { tell: v.tell, cat: v.cat, claim: v.claim, note: v.note }; }),
@@ -867,7 +957,7 @@ function cardsForPublish(){
 }
 
 function buildExport(){
-  var cards = sessionCards();
+  var cards = orderedFeed();
   var flagN = 0, hygN = 0;
   cards.forEach(function(d){ (d.variants||[]).forEach(function(v){ if (v.cat==="red") flagN++; else hygN++; }); });
   var subjects = [];
@@ -876,9 +966,12 @@ function buildExport(){
   lines.push("# Feed drop — session draft, DRAFT FOR VETTING");
   lines.push("*Subjects in this session: " + (subjects.length ? subjects.join(", ") : "(none)") + "*");
   if (publishedCode) lines.push("*Published word: " + publishedCode + "*");
-  lines.push("*" + cards.length + " stories · about " + (cards.length * MIN_PER_STORY) + " min · " +
+  lines.push("*" + cards.length + " stories in the feed · " + Math.min(sessionCases, cards.length) +
+             " cases to file · about " + estimateMin() + " min · " +
              flagN + " spun / " + hygN + " straight framings, AI-personalized per player*");
-  if (FEED.length > cards.length) lines.push("*" + (FEED.length - cards.length) + " more saved in the feed, not published*");
+  var picks = pickedCards();
+  if (picks.length) lines.push("*Picked to be played: " + picks.map(function(d){ return d.headline; }).join(" / ") + "*");
+  lines.push("*Session settings are advisory — the game files 2 cases and picks the second itself until it reads them.*");
   lines.push("");
   lines.push("| # | Subject | AI-personalized framings (curator did not choose these) |");
   lines.push("|---|---|---|");
@@ -900,20 +993,23 @@ function renderPublished(){
   $("codesub").innerHTML = publishedCode
     ? "Say the word — <b style=\"color:var(--ink)\">" + publishedCode + "</b> — to your class. Each table's first player types just this word at the join screen and gets a table number back; everyone else at that table types the full code they're given. A second table typing the same word gets its own table, same content."
     : "";
-  var cards = sessionCards();
+  var cards = orderedFeed();
   var host = $("playlist"); host.innerHTML = "";
   cards.forEach(function(d, i){
     var row = document.createElement("div"); row.className = "feeditem";
     var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (i+1);
     var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
     row.appendChild(pos); row.appendChild(t);
+    if (d.picked){
+      var flag = document.createElement("span"); flag.className = "openerflag";
+      flag.textContent = (i === 0 ? "opens" : "picked");
+      row.appendChild(flag);
+    }
     host.appendChild(row);
   });
-  $("playsummary").textContent = cards.length + " of " + FEED.length + " · about " + (cards.length * MIN_PER_STORY) + " min";
-  var saved = FEED.length - cards.length;
-  $("savedsummary").textContent = saved > 0
-    ? saved + (saved === 1 ? " story stays" : " stories stay") + " in your feed, unpublished — same feed, next class, nothing to rebuild."
-    : "";
+  $("playsummary").textContent = cards.length + " stories · " + Math.min(sessionCases, cards.length) +
+    " to file · about " + estimateMin() + " min";
+  $("savedsummary").textContent = "";
 }
 
 // ---- shell ----------------------------------------------------------------
@@ -928,23 +1024,31 @@ function go(n){
   renderAll();
 }
 function renderAll(){
-  syncN();
+  clampCases();
   renderPullBar(); renderQueue(); renderFeed(); renderSession();
   if (pane === 2) renderPublished();
 }
 
 $("clearbtn").onclick = function(){
-  FEED = []; sessionN = DEFAULT_N; touchedN = false; renderAll();
+  FEED = []; sessionCases = DEFAULT_CASES; touchedCases = false; minutes = null; renderAll();
 };
 $("back1").onclick = function(){ go(1); };
-$("minus").onclick = function(){ if (sessionN > 1){ touchedN = true; sessionN--; renderAll(); } };
-$("plus").onclick = function(){ if (sessionN < FEED.length){ touchedN = true; sessionN++; renderAll(); } };
-Array.prototype.forEach.call(document.querySelectorAll(".endcard"), function(c){
-  c.onclick = function(){ endBy = c.getAttribute("data-end"); renderAll(); };
-});
+$("minus").onclick = function(){ if (sessionCases > 1){ touchedCases = true; sessionCases--; renderAll(); } };
+$("plus").onclick = function(){ if (!FEED.length || sessionCases < FEED.length){ touchedCases = true; sessionCases++; renderAll(); } };
 Array.prototype.forEach.call(document.querySelectorAll("#minutes button"), function(b){
-  b.onclick = function(){ minutes = +b.getAttribute("data-m"); renderAll(); };
+  b.onclick = function(){
+    var m = +b.getAttribute("data-m");
+    minutes = (minutes === m) ? null : m;   // tapping the same chip clears it
+    renderAll();
+  };
 });
+// The clock only ever suggests — the teacher applies it.
+$("use-suggest").onclick = function(){
+  if (minutes === null || !FEED.length) return;
+  touchedCases = true;
+  sessionCases = Math.min(casesThatFit(minutes), FEED.length);
+  renderAll();
+};
 Array.prototype.forEach.call(document.querySelectorAll(".step"), function(s){
   s.onclick = function(){ go(+s.getAttribute("data-go")); };
 });
