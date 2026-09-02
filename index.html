@@ -312,6 +312,24 @@
   .points{ display:flex; flex-direction:column; gap:26px; margin-top:6px; }
   .point h3{ font-family:var(--serif); font-weight:400; font-size:22px; letter-spacing:-.5px; margin:0 0 7px; }
   .point p{ font-size:15.5px; color:var(--dim); line-height:1.58; margin:0; }
+
+  /* ---------- credits ---------- */
+  .credits{
+    display:grid; grid-template-columns:1fr 1fr; gap:44px;
+    padding-top:38px; margin-top:78px; border-top:1px solid var(--line);
+  }
+  @media (max-width:760px){ .credits{ grid-template-columns:1fr; gap:32px; margin-top:56px; } }
+  .credit .clabel2{
+    font-size:10.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase;
+    color:var(--faint); margin-bottom:14px;
+  }
+  .credit p{
+    font-family:var(--serif); font-weight:300; font-size:19px; line-height:1.45;
+    letter-spacing:-.3px; margin:0; color:var(--dim);
+  }
+  .credit p b{ color:var(--ink); font-weight:400; }
+  .credit p a{ color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); }
+  .credit p a:hover{ border-color:var(--ink); }
 </style>
 </head>
 <body>
@@ -557,9 +575,24 @@
     </div>
   </section>
 
+  <div class="credits">
+    <div class="credit">
+      <div class="clabel2">Where it started</div>
+      <p>Infodemic began at <a href="https://soraschools.com/" target="_blank" rel="noopener">Sora Schools</a>,
+         a project-based school for grades 6&ndash;12. Everything here comes from watching students take an
+         argument seriously when it was actually theirs to settle.</p>
+    </div>
+    <div class="credit">
+      <div class="clabel2">Where it's being built</div>
+      <p>It's being built during the <b>Assembly Code</b> fellowship, and it's free and open source
+         &mdash; <a href="https://github.com/taralif/infodemic" target="_blank" rel="noopener">AGPL-3.0 on GitHub</a>,
+         for anyone who wants to run it, teach with it, or take it somewhere else.</p>
+    </div>
+  </div>
+
   <footer>
     <div class="footrow">
-      <span>Assembly Code fellowship build · prototype, 2026</span>
+      <span>Prototype, 2026 &middot; not a finished product</span>
       <span>Open source at <a href="https://github.com/taralif/infodemic">github.com/taralif/infodemic</a></span>
     </div>
   </footer>
