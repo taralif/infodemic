@@ -3,144 +3,272 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>INFODEMIC — Content Pipeline (Teacher Console prototype)</title>
+<title>INFODEMIC — Content Pipeline (Teacher Console)</title>
 <style>
   :root{
     --bg:#0d0d0f; --grid:#38383a; --panel:#1c1c1e; --panel2:#2c2c2e;
-    --ink:#ffffff; --dim:rgba(235,235,245,.6); --faint:rgba(235,235,245,.3);
-    --green:#30d158; --red:#ff453a; --gold:#ff9f0a; --card:#2c2c2e;
-    --accent:#0a84ff; --blue:#0a84ff;
+    --ink:#ffffff; --dim:rgba(235,235,245,.6); --faint:rgba(235,235,245,.32);
+    --green:#30d158; --red:#ff453a; --gold:#ff9f0a;
+    --blue:#0a84ff; --blue-soft:rgba(10,132,255,.13); --blue-line:rgba(10,132,255,.34);
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    --mono:'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box;}
   body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
   }
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:0 26px 70px;}
   header{
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
-    padding:20px 28px; border-bottom:1px solid var(--grid);
+    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px;
+    padding:22px 26px 18px; border-bottom:1px solid var(--grid); max-width:1180px; margin:0 auto;
   }
-  header .brand{font-size:22px; font-weight:800; letter-spacing:3px; color:var(--ink);}
-  header .sub{font-size:10.5px; font-weight:700; color:var(--blue); letter-spacing:1px; text-transform:uppercase; margin-top:6px;}
-  .pull-tag{
-    font-size:11.5px; color:var(--dim); background:var(--panel);
-    border:1px solid var(--grid); border-radius:10px; padding:8px 13px; text-align:right; line-height:1.5;
+  .brand{font-size:21px; font-weight:800; letter-spacing:3px;}
+  .sub{font-size:10.5px; font-weight:700; color:var(--blue); letter-spacing:1.1px; text-transform:uppercase; margin-top:6px;}
+  .mocktag{
+    font-size:11px; color:var(--gold); border:1px solid rgba(255,159,10,.4); background:rgba(255,159,10,.1);
+    border-radius:9px; padding:6px 11px; letter-spacing:.4px; font-weight:700;
   }
-  .pull-tag b{color:var(--green);}
 
-  .strip{
-    margin:0 28px; padding:12px 16px; background:var(--panel2); border:1px solid var(--grid);
-    border-radius:14px; font-size:13.5px; color:var(--dim); line-height:1.5; margin-top:18px;
+  .steps{display:flex; gap:8px; flex-wrap:wrap; padding:18px 0 4px;}
+  .step{
+    display:flex; align-items:center; gap:9px; background:var(--panel); border:1px solid var(--grid);
+    border-radius:13px; padding:10px 15px 10px 11px; font-size:13px; color:var(--faint); cursor:pointer;
   }
-  .strip b{color:var(--ink);}
+  .step .n{
+    width:21px; height:21px; border-radius:50%; display:grid; place-items:center;
+    background:var(--panel2); color:var(--faint); font-size:11px; font-weight:800; flex:0 0 auto;
+  }
+  .step.done{color:var(--dim);}
+  .step.done .n{background:rgba(48,209,88,.16); color:var(--green);}
+  .step.active{border-color:var(--blue-line); background:var(--blue-soft); color:var(--ink); font-weight:700;}
+  .step.active .n{background:var(--blue); color:#fff;}
+  .step[disabled]{opacity:.4; cursor:default;}
 
-  main{display:flex; gap:22px; padding:20px 28px 60px; align-items:flex-start;}
-  @media (max-width:980px){ main{flex-direction:column;} }
+  h2.sec{font-size:12px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; color:var(--blue); margin:0;}
 
-  .roundcol{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:12px;}
-  .round-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;}
-  .round-head h2{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--blue); margin:0;}
-  .round-head .count{font-size:12px; color:var(--dim);}
+  .lexicon{
+    display:flex; flex-wrap:wrap; gap:0 26px; margin-top:16px; padding:12px 15px;
+    background:var(--panel2); border:1px solid var(--grid); border-left:3px solid var(--blue);
+    border-radius:12px; font-size:12.5px; line-height:1.7; color:var(--faint);
+  }
+  .lexicon span{white-space:normal;}
+  .lexicon b{color:var(--ink); font-weight:700;}
+  .lexicon i{color:var(--dim); font-style:normal;}
+  .count{font-size:12px; color:var(--dim); font-variant-numeric:tabular-nums;}
+
+  .cols{display:flex; gap:22px; align-items:flex-start; padding-top:16px;}
+  @media (max-width:960px){ .cols{flex-direction:column;} }
+  .maincol{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:11px;}
+
+  .pullbar{
+    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+    background:var(--panel2); border:1px solid var(--grid); border-radius:13px; padding:11px 14px;
+  }
+  .pullbar .when{font-size:12px; color:var(--faint); line-height:1.5;}
+  .pullbar .when b{color:var(--dim); font-weight:600;}
 
   .story{
-    background:var(--panel); border:1px solid var(--grid); border-radius:18px; padding:16px 18px;
+    background:var(--panel); border:1px solid var(--grid); border-radius:17px; padding:15px 17px;
+    display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
   }
-  .story .row1{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;}
-  .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;}
-  .chip{
-    font-size:10.5px; font-weight:700; letter-spacing:.3px; text-transform:uppercase;
-    padding:3px 9px; border-radius:8px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
+  .story.in{border-color:rgba(48,209,88,.45); background:linear-gradient(0deg,rgba(48,209,88,.05),rgba(48,209,88,.05)),var(--panel);}
+  .story.fresh{border-left:3px solid var(--blue);}
+  .story .body{min-width:0;}
+  .meta{display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-bottom:7px;}
+  .tag{
+    font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+    padding:3px 8px; border-radius:7px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
   }
-  .chip.subject{color:var(--blue); border-color:rgba(10,132,255,.3); background:rgba(10,132,255,.12);}
-  .raw-headline{font-size:17px; font-weight:700; color:var(--ink); line-height:1.35; margin:2px 0 4px;}
-  .src-line{font-size:12px; color:var(--faint);}
-  .story-actions{display:flex; gap:8px; flex:0 0 auto;}
+  .tag.subject{color:var(--blue); border-color:var(--blue-line); background:var(--blue-soft);}
+  .tag.new{color:var(--gold); border-color:rgba(255,159,10,.35); background:rgba(255,159,10,.1);}
+  .hl{font-size:16px; font-weight:700; line-height:1.35; margin:0 0 5px; text-wrap:balance;}
+  .src{font-size:12px; color:var(--faint);}
+
   .btn{
-    font-size:12.5px; font-weight:700; letter-spacing:.3px;
-    padding:9px 14px; border-radius:10px; border:1px solid var(--grid); background:var(--panel2);
-    color:var(--ink); cursor:pointer; white-space:nowrap;
+    font-size:12.5px; font-weight:700; letter-spacing:.2px; padding:9px 14px; border-radius:10px;
+    border:1px solid var(--grid); background:var(--panel2); color:var(--ink); cursor:pointer; white-space:nowrap;
   }
-  .btn:hover{border-color:var(--blue);}
-  .btn.primary{background:var(--blue); color:#fff; border-color:var(--blue);}
-  .btn.primary:hover{filter:brightness(1.1);}
+  .btn:hover{border-color:var(--blue-line);}
+  .btn.primary{background:var(--blue); border-color:var(--blue); color:#fff;}
+  .btn.primary:hover{filter:brightness(1.12);}
+  .btn.add{background:var(--green); border-color:var(--green); color:#04140a;}
+  .btn.add:hover{filter:brightness(1.08);}
   .btn.ghost{background:transparent; color:var(--dim);}
-  .btn.danger:hover{border-color:var(--red); color:var(--red);}
-  .btn:disabled{opacity:.4; cursor:default;}
-  .btn.small{padding:6px 10px; font-size:11px;}
-  .btn.big{padding:14px 18px; font-size:14px; width:100%; border-radius:14px;}
+  .btn.small{padding:6px 10px; font-size:11.5px;}
+  .btn.big{width:100%; padding:15px 18px; font-size:15px; border-radius:14px;}
+  .btn:disabled{opacity:.38; cursor:default;}
+  .btn.stub{border-style:dashed; color:var(--faint); cursor:not-allowed;}
+  .btn.stub:hover{border-color:var(--grid);}
 
-  .addback{display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;}
-  .addback-pill{
-    display:flex; align-items:center; gap:8px; background:var(--panel2); border:1px dashed var(--grid);
-    border-radius:16px; padding:6px 8px 6px 12px; font-size:12.5px; color:var(--dim);
+  .rail{flex:0 0 340px; position:sticky; top:16px; display:flex; flex-direction:column; gap:14px;}
+  @media (max-width:960px){ .rail{position:static; flex:1 1 auto; width:100%;} }
+  .box{background:var(--panel); border:1px solid var(--grid); border-radius:17px; padding:15px 17px;}
+  .boxhead{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:12px;}
+
+  .playrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--panel2); border:1px solid var(--grid); border-radius:12px; padding:10px 12px; margin-bottom:13px;
   }
-  .addback-pill button{
-    background:var(--green); color:#04140a; border:none; border-radius:12px; padding:3px 9px;
-    font-size:11px; font-weight:700; cursor:pointer;
+  .playrow .lbl{font-size:13px; color:var(--dim);}
+  .playrow .lbl b{color:var(--ink);}
+  .stepper{display:flex; align-items:center; gap:8px;}
+  .stepper button{
+    width:30px; height:30px; border-radius:9px; background:var(--panel); border:1px solid var(--grid);
+    color:var(--ink); font-size:16px; cursor:pointer; line-height:1;
+  }
+  .stepper button:hover:not(:disabled){border-color:var(--blue-line);}
+  .stepper button:disabled{opacity:.3; cursor:default;}
+  .stepper .val{font-size:19px; font-weight:800; min-width:26px; text-align:center; font-variant-numeric:tabular-nums;}
+
+  .feeditem{
+    display:flex; align-items:center; gap:9px; background:var(--panel2); border:1px solid var(--grid);
+    border-radius:11px; padding:9px 10px; margin-bottom:7px;
+  }
+  .feeditem .pos{font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums; width:15px; flex:0 0 auto;}
+  .feeditem .t{flex:1 1 auto; min-width:0; font-size:12.5px; line-height:1.35; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .feeditem.saved{opacity:.55; border-style:dashed;}
+  .feeditem .x{background:none; border:none; color:var(--faint); font-size:15px; cursor:pointer; padding:0 2px; line-height:1;}
+  .feeditem .x:hover{color:var(--red);}
+  .arrows{display:flex; flex-direction:column; gap:1px;}
+  .arrows button{background:none; border:none; color:var(--faint); cursor:pointer; font-size:9px; line-height:1; padding:1px;}
+  .arrows button:hover:not(:disabled){color:var(--blue);}
+  .arrows button:disabled{opacity:.25; cursor:default;}
+
+  .zonehead{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; font-weight:700;
+    color:var(--faint); margin:14px 0 8px; display:flex; align-items:center; gap:9px;
+  }
+  .zonehead::after{content:""; flex:1 1 auto; height:1px; background:var(--grid);}
+  .zonehead.first{margin-top:0;}
+  .zonenote{font-size:11.5px; color:var(--faint); line-height:1.55; margin:-2px 0 9px;}
+
+  .empty{font-size:12.5px; color:var(--faint); font-style:italic; line-height:1.55;}
+
+  .endcards{display:flex; gap:9px;}
+  .endcard{
+    flex:1 1 0; text-align:left; padding:11px 12px; border-radius:12px; cursor:pointer;
+    background:var(--panel2); border:1px solid var(--grid); color:var(--dim);
+  }
+  .endcard .t{font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:3px;}
+  .endcard .d{font-size:11.5px; line-height:1.45;}
+  .endcard.on{background:var(--blue-soft); border-color:var(--blue-line);}
+  .segmented{display:flex; gap:6px; margin-top:11px;}
+  .segmented button{
+    flex:1 1 0; font-size:13px; font-weight:700; padding:8px 6px; border-radius:10px; cursor:pointer;
+    background:var(--panel2); border:1px solid var(--grid); color:var(--faint);
+  }
+  .segmented button.on{background:var(--blue); border-color:var(--blue); color:#fff;}
+
+  .shapecard{display:flex; border:1px solid var(--grid); border-radius:12px; overflow:hidden; background:var(--panel2); margin-top:12px;}
+  .shapecard div{flex:1 1 0; padding:11px 8px; text-align:center; border-right:1px solid var(--grid);}
+  .shapecard div:last-child{border-right:none;}
+  .shapecard .k{font-size:9.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--faint); font-weight:700;}
+  .shapecard .v{font-size:17px; font-weight:800; margin-top:4px; font-variant-numeric:tabular-nums;}
+
+  .warn{
+    display:flex; gap:9px; align-items:flex-start; font-size:12.5px; line-height:1.55; color:var(--gold);
+    background:rgba(255,159,10,.09); border:1px solid rgba(255,159,10,.32); border-radius:12px;
+    padding:11px 13px; margin-top:12px;
   }
 
-  .empty-note{font-size:12.5px; color:var(--faint); font-style:italic; padding:6px 0 10px;}
+  .codebox{background:var(--panel); border:1px solid var(--green); border-radius:18px; padding:26px 22px; text-align:center;}
+  .codeword{font-family:var(--mono); font-size:46px; font-weight:800; letter-spacing:4px; color:var(--green); line-height:1;}
+  .codesub{font-size:13px; color:var(--dim); margin-top:12px; line-height:1.6;}
 
-  .sidebar{flex:0 0 320px; position:sticky; top:20px; display:flex; flex-direction:column; gap:14px;}
-  .side-box{background:var(--panel); border:1px solid var(--grid); border-radius:18px; padding:16px 18px;}
-  .side-title{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--blue); margin-bottom:10px;}
-  .mixmeter{display:flex; height:8px; border-radius:4px; overflow:hidden; background:var(--panel2); margin-bottom:6px;}
-  .mixmeter div{height:100%;}
-  .mix-flag{background:var(--gold);}
-  .mix-hygiene{background:var(--green);}
-  .mix-empty{background:transparent;}
-  .mixlabels{display:flex; justify-content:space-between; font-size:11px; color:var(--dim); margin-bottom:14px;}
-  .subject-chips{display:flex; flex-wrap:wrap; gap:6px;}
-
-  .round-guide{
-    font-size:12.5px; line-height:1.6; color:var(--faint); background:var(--panel2);
-    border:1px solid var(--grid); border-left:3px solid var(--blue);
-    border-radius:10px; padding:11px 13px; margin:0 0 14px;
+  .tablehead{
+    display:flex; align-items:baseline; gap:8px; margin:14px 0 8px; font-size:12.5px; font-weight:700;
   }
-  .round-guide b{ color:var(--ink); font-weight:700; }
-  .count .off-target{ color:var(--faint); }
-  .publish-box{text-align:center;}
-  .publish-hint{font-size:12px; color:var(--faint); margin-top:10px; line-height:1.5;}
+  .tablehead:first-child{margin-top:0;}
+  .tablehead .code{font-family:var(--mono); color:var(--green);}
+  .tablehead .n{font-size:11px; color:var(--faint); font-weight:600;}
+  .tablehead.loose .code{color:var(--gold);}
+  .player{
+    display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--grid);
+    border-radius:11px; padding:9px 11px; margin-bottom:6px;
+  }
+  .player .av{width:24px; height:24px; border-radius:7px; background:var(--blue-soft); display:grid; place-items:center; font-size:12px;}
+  .player .nm{flex:1 1 auto; font-size:13.5px;}
+  .player.loose{border-style:dashed; opacity:.72;}
+  .player .st{font-size:11px; color:var(--faint);}
+
+  .nextnote{
+    font-size:12.5px; line-height:1.6; color:var(--faint); border:1px dashed var(--grid);
+    border-radius:12px; padding:12px 14px; margin-top:12px;
+  }
+  .nextnote b{color:var(--gold);}
+
+  .callout{
+    margin-top:30px; border-top:1px solid var(--grid); padding-top:18px;
+    font-size:12.5px; line-height:1.7; color:var(--faint); max-width:78ch;
+  }
+  .callout b{color:var(--dim);}
+  .callout code{font-family:var(--mono); font-size:11.5px; color:var(--dim);}
+  .callout ul{margin:8px 0 0; padding-left:18px;}
+  .callout li{margin-bottom:5px;}
+  .hide{display:none;}
+
+  /* ---- live-console additions on top of the mock's styles ---- */
+  .field{
+    width:100%; background:var(--panel2); border:1px solid var(--grid); border-radius:10px;
+    color:var(--ink); font-size:13px; padding:9px 11px; margin-bottom:8px; font-family:var(--sans);
+  }
+  .field:focus{outline:none; border-color:var(--blue-line);}
+  .publish-hint{font-size:12px; color:var(--faint); margin-top:10px; line-height:1.55;}
   .code-display{
-    margin-top:14px; padding:18px; background:var(--panel2); border:1px solid var(--green); border-radius:14px;
+    margin-top:14px; padding:18px; background:var(--panel2); border:1px solid var(--green); border-radius:14px; text-align:center;
   }
   .code-display .code-word{
-    font-family:'SF Mono',Menlo,monospace; font-size:30px; font-weight:800; letter-spacing:2px; color:var(--green);
+    font-family:var(--mono); font-size:30px; font-weight:800; letter-spacing:2px; color:var(--green);
   }
-  .code-display .code-sub{font-size:12px; color:var(--dim); margin-top:6px; line-height:1.5;}
-
+  .code-display .code-sub{font-size:12px; color:var(--dim); margin-top:8px; line-height:1.55; text-align:left;}
   .export-panel{margin-top:12px;}
   .export-link{font-size:12px; color:var(--dim); text-decoration:underline; cursor:pointer; background:none; border:none; padding:0;}
   textarea.export-out{
-    width:100%; min-height:200px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
-    border-radius:10px; font-family:'SF Mono',Menlo,monospace; font-size:11px; padding:10px; line-height:1.5; margin-top:10px;
+    width:100%; min-height:180px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
+    border-radius:10px; font-family:var(--mono); font-size:11px; padding:10px; line-height:1.5; margin-top:10px;
   }
-  .footnote{max-width:1400px; margin:0 auto; padding:0 28px 34px; color:var(--faint); font-size:12.5px; line-height:1.6;}
+  .pullerr{color:var(--red); font-size:12px; line-height:1.5; margin-top:7px;}
+  .notwired{
+    font-size:12.5px; line-height:1.6; color:var(--faint); border:1px dashed var(--grid);
+    border-radius:12px; padding:13px 14px;
+  }
+  .notwired b{color:var(--dim);}
+  /* ---- session settings (advisory until the game reads them) ---- */
+  .inert-badge{
+    font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+    color:var(--gold); background:rgba(255,159,10,.1); border:1px solid rgba(255,159,10,.34);
+    border-radius:7px; padding:3px 8px;
+  }
+  .inertnote{
+    font-size:12px; line-height:1.6; color:var(--faint); border:1px dashed rgba(255,159,10,.3);
+    background:rgba(255,159,10,.04); border-radius:11px; padding:11px 13px; margin-top:12px;
+  }
+  .inertnote b{color:var(--gold);}
+  .sublabel{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; font-weight:700;
+    color:var(--faint); margin:2px 0 8px;
+  }
+  .suggestline{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px;
+    font-size:12.5px; color:var(--dim); line-height:1.5;
+  }
+  .suggestline b{color:var(--ink);}
+  .feednote{font-size:12px; color:var(--faint); line-height:1.55; margin:-2px 0 11px;}
+  /* .cols aligns to flex-start, which on a narrow screen stacks the columns and
+     lets each size to its max-content instead of the container — that is what
+     pushed the page sideways at 414px. */
+  @media (max-width:960px){
+    .cols{align-items:stretch;}
+    .maincol, .rail{width:100%; max-width:100%;}
+  }
 
-  .topicpicker{display:flex; gap:22px; padding:16px 28px 0; align-items:flex-start;}
-  @media (max-width:980px){ .topicpicker{flex-direction:column;} }
-  .topicpicker-box{flex:1 1 auto; min-width:0; background:var(--panel); border:1px solid var(--grid); border-radius:18px; padding:16px 18px;}
-  .tp-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;}
-  .tp-title{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--blue);}
-  .tp-sub{font-size:11px; color:var(--dim);}
-  .topic-group{margin-bottom:14px;}
-  .topic-group:last-child{margin-bottom:0;}
-  .topic-group-head{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--dim); margin-bottom:8px;}
-  .tg-icon{font-size:14px;}
-  .topic-chip-row{display:flex; flex-wrap:wrap; gap:8px;}
-  .topic-chip{
-    font-size:13px; font-weight:700; padding:8px 13px; border-radius:16px;
-    border:1px solid var(--grid); background:var(--panel2); color:var(--dim); cursor:pointer;
-  }
-  .topic-chip:hover:not(:disabled){border-color:var(--blue);}
-  .topic-chip.selected{background:var(--blue); color:#fff; border-color:var(--blue);}
-  .topic-chip:disabled{opacity:.35; cursor:default;}
-  .tp-side{flex:0 0 300px;}
-  .tp-side-item{
-    display:flex; justify-content:space-between; align-items:center; gap:8px; background:var(--panel2);
-    border:1px solid var(--grid); border-radius:10px; padding:8px 10px; margin-bottom:7px; font-size:13px;
-  }
-  .tp-side-name{flex:1 1 auto; color:var(--ink); font-weight:700;}
+  /* console_extra is appended after the base sheet, so its display rules would
+     otherwise beat .hide on equal specificity — keep the toggle authoritative. */
+  .hide{display:none !important;}
 </style>
 </head>
 <body>
@@ -148,86 +276,154 @@
 <header>
   <div>
     <div class="brand">INFODEMIC</div>
-    <div class="sub">CONTENT PIPELINE — TEACHER CONSOLE (PROTOTYPE)</div>
+    <div class="sub">Content pipeline — teacher console</div>
   </div>
-  <div class="pull-tag" id="pull-tag"></div>
 </header>
 
-<div class="strip">
-  <b>How this works:</b> pick your topics — the round builds itself, no per-story approving needed. Swap out anything you don't want, then publish. You never choose how a story gets framed; the game's AI personalizes that per player from the Tells taxonomy — that's generated at publish time, not something to review here.
-</div>
+<div class="wrap">
 
-<section class="topicpicker">
-  <div class="topicpicker-box">
-    <div class="tp-head">
-      <div class="tp-title">Choose topics</div>
-      <div class="tp-sub" id="tp-counter"></div>
-    </div>
-    <div id="tp-groups"></div>
-  </div>
-  <div class="tp-side">
-    <div class="side-box">
-      <div class="side-title">Your topics</div>
-      <div id="tp-side-list"></div>
-      <div class="empty-note" id="tp-empty" style="display:none;">No topics selected — the round below stays empty until you pick at least one. A parent might drop Politics; a teacher might drop Brands. Same tool, different picks.</div>
-    </div>
-  </div>
-</section>
-
-<main>
-  <div class="roundcol">
-    <div class="round-head">
-      <h2>This round</h2>
-      <span class="count" id="round-count"></span>
-    </div>
-    <!-- Guidance, not a limit (Tara, 8/24/2026): a table with no code gets 5 stories,
-         and 5 is the length the round is paced around. The curator can publish more
-         or fewer - this says what's recommended without taking the choice away. -->
-    <div class="round-guide" id="round-guide">
-      <b>5 stories is a good number to aim for.</b> That's what a table gets when they
-      start without a code, and it's about one round's worth of attention — enough for
-      the split between versions to show up, short enough to finish and file. You can
-      publish more or fewer; it's your call.
-    </div>
-    <div id="round-list"></div>
-    <div id="addback-wrap"></div>
+  <div class="steps">
+    <button class="step active" id="s1" data-go="1"><span class="n">1</span>Build the feed</button>
+    <button class="step" id="s2" data-go="2"><span class="n">2</span>Publish</button>
   </div>
 
-  <div class="sidebar">
-    <div class="side-box">
-      <div class="side-title">Round mix</div>
-      <div class="mixmeter" id="mixmeter"></div>
-      <div class="mixlabels"><span id="mix-flag-label">0 flag</span><span id="mix-hygiene-label">0 hygiene</span></div>
-      <div class="subject-chips" id="subject-chips"></div>
-    </div>
+  <!-- ================= STEP 1 ================= -->
+  <section id="pane1">
+    <div class="cols">
+      <div class="maincol">
+        <div class="pullbar">
+          <div class="when" id="pull-line"></div>
+          <button class="btn small primary" id="refresh-btn">Pull more stories →</button>
+        </div>
+        <div class="pullerr hide" id="pull-error"></div>
 
-    <div class="side-box publish-box">
-      <div class="side-title">Publish</div>
-      <input id="curated-by" placeholder="Your name (optional)" style="width:100%; background:var(--panel2); border:1px solid var(--grid); border-radius:10px; color:var(--ink); font-size:13px; padding:9px 11px; margin-bottom:8px;" autocomplete="off">
-      <select id="context-select" style="width:100%; background:var(--panel2); border:1px solid var(--grid); border-radius:10px; color:var(--ink); font-size:13px; padding:9px 11px; margin-bottom:10px;">
-        <option value="general">General</option>
-        <option value="classroom">Classroom</option>
-        <option value="family">Family</option>
-      </select>
-      <button class="btn primary big" id="publish-btn">Publish this round →</button>
-      <div class="publish-hint" id="publish-hint">Generates one word your whole table or class uses to join — no separate room step.</div>
-      <div class="code-display" id="code-display" style="display:none;"></div>
-      <div class="export-panel">
-        <button class="export-link" id="export-link">View draft for vetting (Markdown) ▾</button>
-        <div id="export-panel-body" style="display:none;">
-          <textarea class="export-out" id="export-out" readonly></textarea>
-          <button class="btn small" id="copy-md-btn" style="margin-top:8px;">Copy Markdown</button>
+        <div id="queue" style="display:flex;flex-direction:column;gap:11px;"></div>
+      </div>
+
+      <aside class="rail">
+        <div class="box">
+          <div class="boxhead">
+            <h2 class="sec">Your feed</h2>
+            <span class="count" id="fcount">0 stories</span>
+          </div>
+
+          <div class="feednote" id="feednote"></div>
+          <div id="feedlist"></div>
+          <div class="empty" id="fempty">Nothing here yet. Add stories from the left — everything you add gets served in Round 1.</div>
+          <button class="btn ghost small" id="clearbtn" style="margin-top:11px;width:100%;">Clear the feed</button>
+        </div>
+
+        <div class="box">
+          <div class="boxhead">
+            <h2 class="sec">This session</h2>
+            <span class="inert-badge">not enforced yet</span>
+          </div>
+
+          <div class="playrow">
+            <div class="lbl">Cases they file<b id="caseshint"></b></div>
+            <div class="stepper">
+              <button id="minus" aria-label="Fewer cases">&minus;</button>
+              <span class="val" id="nval">2</span>
+              <button id="plus" aria-label="More cases">+</button>
+            </div>
+          </div>
+          <div class="zonenote" id="casesnote" style="margin:-6px 0 13px;"></div>
+
+          <div class="sublabel">How long you've got</div>
+          <div class="segmented" id="minutes">
+            <button data-m="30">30 min</button><button data-m="45">45 min</button>
+            <button data-m="60">60 min</button><button data-m="90">90 min</button>
+          </div>
+          <div class="suggestline hide" id="suggest">
+            <span id="suggest-text"></span>
+            <button class="btn small" id="use-suggest">Use it</button>
+          </div>
+
+          <div class="shapecard">
+            <div><div class="k">Runs about</div><div class="v" id="shape-min">&mdash;</div></div>
+            <div><div class="k">Cases</div><div class="v" id="shape-cases">&mdash;</div></div>
+            <div><div class="k">In the feed</div><div class="v" id="shape-feed">&mdash;</div></div>
+          </div>
+          <div class="zonenote" style="margin:9px 0 0;">Round 1 shows the whole feed in 60 seconds. A case they actually chase &mdash; gut check, investigation, note &mdash; runs about 10 minutes.</div>
+
+          <div class="warn hide" id="allstraight">
+            <span>&#9888;</span>
+            <span>Nothing in this feed plays spun &mdash; no two players would see a different version, so there's nothing to disagree about. Add one more story.</span>
+          </div>
+
+          <div class="inertnote">
+            <b>Nothing here reaches the game yet.</b> The table currently files two cases and picks the
+            second one itself. This number only shapes what you see on this screen; wiring it into play
+            is waiting on the multiplayer conversation.
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="boxhead"><h2 class="sec">Publish</h2></div>
+          <input id="curated-by" class="field" placeholder="Your name (optional)" autocomplete="off">
+          <select id="context-select" class="field">
+            <option value="general">General</option>
+            <option value="classroom">Classroom</option>
+            <option value="family">Family</option>
+          </select>
+          <button class="btn primary big" id="publish-btn">Publish this session →</button>
+          <div class="pullerr hide" id="publish-error"></div>
+          <div class="publish-hint">Generates one word for the whole room. Each table's first player turns it into that table's own code.</div>
+          <div class="export-panel">
+            <button class="export-link" id="export-link">View draft for vetting (Markdown) ▾</button>
+            <div id="export-panel-body" style="display:none;">
+              <textarea class="export-out" id="export-out" readonly></textarea>
+              <button class="btn small" id="copy-md-btn" style="margin-top:8px;">Copy Markdown</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ================= STEP 2 ================= -->
+  <section id="pane2" class="hide">
+    <div class="cols">
+      <div class="maincol">
+        <div class="codebox">
+          <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:14px;">Read this word to the room</div>
+          <div class="codeword" id="code">—</div>
+          <div class="codesub" id="codesub"></div>
+          <button class="btn small" id="copy-code-btn" style="margin-top:14px;">Copy word</button>
+        </div>
+
+        <div class="box" style="margin-top:16px;">
+          <div class="boxhead"><h2 class="sec">What they'll play</h2><span class="count" id="playsummary"></span></div>
+          <div id="playlist"></div>
+          <div id="savedsummary" class="empty" style="margin-top:10px;"></div>
+          <div class="inertnote" style="margin-top:12px;">
+            <b>All of it publishes.</b> Round 1 serves the whole feed; the cases number is how many of
+            them a table takes all the way through. Which ones those are is the table's call at triage —
+            that choice is the lesson, so it isn't yours to make here.
+          </div>
         </div>
       </div>
-      <button class="btn ghost small" id="reset-btn" style="margin-top:10px;">Start a fresh round</button>
+
+      <aside class="rail">
+        <div class="box">
+          <div class="boxhead"><h2 class="sec">Who's in</h2></div>
+          <div class="notwired">
+            <b>Not wired up yet.</b> This is where the tables that joined your word will show — who's
+            at which table, and who typed the word but never sat down. Reading that back needs a
+            query the sync layer doesn't have, and removing someone needs a lobby control the game
+            doesn't have. Both are the next piece of work, not something this screen is faking.
+          </div>
+        </div>
+
+        <button class="btn ghost" id="back1">← Back to the feed</button>
+      </aside>
     </div>
-  </div>
-</main>
+  </section>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="multiplayer/supabase-sync.js"></script>
-
-<div class="footnote"><b>Live-connected as of 8/13/2026:</b> Publish writes a real <code>drops</code> row to the shared Supabase project (the same one the multiplayer lobby uses), and the word it returns is immediately joinable there — enter it in the game itself (<code>infodemic-multiplayer-prototype.html</code>) and a table spins up for real, straight into Round 1 with your real content. What's still mocked: the 10 stories are hand-written data standing in for a NewsData.io free-tier pull (the API recommended for this pipeline — see <code>personalization-data-model-sketch.md</code>), and each story's AI framings — plus, as of 8/14/2026, each story's Round 2 investigation content (hook, poster persona, evidence clips) — are pre-drafted rather than generated live, so we could pressure-test the <i>mechanic</i> before wiring a real key or a live drafting model. 9 of 10 stories carry full Round 2 content now; story 9 stays intentionally unwired as the "not every story needs a flag lens" counterweight, and shows the game's existing empty state for it. The curator's job stays narrowed on purpose: pick topics, optionally swap a story out, publish — nothing about how any story gets framed for any given player, and nothing about approving stories one by one. Matches <code>curation-charter.md</code>'s "AI-drafted, human-vetted" model: publishing here is a first draft, not a ship — Tara's vetting pass (source-checking, freshness, mix quotas, hard exclusions) still applies before anything reaches players. Publish only ever produces the word (the prefix); the number after it is minted for real by whichever player enters that word first at each table, per the sketch's join scheme.</div>
 
 <script>
 var TELL_NAMES = {
@@ -479,201 +675,216 @@ var MOCK_STORIES = [
 // of the mock set so the console is never blank, then loadStories() (called
 // at init, and again after every refresh) swaps it for real generated
 // content when available. See the "Live story source" block near the bottom.
+
+// ---------------------------------------------------------------------------
+// Teacher console — build a feed, publish a session.
+//
+// Vocabulary (see the strip at the top of the screen): a ROUND is a phase
+// inside one story (gut check / investigation / note), so nothing here is
+// called a round. A STORY is one thing to figure out, ~10 minutes at a table.
+// A FEED is the group of stories the curator builds. A SESSION is one class
+// playing part of that feed.
+//
+// The feed holds full card objects, not story ids, so pulling fresh candidates
+// never strands what's already been added.
+// ---------------------------------------------------------------------------
+
+// Round 1 serves the WHOLE feed in 60s; only the cases a table chases cost real
+// time (gut check -> investigation -> note). See infodemic-triage-and-drafting-beat.
+var MIN_PER_CASE = 10;
+var SWEEP_MIN = 3;        // round 1 + the reveal + the investigate tour, flat
+var DEFAULT_CASES = 2;    // matches the game's SESSION_CASES; includes the shared opening story
+
 var STORIES = MOCK_STORIES.slice();
 var storiesSource = "mock";   // "mock" | "live"
 var storiesPulledAt = null;
 var refreshing = false;
 var refreshError = null;
 
-// ---- Round state — auto-built from selected topics, no per-story approve/skip ----
-var DROP = [];              // current round: {storyId, subject, source, url, headline, variants}
-var removedStoryIds = [];   // curator explicitly took these out — don't auto re-add
+var FEED = [];            // [{storyId, subject, source, url, headline, variants, hook, background, clips}]
+var sessionCases = DEFAULT_CASES;
+var touchedCases = false; // once the teacher sets a number, stop tracking the feed
+var minutes = null;       // a period the teacher can pick; only ever a suggestion
 var publishedCode = null;
+var pane = 1;
 
-// ---- Topic selection (curator pre-filter, drives what auto-builds into the round) ----
-var TOPIC_GROUPS = [
-  {group:"News & world", icon:"📰", topics:["World","Politics","Disaster"]},
-  {group:"Health & science", icon:"🧪", topics:["Health","Science"]},
-  {group:"Tech & media", icon:"💻", topics:["Tech","Media","Gaming"]},
-  {group:"Life & culture", icon:"🎽", topics:["Sports","Brands"]}
-];
-var TOPIC_CAP = 8;
-var selectedTopics = ["Tech","Health","Sports","Science","Media","World"];
+function $(id){ return document.getElementById(id); }
+function tellName(t){ return TELL_NAMES[t] || t; }
 
-function toggleTopic(t){
-  var idx = selectedTopics.indexOf(t);
-  if (idx !== -1){ selectedTopics.splice(idx,1); }
-  else {
-    if (selectedTopics.length >= TOPIC_CAP) return;
-    selectedTopics.push(t);
-  }
-  autoBuildRound();
-  renderTopicPicker(); renderRound(); renderSidebar();
+// InfodemicSync's ensureClient() throws synchronously when the Supabase CDN
+// script didn't load (offline, blocked, cached miss). A plain .catch() never
+// sees that, which left Publish stuck on "Publishing…" forever. Route every
+// sync call through here so a synchronous throw arrives as a rejection.
+function syncCall(fn){
+  try { return Promise.resolve(fn()); }
+  catch (e) { return Promise.reject(e); }
 }
-function renderTopicPicker(){
-  var groupsEl = document.getElementById("tp-groups"); groupsEl.innerHTML = "";
-  TOPIC_GROUPS.forEach(function(g){
-    var gEl = document.createElement("div"); gEl.className = "topic-group";
-    var head = document.createElement("div"); head.className = "topic-group-head";
-    head.innerHTML = '<span class="tg-icon">'+g.icon+'</span><span>'+g.group+'</span>';
-    gEl.appendChild(head);
-    var row = document.createElement("div"); row.className = "topic-chip-row";
-    g.topics.forEach(function(t){
-      var sel = selectedTopics.indexOf(t) !== -1;
-      var chip = document.createElement("button");
-      chip.className = "topic-chip" + (sel ? " selected" : "");
-      chip.textContent = sel ? (t + " ✕") : t;
-      chip.disabled = !sel && selectedTopics.length >= TOPIC_CAP;
-      chip.onclick = function(){ toggleTopic(t); };
-      row.appendChild(chip);
-    });
-    gEl.appendChild(row);
-    groupsEl.appendChild(gEl);
-  });
-
-  document.getElementById("tp-counter").textContent = selectedTopics.length + " / " + TOPIC_CAP + " selected";
-
-  var sideList = document.getElementById("tp-side-list"); sideList.innerHTML = "";
-  document.getElementById("tp-empty").style.display = selectedTopics.length === 0 ? "block" : "none";
-  selectedTopics.forEach(function(t){
-    var item = document.createElement("div"); item.className = "tp-side-item";
-    var left = document.createElement("span"); left.className = "tp-side-name"; left.textContent = t;
-    item.appendChild(left);
-    var rm = document.createElement("button"); rm.className = "btn small ghost"; rm.textContent = "✕"; rm.title = "Remove topic";
-    rm.onclick = function(){ toggleTopic(t); };
-    item.appendChild(rm);
-    sideList.appendChild(item);
-  });
+function errText(err){
+  return (err && err.message) ? err.message : String(err || "Something went wrong.");
 }
 
-// ---- Auto-build: the whole point — curator never approves stories one by one ----
-function autoBuildRound(){
-  selectedTopics.forEach(function(topic){
-    var already = DROP.some(function(d){ return d.subject === topic; });
-    if (already) return;
-    var story = STORIES.filter(function(s){ return s.subject === topic && removedStoryIds.indexOf(s.id) === -1; })[0];
-    if (story) DROP.push(cardFromStory(story));
-  });
-  DROP = DROP.filter(function(d){ return selectedTopics.indexOf(d.subject) !== -1; });
-}
 function cardFromStory(story){
   return { storyId: story.id, subject: story.subject, source: story.source, url: story.url,
-           headline: story.headline, variants: story.lenses,
+           headline: story.headline, variants: story.lenses || [],
            hook: story.hook || null, background: story.background || null, clips: story.clips || [] };
 }
+function inFeed(id){
+  for (var i=0;i<FEED.length;i++){ if (FEED[i].storyId === id) return i; }
+  return -1;
+}
 
-function renderRound(){
-  var list = document.getElementById("round-list"); list.innerHTML = "";
-  // Nudge toward 5 without blocking anything - see .round-guide in the markup.
-  var offTarget = DROP.length === 5 ? "" :
-    (DROP.length < 5 ? " · " + (5 - DROP.length) + " under the suggested 5"
-                     : " · " + (DROP.length - 5) + " over the suggested 5");
-  document.getElementById("round-count").innerHTML =
-    DROP.length + " stor" + (DROP.length===1?"y":"ies") + " · builds itself as you pick topics" +
-    (offTarget ? '<span class="off-target">' + offTarget + '</span>' : "");
-
-  if (DROP.length === 0){
-    var e = document.createElement("div"); e.className = "empty-note";
-    e.textContent = "Pick at least one topic above — the round fills in automatically.";
-    list.appendChild(e);
+// ---- session sizing -------------------------------------------------------
+// Two numbers, not one. The FEED is what round 1 serves (all of it, 60 seconds).
+// CASES is how many of those a table takes all the way through — the real length
+// lever, and the game's SESSION_CASES. The opening story everybody does together
+// counts as one of them.
+function clampCases(){
+  // Until the teacher picks a number it follows the feed — otherwise adding the
+  // first story pins the session at one case forever.
+  if (!touchedCases){
+    sessionCases = FEED.length ? Math.min(DEFAULT_CASES, FEED.length) : DEFAULT_CASES;
   }
+  if (sessionCases < 1) sessionCases = 1;
+  if (FEED.length && sessionCases > FEED.length) sessionCases = FEED.length;
+}
+function estimateMin(){
+  if (!FEED.length) return 0;
+  return SWEEP_MIN + Math.min(sessionCases, FEED.length) * MIN_PER_CASE;
+}
+// What fits in a period the teacher named. A suggestion — it never moves the
+// number on its own.
+function casesThatFit(m){
+  return Math.max(1, Math.floor((m - SWEEP_MIN) / MIN_PER_CASE));
+}
+// The whole feed publishes, in the order the curator arranged it. WHICH stories
+// get chased is the table's call at triage — deliberately not a teacher setting.
+function orderedFeed(){ return FEED.slice(); }
 
-  DROP.forEach(function(d){
-    var card = document.createElement("div"); card.className = "story";
-    var row1 = document.createElement("div"); row1.className = "row1";
-    var left = document.createElement("div");
+// ---- candidate list -------------------------------------------------------
+function renderPullBar(){
+  var when = (storiesSource === "live" && storiesPulledAt)
+    ? " · pulled " + new Date(storiesPulledAt).toLocaleString()
+    : "";
+  $("pull-line").innerHTML = "<b>" + STORIES.length + " stories</b> to choose from" + when +
+    (refreshing ? " · pulling and generating…" : "");
+  var btn = $("refresh-btn");
+  btn.disabled = refreshing;
+  btn.textContent = refreshing ? "Pulling + generating…" : "Pull more stories →";
+  var err = $("pull-error");
+  err.className = refreshError ? "pullerr" : "pullerr hide";
+  err.textContent = refreshError || "";
+}
+
+function renderQueue(){
+  var host = $("queue"); host.innerHTML = "";
+  STORIES.forEach(function(s){
+    var isIn = inFeed(s.id) !== -1;
+    var el = document.createElement("article");
+    el.className = "story" + (isIn ? " in" : "");
+    var body = document.createElement("div"); body.className = "body";
     var meta = document.createElement("div"); meta.className = "meta";
-    meta.innerHTML = '<span class="chip subject">'+d.subject+'</span><span class="chip">'+d.source+'</span>';
-    left.appendChild(meta);
-    var h = document.createElement("div"); h.className = "raw-headline"; h.textContent = d.headline;
-    left.appendChild(h);
-    var src = document.createElement("div"); src.className = "src-line"; src.textContent = d.url + " (as pulled — not player-facing)";
-    left.appendChild(src);
-    row1.appendChild(left);
-
-    var actions = document.createElement("div"); actions.className = "story-actions";
-    var rm = document.createElement("button"); rm.className="btn ghost small danger"; rm.textContent="Remove";
-    rm.onclick = function(){
-      removedStoryIds.push(d.storyId);
-      DROP = DROP.filter(function(x){ return x.storyId !== d.storyId; });
-      renderRound(); renderSidebar();
+    var t1 = document.createElement("span"); t1.className = "tag subject"; t1.textContent = s.subject;
+    meta.appendChild(t1);
+    var h = document.createElement("h3"); h.className = "hl"; h.textContent = s.headline;
+    var src = document.createElement("div"); src.className = "src";
+    src.textContent = s.source + " · " + s.url + " (as pulled — not player-facing)";
+    body.appendChild(meta); body.appendChild(h); body.appendChild(src);
+    var btn = document.createElement("button");
+    btn.className = isIn ? "btn small" : "btn add";
+    btn.textContent = isIn ? "✓ In your feed" : "+ Add";
+    btn.onclick = function(){
+      var i = inFeed(s.id);
+      if (i !== -1){ FEED.splice(i,1); } else { FEED.push(cardFromStory(s)); }
+      renderAll();
     };
-    actions.appendChild(rm);
-    row1.appendChild(actions);
-    card.appendChild(row1);
-
-    list.appendChild(card);
+    el.appendChild(body); el.appendChild(btn);
+    host.appendChild(el);
   });
-
-  // Add-back: topics selected but currently missing a card (explicitly removed, or none exists)
-  var addWrap = document.getElementById("addback-wrap"); addWrap.innerHTML = "";
-  var missing = selectedTopics.filter(function(t){ return !DROP.some(function(d){ return d.subject === t; }); });
-  if (missing.length){
-    var label = document.createElement("div"); label.className = "empty-note"; label.style.padding = "2px 0 6px";
-    label.textContent = "Not in this round:";
-    addWrap.appendChild(label);
-    var row = document.createElement("div"); row.className = "addback";
-    missing.forEach(function(t){
-      var story = STORIES.filter(function(s){ return s.subject === t; })[0];
-      var pill = document.createElement("span"); pill.className = "addback-pill";
-      pill.textContent = t + (story ? "" : " (no candidate pulled)") + " ";
-      if (story){
-        var addBtn = document.createElement("button"); addBtn.textContent = "+ Add back";
-        addBtn.onclick = function(){
-          removedStoryIds = removedStoryIds.filter(function(id){ return id !== story.id; });
-          autoBuildRound(); renderRound(); renderSidebar();
-        };
-        pill.appendChild(addBtn);
-      }
-      row.appendChild(pill);
-    });
-    addWrap.appendChild(row);
-  }
 }
 
-function renderSidebar(){
-  var flagN = 0, hygN = 0;
-  DROP.forEach(function(d){ d.variants.forEach(function(v){ if (v.cat==="flag") flagN++; else hygN++; }); });
-  var total = flagN + hygN;
+// ---- the feed -------------------------------------------------------------
+function renderFeed(){
+  var host = $("feedlist"); host.innerHTML = "";
+  var has = FEED.length > 0;
+  $("fempty").className = has ? "empty hide" : "empty";
+  $("fcount").textContent = FEED.length + (FEED.length === 1 ? " story" : " stories");
+  $("feednote").textContent = has
+    ? "Round 1 serves all of these in 60 seconds. Which ones the table then works through is their call at triage — that choice is the lesson."
+    : "";
+  if (!has) return;
 
-  var meter = document.getElementById("mixmeter"); meter.innerHTML = "";
-  if (total === 0){
-    var e = document.createElement("div"); e.className="mix-empty"; e.style.width="100%"; meter.appendChild(e);
+  FEED.forEach(function(d, idx){
+    var row = document.createElement("div");
+    row.className = "feeditem";
+    var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (idx+1);
+    var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
+
+    var arr = document.createElement("span"); arr.className = "arrows";
+    var up = document.createElement("button"); up.textContent = "▲"; up.disabled = idx === 0; up.title = "Move up";
+    up.onclick = function(){ var v = FEED.splice(idx,1)[0]; FEED.splice(idx-1,0,v); renderAll(); };
+    var dn = document.createElement("button"); dn.textContent = "▼"; dn.disabled = idx === FEED.length-1; dn.title = "Move down";
+    dn.onclick = function(){ var v = FEED.splice(idx,1)[0]; FEED.splice(idx+1,0,v); renderAll(); };
+    arr.appendChild(up); arr.appendChild(dn);
+
+    var x = document.createElement("button"); x.className = "x"; x.textContent = "×"; x.title = "Take out of the feed";
+    x.onclick = function(){ FEED.splice(idx,1); renderAll(); };
+
+    row.appendChild(pos); row.appendChild(t); row.appendChild(arr); row.appendChild(x);
+    host.appendChild(row);
+  });
+}
+
+function renderSession(){
+  var cases = Math.min(sessionCases, FEED.length || sessionCases);
+
+  $("nval").textContent = FEED.length ? cases : sessionCases;
+  $("minus").disabled = sessionCases <= 1;
+  $("plus").disabled = FEED.length > 0 && sessionCases >= FEED.length;
+  $("caseshint").textContent = "";
+  $("casesnote").textContent = FEED.length === 0
+    ? "Add stories first."
+    : (sessionCases === 1
+        ? "One case: the story the whole table does together, and that's the session."
+        : "The story everyone does together, plus " + (sessionCases - 1) +
+          (sessionCases - 1 === 1 ? " the table chooses at triage." : " they choose at triage."));
+
+  Array.prototype.forEach.call(document.querySelectorAll("#minutes button"), function(b){
+    b.className = (minutes !== null && +b.getAttribute("data-m") === minutes) ? "on" : "";
+  });
+  var sug = $("suggest");
+  if (minutes === null || !FEED.length){
+    sug.className = "suggestline hide";
   } else {
-    var fEl = document.createElement("div"); fEl.className="mix-flag"; fEl.style.width=(100*flagN/total)+"%"; meter.appendChild(fEl);
-    var hEl = document.createElement("div"); hEl.className="mix-hygiene"; hEl.style.width=(100*hygN/total)+"%"; meter.appendChild(hEl);
+    var fits = Math.min(casesThatFit(minutes), FEED.length);
+    sug.className = "suggestline";
+    $("suggest-text").innerHTML = fits === sessionCases
+      ? "<b>" + minutes + " min</b> fits about <b>" + fits + "</b> — that's what you've got."
+      : "<b>" + minutes + " min</b> fits about <b>" + fits + (fits === 1 ? " case" : " cases") + "</b>.";
+    $("use-suggest").className = fits === sessionCases ? "btn small hide" : "btn small";
   }
-  document.getElementById("mix-flag-label").textContent = flagN + " flag";
-  document.getElementById("mix-hygiene-label").textContent = hygN + " hygiene";
 
-  var subjCounts = {};
-  DROP.forEach(function(d){ subjCounts[d.subject] = (subjCounts[d.subject]||0)+1; });
-  var chipsEl = document.getElementById("subject-chips"); chipsEl.innerHTML = "";
-  Object.keys(subjCounts).forEach(function(s){
-    var c = document.createElement("span"); c.className="chip subject"; c.textContent = s+" ×"+subjCounts[s];
-    chipsEl.appendChild(c);
+  $("shape-min").textContent = FEED.length === 0 ? "—" : estimateMin() + " min";
+  $("shape-cases").textContent = FEED.length === 0 ? "—" : cases;
+  $("shape-feed").textContent = FEED.length === 0 ? "—" : FEED.length;
+
+  var anySpun = false;
+  FEED.forEach(function(d){
+    (d.variants || []).forEach(function(v){ if (v.cat === "red") anySpun = true; });
   });
-  if (Object.keys(subjCounts).length === 0){
-    var nc = document.createElement("span"); nc.className="chip"; nc.textContent="empty round";
-    chipsEl.appendChild(nc);
-  }
+  $("allstraight").className = (FEED.length > 0 && !anySpun) ? "warn" : "warn hide";
 
-  document.getElementById("publish-btn").disabled = DROP.length === 0;
+  $("publish-btn").disabled = FEED.length === 0;
+  $("s2").disabled = !publishedCode;
 }
 
-// ---- Publish: writes a real drops row via InfodemicSync (multiplayer/supabase-sync.js) ----
-// The word (code_prefix) is all Publish produces — the number half only gets
-// minted for real once a player enters that word at the join screen. See
-// personalization-data-model-sketch.md.
+// ---- publish --------------------------------------------------------------
 function cardsForPublish(){
-  return DROP.map(function(d){
+  return orderedFeed().map(function(d){
     return {
       id: d.storyId, subject: d.subject, source: d.source, sourceUrl: d.url, headline: d.headline,
-      variants: d.variants.map(function(v){ return { tell: v.tell, cat: v.cat, claim: v.claim, note: v.note }; }),
-      // Round 2 investigation content — hook, poster persona, and evidence clips —
-      // generated alongside the headline framings above. A card with no hook/clips
-      // (see story 9's "not every story needs a flag lens" counterweight) publishes
-      // with none of this, and the game shows its existing empty state for it.
+      variants: (d.variants || []).map(function(v){ return { tell: v.tell, cat: v.cat, claim: v.claim, note: v.note }; }),
+      // Round 2 investigation content rides along with the card. A story with no
+      // hook/clips publishes with none of it and the game shows its empty state.
       hook: d.hook || null,
       background: d.background || null,
       clips: d.clips || []
@@ -682,18 +893,25 @@ function cardsForPublish(){
 }
 
 function buildExport(){
+  var cards = orderedFeed();
   var flagN = 0, hygN = 0;
-  DROP.forEach(function(d){ d.variants.forEach(function(v){ if (v.cat==="flag") flagN++; else hygN++; }); });
+  cards.forEach(function(d){ (d.variants||[]).forEach(function(v){ if (v.cat==="red") flagN++; else hygN++; }); });
+  var subjects = [];
+  cards.forEach(function(d){ if (subjects.indexOf(d.subject) === -1) subjects.push(d.subject); });
   var lines = [];
-  lines.push("# Feed Drop — pipeline draft, DRAFT FOR VETTING");
-  lines.push("*Topics selected: " + (selectedTopics.length ? selectedTopics.join(", ") : "(none)") + "*");
-  if (publishedCode) lines.push("*Published code: " + publishedCode + "*");
-  lines.push("*Pulled from mock news feed 2026-08-12 · " + DROP.length + " stories · " + flagN + " flag-lens / " + hygN + " hygiene-lens variants, AI-personalized per player*");
+  lines.push("# Feed drop — session draft, DRAFT FOR VETTING");
+  lines.push("*Subjects in this session: " + (subjects.length ? subjects.join(", ") : "(none)") + "*");
+  if (publishedCode) lines.push("*Published word: " + publishedCode + "*");
+  lines.push("*" + cards.length + " stories in the feed · " + Math.min(sessionCases, cards.length) +
+             " cases to file · about " + estimateMin() + " min · " +
+             flagN + " spun / " + hygN + " straight framings, AI-personalized per player*");
+  lines.push("*Which stories get chased is the table's call at triage, not the curator's.*");
+  lines.push("*The cases number is advisory — the game files 2 until it reads the setting.*");
   lines.push("");
   lines.push("| # | Subject | AI-personalized framings (curator did not choose these) |");
   lines.push("|---|---|---|");
-  DROP.forEach(function(d, i){
-    var vtext = d.variants.map(function(v){ return "**["+tellName(v.tell)+"]** " + v.claim.replace(/\|/g,"/"); }).join("<br>");
+  cards.forEach(function(d, i){
+    var vtext = (d.variants||[]).map(function(v){ return "**["+tellName(v.tell)+"]** " + String(v.claim).replace(/\|/g,"/"); }).join("<br>");
     lines.push("| "+(i+1)+" | "+d.subject+" | "+vtext+" |");
   });
   lines.push("");
@@ -701,58 +919,127 @@ function buildExport(){
   lines.push("☐ Click through every source below ☐ Confirm freshness ☐ Paraphrases don't copy source text ☐ No named private individuals ☐ Age-appropriate ☐ Mix quotas checked against a full drop, not just this sample");
   lines.push("");
   lines.push("## Sources (audit trail)");
-  DROP.forEach(function(d){ lines.push("- " + d.subject + " — " + d.source + " — " + d.url); });
+  cards.forEach(function(d){ lines.push("- " + d.subject + " — " + d.source + " — " + d.url); });
   return lines.join("\n");
 }
 
-document.getElementById("publish-btn").addEventListener("click", function(){
-  if (DROP.length === 0) return;
+function renderPublished(){
+  $("code").textContent = publishedCode || "—";
+  $("codesub").innerHTML = publishedCode
+    ? "Say the word — <b style=\"color:var(--ink)\">" + publishedCode + "</b> — to your class. Each table's first player types just this word at the join screen and gets a table number back; everyone else at that table types the full code they're given. A second table typing the same word gets its own table, same content."
+    : "";
+  var cards = orderedFeed();
+  var host = $("playlist"); host.innerHTML = "";
+  cards.forEach(function(d, i){
+    var row = document.createElement("div"); row.className = "feeditem";
+    var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (i+1);
+    var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
+    row.appendChild(pos); row.appendChild(t);
+    host.appendChild(row);
+  });
+  $("playsummary").textContent = cards.length + " stories · " + Math.min(sessionCases, cards.length) +
+    " to file · about " + estimateMin() + " min";
+  $("savedsummary").textContent = "";
+}
+
+// ---- shell ----------------------------------------------------------------
+function go(n){
+  if (n === 2 && !publishedCode) return;
+  pane = n;
+  [1,2].forEach(function(i){
+    $("pane"+i).className = (i === n) ? "" : "hide";
+    $("s"+i).className = "step" + (i === n ? " active" : (i < n ? " done" : ""));
+  });
+  window.scrollTo({top:0, behavior:"smooth"});
+  renderAll();
+}
+function renderAll(){
+  clampCases();
+  renderPullBar(); renderQueue(); renderFeed(); renderSession();
+  if (pane === 2) renderPublished();
+}
+
+$("clearbtn").onclick = function(){
+  FEED = []; sessionCases = DEFAULT_CASES; touchedCases = false; minutes = null; renderAll();
+};
+$("back1").onclick = function(){ go(1); };
+$("minus").onclick = function(){ if (sessionCases > 1){ touchedCases = true; sessionCases--; renderAll(); } };
+$("plus").onclick = function(){ if (!FEED.length || sessionCases < FEED.length){ touchedCases = true; sessionCases++; renderAll(); } };
+Array.prototype.forEach.call(document.querySelectorAll("#minutes button"), function(b){
+  b.onclick = function(){
+    var m = +b.getAttribute("data-m");
+    minutes = (minutes === m) ? null : m;   // tapping the same chip clears it
+    renderAll();
+  };
+});
+// The clock only ever suggests — the teacher applies it.
+$("use-suggest").onclick = function(){
+  if (minutes === null || !FEED.length) return;
+  touchedCases = true;
+  sessionCases = Math.min(casesThatFit(minutes), FEED.length);
+  renderAll();
+};
+Array.prototype.forEach.call(document.querySelectorAll(".step"), function(s){
+  s.onclick = function(){ go(+s.getAttribute("data-go")); };
+});
+
+$("publish-btn").addEventListener("click", function(){
+  if (!FEED.length) return;
   var btn = this;
-  var disp = document.getElementById("code-display");
+  var errBox = $("publish-error");
   btn.disabled = true; btn.textContent = "Publishing…";
-  disp.style.display = "none";
+  errBox.className = "pullerr hide"; errBox.textContent = "";
+  var cards = cardsForPublish();
+  var subjects = [];
+  cards.forEach(function(c){ if (subjects.indexOf(c.subject) === -1) subjects.push(c.subject); });
 
-  var curatedBy = document.getElementById("curated-by").value.trim() || null;
-  var context = document.getElementById("context-select").value;
-
-  InfodemicSync.createDrop({
-    title: "Round · " + new Date().toLocaleDateString(),
-    curated_by: curatedBy,
-    context: context,
-    topics_selected: selectedTopics,
-    cards: cardsForPublish()
+  syncCall(function(){
+    return InfodemicSync.createDrop({
+      title: "Session · " + new Date().toLocaleDateString(),
+      curated_by: $("curated-by").value.trim() || null,
+      context: $("context-select").value,
+      topics_selected: subjects,
+      cards: cards
+    });
   }).then(function(drop){
     publishedCode = drop.code_prefix;
-    btn.disabled = false; btn.textContent = "Publish this round →";
-    disp.style.display = "block";
-    disp.innerHTML =
-      '<div class="code-word">'+publishedCode+'</div>' +
-      '<div class="code-sub">This is live in Supabase. Say the word — <b>'+publishedCode+'</b> — to your table or class. Each table\'s first player types just this word (in the lobby\'s join screen) and gets their own table number automatically; everyone else at that table types the full code they\'re given. A second table typing the same word gets a different table, same content.</div>' +
-      '<button class="btn small" id="copy-code-btn" style="margin-top:10px;">Copy word</button>';
-    document.getElementById("copy-code-btn").addEventListener("click", function(){
-      try{ navigator.clipboard.writeText(publishedCode); }catch(e){}
-      this.textContent = "Copied ✓";
-    });
+    btn.disabled = false; btn.textContent = "Publish this session →";
+    go(2);
   }).catch(function(err){
-    btn.disabled = false; btn.textContent = "Publish this round →";
-    disp.style.display = "block";
-    disp.innerHTML = '<div style="color:var(--red); font-size:13px; line-height:1.5;">Publish failed: ' + err.message + '</div>';
+    btn.disabled = false; btn.textContent = "Publish this session →";
+    errBox.className = "pullerr";
+    errBox.textContent = "Publish failed: " + errText(err) + " Nothing was sent — your feed is untouched, try again.";
   });
 });
 
-document.getElementById("export-link").addEventListener("click", function(){
-  var body = document.getElementById("export-panel-body");
+$("copy-code-btn").addEventListener("click", function(){
+  if (!publishedCode) return;
+  try { navigator.clipboard.writeText(publishedCode); } catch(e){}
+  var b = this; b.textContent = "Copied ✓";
+  setTimeout(function(){ b.textContent = "Copy word"; }, 1400);
+});
+
+$("export-link").addEventListener("click", function(){
+  var body = $("export-panel-body");
   var opening = body.style.display !== "block";
   body.style.display = opening ? "block" : "none";
   this.textContent = "View draft for vetting (Markdown) " + (opening ? "▲" : "▾");
-  if (opening) document.getElementById("export-out").value = buildExport();
+  if (opening) $("export-out").value = buildExport();
 });
 
-// ---- Live story source: generate-drop-candidates Edge Function output ----
-// MOCK_STORIES stays as a fallback so the console is never blank — before
-// the first "Refresh from news" run (or if a refresh fails outright),
-// STORIES is just MOCK_STORIES. Once real candidates exist in
-// story_candidates, they fully replace the mock set (not merged with it).
+$("copy-md-btn").addEventListener("click", function(){
+  var out = $("export-out");
+  out.select();
+  try { navigator.clipboard.writeText(out.value); } catch(e){ document.execCommand("copy"); }
+  var b = this; var orig = b.textContent; b.textContent = "Copied ✓";
+  setTimeout(function(){ b.textContent = orig; }, 1400);
+});
+
+// ---- live story source ----------------------------------------------------
+// MOCK_STORIES is the fallback so the console is never blank. Once real
+// candidates exist in story_candidates they replace the mock set. A pull
+// never touches FEED: the feed holds copies of the cards, so stories already
+// added survive a refresh even though their candidate row is gone.
 function rowToStory(row){
   return {
     id: row.id, subject: row.subject, source: row.source, date: row.date,
@@ -761,7 +1048,7 @@ function rowToStory(row){
   };
 }
 function loadStories(){
-  return InfodemicSync.getStoryCandidates().then(function(rows){
+  return syncCall(function(){ return InfodemicSync.getStoryCandidates(); }).then(function(rows){
     if (rows && rows.length){
       STORIES = rows.map(rowToStory);
       storiesSource = "live";
@@ -778,26 +1065,11 @@ function loadStories(){
     storiesPulledAt = null;
   });
 }
-function renderPullTag(){
-  var el = document.getElementById("pull-tag");
-  var html = storiesSource === "live"
-    ? "Source: <b>NewsData.io + Claude-generated</b> (" + STORIES.length + " candidates)<br>Pulled: " + (storiesPulledAt ? new Date(storiesPulledAt).toLocaleString() : "just now")
-    : "Source: <b>mock news feed</b> (stands in for NewsData.io free tier)<br>" + STORIES.length + " candidates";
-  html += '<div style="margin-top:8px;"><button class="btn small' + (refreshing ? '' : ' primary') + '" id="refresh-stories-btn"' + (refreshing ? ' disabled' : '') + '>' +
-    (refreshing ? "Pulling + generating… (can take a minute)" : "Refresh from news →") + '</button></div>';
-  if (refreshError) html += '<div style="color:var(--red); margin-top:6px; max-width:260px;">' + refreshError + '</div>';
-  el.innerHTML = html;
-  var btn = document.getElementById("refresh-stories-btn");
-  if (btn) btn.onclick = doRefreshStories;
-}
-// Pulling fresh candidates makes the old set's story ids meaningless (mock
-// ids don't exist in the live set and vice versa), so a refresh always
-// starts the round over — same as hitting "Start a fresh round" — rather
-// than trying to carry over a DROP built against a story set that's gone.
-function doRefreshStories(){
+
+$("refresh-btn").onclick = function(){
   if (refreshing) return;
-  refreshing = true; refreshError = null; renderPullTag();
-  InfodemicSync.refreshStoryCandidates().then(function(result){
+  refreshing = true; refreshError = null; renderPullBar();
+  syncCall(function(){ return InfodemicSync.refreshStoryCandidates(); }).then(function(result){
     if (result.errors && result.errors.length){
       console.warn("Story generation had partial failures:", result.errors);
       refreshError = result.errors.length + " topic(s) didn't come through (" +
@@ -805,59 +1077,23 @@ function doRefreshStories(){
     }
     if (!result.inserted){
       refreshing = false;
-      refreshError = refreshError || "Refresh failed — no candidates were generated. Check that both API key secrets are set on the Edge Function.";
-      renderPullTag();
+      refreshError = refreshError || "Pull failed — no candidates were generated. Check that both API key secrets are set on the Edge Function.";
+      renderPullBar();
       return;
     }
     return loadStories().then(function(){
-      DROP = []; removedStoryIds = []; publishedCode = null;
-      document.getElementById("code-display").style.display = "none";
-      autoBuildRound(); renderTopicPicker(); renderRound(); renderSidebar();
       refreshing = false;
-      renderPullTag();
+      renderAll();
     });
   }).catch(function(err){
     refreshing = false;
-    refreshError = err.message || "Refresh failed.";
-    renderPullTag();
+    refreshError = "Pull failed: " + errText(err);
+    renderPullBar();
   });
-}
+};
 
-document.getElementById("copy-md-btn").addEventListener("click", function(){
-  var out = document.getElementById("export-out");
-  out.select();
-  try{ navigator.clipboard.writeText(out.value); }catch(e){ document.execCommand("copy"); }
-  var btn = document.getElementById("copy-md-btn");
-  var orig = btn.textContent; btn.textContent = "Copied ✓";
-  setTimeout(function(){ btn.textContent = orig; }, 1400);
-});
-
-document.getElementById("reset-btn").addEventListener("click", function(){
-  DROP = []; removedStoryIds = []; publishedCode = null;
-  document.getElementById("code-display").style.display = "none";
-  document.getElementById("export-panel-body").style.display = "none";
-  document.getElementById("export-link").textContent = "View draft for vetting (Markdown) ▾";
-  autoBuildRound();
-  renderRound(); renderSidebar();
-  // topic selections deliberately persist — that's a curator setting, not part of a single round
-});
-
-renderPullTag();
-renderTopicPicker();
-autoBuildRound();
-renderRound();
-renderSidebar();
-// Check for already-cached live candidates on load (e.g. someone else
-// refreshed earlier today) — if found, swap them in and rebuild the round;
-// if the console starts on the mock set, it just stays there until someone
-// clicks Refresh.
-loadStories().then(function(){
-  renderPullTag();
-  if (storiesSource === "live"){
-    DROP = []; removedStoryIds = [];
-    autoBuildRound(); renderTopicPicker(); renderRound(); renderSidebar();
-  }
-});
+renderAll();
+loadStories().then(renderAll);
 </script>
 </body>
 </html>
