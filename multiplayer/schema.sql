@@ -61,3 +61,24 @@ create policy "players_insert_all" on players for insert with check (true);
 -- state updates) instead of polling. Run this after the tables exist.
 alter publication supabase_realtime add table rooms;
 alter publication supabase_realtime add table players;
+
+-- ---------- 9/7/2026 — per-player slices (the "Round 3/4 sync" build) ----------
+-- Everything ONE player owns (their Round 1 votes, ready-taps, Round 3 spot, Round 4
+-- note / flags / ratings) now lives on that player's own row, written only by that
+-- phone. That removes the ~100ms lost-update hazard of every phone read-modify-writing
+-- one shared blob. Team state (clock, triage, case file, the shared write clock) stays in
+-- rooms.state. Shape of `slice`:
+-- {
+--   votes: { [claimId]: "misinfo"|"biased"|"true"|null },
+--   ready: { [gateKey]: true },            -- "round1", "investigate", "r3:<claimId>"
+--   r3:    { [claimId]: { spot: {i,key}|{straight:true}|null,
+--                         flags: [clipId,...],
+--                         note: {text, cites:[clipId,...]}|null,
+--                         ratings: { [playerId]: "h"|"n" },
+--                         rateDone: bool } }
+-- }
+-- ALREADY-RUNNING PROJECT: paste just this block into the SQL Editor (it is idempotent).
+alter table players add column if not exists slice jsonb not null default '{}'::jsonb;
+
+drop policy if exists "players_update_all" on players;
+create policy "players_update_all" on players for update using (true);

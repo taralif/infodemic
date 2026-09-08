@@ -1,7 +1,9 @@
-// INFODEMIC multiplayer — Supabase sync layer (Week 1)
+// INFODEMIC multiplayer — Supabase sync layer (Week 1; per-player slices added 9/7/2026)
 //
 // Deliberately thin: this is the "easiest for MVP" sync approach discussed —
-// one JSONB blob per room, read-modify-write, last-write-wins. No server-side
+// one JSONB blob per room for TEAM state (read-modify-write, last-write-wins),
+// plus, since 9/7/2026, one JSONB `slice` per player row for everything a single
+// player owns (single writer — see updatePlayerSlice). No server-side
 // vote-hiding, no optimistic-concurrency handling. Good enough for a solo
 // 4-week build with a handful of trusted players; revisit if playtests show
 // writes actually clobbering each other, or if this goes public.
@@ -306,8 +308,31 @@ var InfodemicSync = (function () {
     });
   }
 
+  // ---------------- per-player slices (9/7/2026, the Round 3/4 sync) ----------------
+  // One player's own state (votes, ready-taps, spot, note, flags, ratings) lives on that
+  // player's row and is written ONLY by that phone, so nothing can clobber it. Writes are
+  // serialized through a promise chain so two quick taps can't land out of order on the
+  // network and leave the row holding the older snapshot. The whole slice is written each
+  // time (it's small): no read-modify-write needed because there is one writer.
+  var sliceChain = Promise.resolve();
+  function updatePlayerSlice(playerId, slice) {
+    var db = ensureClient();
+    var snapshot = JSON.parse(JSON.stringify(slice || {}));
+    var run = function () {
+      return db.from("players").update({ slice: snapshot }).eq("id", playerId).then(function (res) {
+        if (res.error) throw res.error;
+        return snapshot;
+      });
+    };
+    var p = sliceChain.then(run, run);
+    sliceChain = p.catch(function () {});
+    return p;
+  }
+
   // ---------------- realtime subscriptions ----------------
-  // onPlayersChange(allPlayers) fires whenever anyone joins this room.
+  // onPlayersChange(allPlayers) fires whenever anyone joins this room (rows include `slice`).
+  // onPlayerChange(row) fires whenever one player's row changes — i.e. their slice was
+  // written (9/7/2026); the row carries the new slice, so no refetch is needed.
   // onStateChange(newState) fires whenever the shared state blob changes
   // (from any player, including this client's own writes).
   function subscribeRoom(code, handlers) {
@@ -326,6 +351,13 @@ var InfodemicSync = (function () {
           if (handlers.onPlayersChange) {
             getPlayers(code).then(handlers.onPlayersChange);
           }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "players", filter: "room_code=eq." + code },
+        function (payload) {
+          if (handlers.onPlayerChange && payload.new) handlers.onPlayerChange(payload.new);
         }
       )
       .subscribe();
@@ -355,6 +387,7 @@ var InfodemicSync = (function () {
     getPlayers: getPlayers,
     getRoomState: getRoomState,
     updateRoomState: updateRoomState,
+    updatePlayerSlice: updatePlayerSlice,
     subscribeRoom: subscribeRoom,
     generateRoomCode: generateRoomCode, // exposed for tests
     createDrop: createDrop,

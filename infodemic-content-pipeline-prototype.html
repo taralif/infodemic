@@ -85,6 +85,14 @@
   }
   .tag.subject{color:var(--blue); border-color:var(--blue-line); background:var(--blue-soft);}
   .tag.new{color:var(--gold); border-color:rgba(255,159,10,.35); background:rgba(255,159,10,.1);}
+  .tag.chip{color:#ff6b62; border-color:rgba(255,69,58,.4); background:rgba(255,69,58,.1); text-transform:none; letter-spacing:.2px;}
+  .tag.straight{color:var(--green); border-color:rgba(48,209,88,.4); background:rgba(48,209,88,.1);}
+  .tag.dup{color:var(--gold); border-color:rgba(255,159,10,.5); background:rgba(255,159,10,.14); text-transform:none; letter-spacing:.2px;}
+  .post{font-size:13.5px; line-height:1.45; margin:0 0 6px; color:var(--ink);}
+  .post b{background:rgba(255,69,58,.18); border-radius:4px; padding:0 2px;}
+  .feeditem .tag{flex:0 0 auto; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  /* claims MVP: the rail used to grow to its longest nowrap feed row (min-width:auto); pin it so rows ellipsize instead */
+  .cols .rail{min-width:0; flex-basis:440px;}
   .hl{font-size:16px; font-weight:700; line-height:1.35; margin:0 0 5px; text-wrap:balance;}
   .src{font-size:12px; color:var(--faint);}
 
@@ -346,6 +354,11 @@
           </div>
           <div class="zonenote" style="margin:9px 0 0;">Round 1 shows the whole feed in 60 seconds. A case they actually chase &mdash; gut check, investigation, note &mdash; runs about 10 minutes.</div>
 
+          <div class="warn hide" id="dupchip">
+            <span>&#9888;</span>
+            <span id="dupchip-text"></span>
+          </div>
+
           <div class="warn hide" id="allstraight">
             <span>&#9888;</span>
             <span>Nothing in this feed plays spun &mdash; no two players would see a different version, so there's nothing to disagree about. Add one more story.</span>
@@ -423,7 +436,7 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="multiplayer/supabase-sync.js"></script>
+<script src="multiplayer/supabase-sync.js?v=2026-09-07-claimsmvp"></script>
 
 <script>
 var TELL_NAMES = {
@@ -446,6 +459,66 @@ var TELL_NAMES = {
   "they-fixed-it": "They fixed it themselves"
 };
 function tellName(key){ return TELL_NAMES[key] || key; }
+
+// ---- claims MVP (9/7/2026): one post per story, CARD tell only ----
+// A story's `post` is {headline, card_tell, card_words}: card_tell is one of the
+// Spotter's five chips or null (= straight), card_words the phrase on the post the
+// chip is hittable through. No dig tells (Tara 9/7). Rows written by
+// generate-drop-candidates v10 carry `post` + `straight`; older rows/drops carry
+// v9 `variants` with old tactic names -- translate the spun variant so they stay
+// playable (card_words unknown -> null).
+var CHIP_KEYS = ["made-to-feel-it","everyones-doing-it","rushing-you","only-two-choices","what-about-them"];
+var OLD_TACTIC_TO_CHIP = {
+  "Bandwagon": "everyones-doing-it",
+  "\"Breaking news\" as a lever": "rushing-you",
+  "Loaded language": "made-to-feel-it",
+  "False dilemma": "only-two-choices",
+  "Whataboutism": "what-about-them"
+};
+function postOf(d){
+  if (d.post && d.post.headline){
+    var ct = CHIP_KEYS.indexOf(d.post.card_tell) === -1 ? null : d.post.card_tell;
+    return { headline: d.post.headline, card_tell: ct, card_words: ct ? (d.post.card_words || null) : null, straight: !ct, legacy: false };
+  }
+  var vs = d.variants || d.lenses || [];
+  var spun = null, plain = null;
+  vs.forEach(function(v){
+    if (!spun && (v.cat === "red" || v.cat === "flag")) spun = v;
+    if (!plain && (v.cat === "green" || v.cat === "hygiene")) plain = v;
+  });
+  if (spun){
+    var key = OLD_TACTIC_TO_CHIP[spun.tell] || OLD_TACTIC_TO_CHIP[spun.tactic] || spun.tell || null;
+    if (CHIP_KEYS.indexOf(key) === -1) key = null;
+    return { headline: spun.claim || d.headline || "", card_tell: key, card_words: key ? (spun.cardWords || null) : null, straight: !key, legacy: true };
+  }
+  return { headline: (plain && plain.claim) || d.headline || "", card_tell: null, card_words: null, straight: true, legacy: true };
+}
+function chipBadge(po){
+  var t = document.createElement("span");
+  if (po.straight){ t.className = "tag straight"; t.textContent = "straight"; }
+  else { t.className = "tag chip"; t.textContent = tellName(po.card_tell); t.title = po.card_words ? "leans on \u201c" + po.card_words + "\u201d" : ""; }
+  return t;
+}
+function postLine(po){
+  var el = document.createElement("p"); el.className = "post";
+  var h = po.headline || "";
+  if (po.card_words && h.indexOf(po.card_words) !== -1){
+    var i = h.indexOf(po.card_words);
+    el.appendChild(document.createTextNode(h.slice(0, i)));
+    var b = document.createElement("b"); b.textContent = po.card_words; el.appendChild(b);
+    el.appendChild(document.createTextNode(h.slice(i + po.card_words.length)));
+  } else {
+    el.textContent = h;
+  }
+  return el;
+}
+// Chips that appear on more than one story in the feed. MVP: a warning only.
+function dupChips(){
+  var seen = {}, dups = [];
+  FEED.forEach(function(d){ var po = postOf(d); if (!po.card_tell) return; seen[po.card_tell] = (seen[po.card_tell]||0) + 1; });
+  Object.keys(seen).forEach(function(k){ if (seen[k] > 1) dups.push(k); });
+  return dups;
+}
 
 // Fallback content — see "Live story source" block below for how this gets
 // replaced by real generate-drop-candidates output once it exists.
@@ -726,6 +799,7 @@ function errText(err){
 function cardFromStory(story){
   return { storyId: story.id, subject: story.subject, source: story.source, url: story.url,
            headline: story.headline, variants: story.lenses || [],
+           post: story.post || null, straight: !!story.straight,
            hook: story.hook || null, background: story.background || null, clips: story.clips || [] };
 }
 function inFeed(id){
@@ -785,9 +859,12 @@ function renderQueue(){
     var meta = document.createElement("div"); meta.className = "meta";
     var t1 = document.createElement("span"); t1.className = "tag subject"; t1.textContent = s.subject;
     meta.appendChild(t1);
-    var h = document.createElement("h3"); h.className = "hl"; h.textContent = s.headline;
+    var po = postOf(s);
+    meta.appendChild(chipBadge(po));
+    // The POST is what players see; the pulled headline is the audit trail.
+    var h = postLine(po);
     var src = document.createElement("div"); src.className = "src";
-    src.textContent = s.source + " · " + s.url + " (as pulled — not player-facing)";
+    src.textContent = "From: " + s.headline + " — " + s.source + " · " + s.url + " (as pulled — not player-facing)";
     body.appendChild(meta); body.appendChild(h); body.appendChild(src);
     var btn = document.createElement("button");
     btn.className = isIn ? "btn small" : "btn add";
@@ -812,12 +889,16 @@ function renderFeed(){
     ? "Round 1 serves all of these in 60 seconds. Which ones the table then works through is their call at triage — that choice is the lesson."
     : "";
   if (!has) return;
+  var dups = dupChips();
 
   FEED.forEach(function(d, idx){
     var row = document.createElement("div");
     row.className = "feeditem";
     var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (idx+1);
-    var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
+    var po = postOf(d);
+    var t = document.createElement("span"); t.className = "t"; t.textContent = po.headline; t.title = po.headline;
+    var badge = chipBadge(po);
+    if (po.card_tell && dups.indexOf(po.card_tell) !== -1){ badge.className = "tag dup"; badge.title = "Another story in this feed carries this chip"; }
 
     var arr = document.createElement("span"); arr.className = "arrows";
     var up = document.createElement("button"); up.textContent = "▲"; up.disabled = idx === 0; up.title = "Move up";
@@ -829,7 +910,7 @@ function renderFeed(){
     var x = document.createElement("button"); x.className = "x"; x.textContent = "×"; x.title = "Take out of the feed";
     x.onclick = function(){ FEED.splice(idx,1); renderAll(); };
 
-    row.appendChild(pos); row.appendChild(t); row.appendChild(arr); row.appendChild(x);
+    row.appendChild(pos); row.appendChild(t); row.appendChild(badge); row.appendChild(arr); row.appendChild(x);
     host.appendChild(row);
   });
 }
@@ -868,10 +949,14 @@ function renderSession(){
   $("shape-feed").textContent = FEED.length === 0 ? "—" : FEED.length;
 
   var anySpun = false;
-  FEED.forEach(function(d){
-    (d.variants || []).forEach(function(v){ if (v.cat === "red") anySpun = true; });
-  });
+  FEED.forEach(function(d){ if (!postOf(d).straight) anySpun = true; });
   $("allstraight").className = (FEED.length > 0 && !anySpun) ? "warn" : "warn hide";
+  var dups = dupChips();
+  $("dupchip").className = dups.length ? "warn" : "warn hide";
+  $("dupchip-text").innerHTML = dups.length
+    ? "Two stories in this feed lean on the same tell (" + dups.map(function(k){ return "<b>" + tellName(k) + "</b>"; }).join(", ") +
+      "). One lesson per story reads better \u2014 consider swapping one out. It still publishes."
+    : "";
 
   $("publish-btn").disabled = FEED.length === 0;
   $("s2").disabled = !publishedCode;
@@ -882,7 +967,10 @@ function cardsForPublish(){
   return orderedFeed().map(function(d){
     return {
       id: d.storyId, subject: d.subject, source: d.source, sourceUrl: d.url, headline: d.headline,
-      variants: (d.variants || []).map(function(v){ return { tell: v.tell, cat: v.cat, claim: v.claim, note: v.note }; }),
+      // claims MVP: the game reads `post`; `variants` only rides along for old rows.
+      post: postOf(d).legacy ? { headline: postOf(d).headline, card_tell: postOf(d).card_tell, card_words: postOf(d).card_words } : d.post,
+      straight: postOf(d).straight,
+      variants: (d.variants || []).map(function(v){ return { tell: v.tell || v.tactic || null, cat: v.cat, claim: v.claim, note: v.note }; }),
       // Round 2 investigation content rides along with the card. A story with no
       // hook/clips publishes with none of it and the game shows its empty state.
       hook: d.hook || null,
@@ -895,7 +983,7 @@ function cardsForPublish(){
 function buildExport(){
   var cards = orderedFeed();
   var flagN = 0, hygN = 0;
-  cards.forEach(function(d){ (d.variants||[]).forEach(function(v){ if (v.cat==="red") flagN++; else hygN++; }); });
+  cards.forEach(function(d){ if (postOf(d).straight) hygN++; else flagN++; });
   var subjects = [];
   cards.forEach(function(d){ if (subjects.indexOf(d.subject) === -1) subjects.push(d.subject); });
   var lines = [];
@@ -904,14 +992,16 @@ function buildExport(){
   if (publishedCode) lines.push("*Published word: " + publishedCode + "*");
   lines.push("*" + cards.length + " stories in the feed · " + Math.min(sessionCases, cards.length) +
              " cases to file · about " + estimateMin() + " min · " +
-             flagN + " spun / " + hygN + " straight framings, AI-personalized per player*");
+             flagN + " spun / " + hygN + " straight*");
   lines.push("*Which stories get chased is the table's call at triage, not the curator's.*");
   lines.push("*The cases number is advisory — the game files 2 until it reads the setting.*");
   lines.push("");
-  lines.push("| # | Subject | AI-personalized framings (curator did not choose these) |");
+  lines.push("| # | Subject | The post (tell in brackets) |");
   lines.push("|---|---|---|");
   cards.forEach(function(d, i){
-    var vtext = (d.variants||[]).map(function(v){ return "**["+tellName(v.tell)+"]** " + String(v.claim).replace(/\|/g,"/"); }).join("<br>");
+    var po = postOf(d);
+    var vtext = "**[" + (po.straight ? "straight" : tellName(po.card_tell)) + "]** " + String(po.headline).replace(/\|/g,"/") +
+                (po.card_words ? " _(leans on \u201c" + po.card_words + "\u201d)_" : "");
     lines.push("| "+(i+1)+" | "+d.subject+" | "+vtext+" |");
   });
   lines.push("");
@@ -933,8 +1023,9 @@ function renderPublished(){
   cards.forEach(function(d, i){
     var row = document.createElement("div"); row.className = "feeditem";
     var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (i+1);
-    var t = document.createElement("span"); t.className = "t"; t.textContent = d.headline; t.title = d.headline;
-    row.appendChild(pos); row.appendChild(t);
+    var po = postOf(d);
+    var t = document.createElement("span"); t.className = "t"; t.textContent = po.headline; t.title = po.headline;
+    row.appendChild(pos); row.appendChild(t); row.appendChild(chipBadge(po));
     host.appendChild(row);
   });
   $("playsummary").textContent = cards.length + " stories · " + Math.min(sessionCases, cards.length) +
@@ -1044,6 +1135,7 @@ function rowToStory(row){
   return {
     id: row.id, subject: row.subject, source: row.source, date: row.date,
     headline: row.headline, url: row.url, lenses: row.variants || [],
+    post: row.post || null, straight: !!row.straight,
     hook: row.hook || null, background: row.background || null, clips: row.clips || []
   };
 }
