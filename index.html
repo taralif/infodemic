@@ -66,32 +66,38 @@
   }
   .btn-text:hover{ border-color:var(--ink); }
 
-  /* ---------- hero visual: two phones, same story ---------- */
-  .stage{ display:flex; gap:18px; justify-content:center; align-items:flex-start; }
-  .col{ flex:1; max-width:238px; }
-  .col.offset{ margin-top:44px; }
-  .seat{
-    font-size:10px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase;
-    color:var(--faint); margin:0 0 10px 4px;
+  /* ---------- hero visual: the raging feed (9/8) ---------- */
+  .rage{ position:relative; }
+  @media (max-width:900px){ .hero{ overflow:hidden; } }
+  .rage-win{
+    position:relative; height:470px; overflow:hidden;
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 18%, #000 78%, transparent 100%);
+            mask-image:linear-gradient(to bottom, transparent 0%, #000 18%, #000 78%, transparent 100%);
   }
-  .phone{
-    border:1.5px solid rgba(242,241,234,.16); border-radius:26px; background:#000;
-    padding:9px 8px 14px; box-shadow:0 20px 50px rgba(0,0,0,.6);
-  }
-  .notch{ width:44%; height:4px; border-radius:99px; background:rgba(242,241,234,.16); margin:2px auto 11px; }
+  .rage-track{ display:flex; flex-direction:column; gap:10px; padding:0 28px; will-change:transform; animation:rage 4.2s linear infinite; }
+  @keyframes rage{ from{ transform:translateY(0); } to{ transform:translateY(-50%); } }
+  .rage .post{ border-radius:16px; padding:14px 15px 15px; border-color:rgba(242,241,234,.1); }
+  .rage .post-text{ font-size:14px; }
+  .fire{ position:absolute; border-radius:50%; filter:blur(26px); opacity:.5; pointer-events:none; }
+  .f1{ left:-6%; right:-6%; bottom:30px; height:300px; background:radial-gradient(ellipse at 50% 100%, #ff7a1a 0%, #e0654a 35%, rgba(224,101,74,0) 72%); animation:lick 1.6s ease-in-out infinite; }
+  .f2{ left:14%; right:30%; bottom:60px; height:360px; background:radial-gradient(ellipse at 50% 100%, #ffd166 0%, #ff7a1a 30%, rgba(255,122,26,0) 70%); animation:lick 1.1s ease-in-out infinite reverse; }
+  .f3{ left:38%; right:0; bottom:40px; height:260px; background:radial-gradient(ellipse at 50% 100%, #ff4d2e 0%, rgba(255,77,46,0) 70%); animation:lick 1.35s ease-in-out .3s infinite; }
+  @keyframes lick{ 0%{ transform:translateY(0) scale(1); opacity:.42; } 50%{ transform:translateY(-18px) scale(1.04,1.14); opacity:.55; } 100%{ transform:translateY(0) scale(1); opacity:.42; } }
+  @media (prefers-reduced-motion: reduce){ .rage-track{ animation-duration:40s; } .fire{ animation:none; } }
+  @media (max-width:900px){ .rage-win{ height:380px; } .rage-track{ padding:0 8px; } }
+  .avatar{ width:20px; height:20px; border-radius:50%; flex:none; }
+  .a1{ background:linear-gradient(140deg,#4caf7d,#5b8fbf); }
+  .a2{ background:linear-gradient(140deg,#e0654a,#d9a441); }
+  .a3{ background:linear-gradient(140deg,#5b8fbf,#4caf7d); }
+  .a4{ background:linear-gradient(140deg,#d9a441,#e0654a); }
+  .a5{ background:linear-gradient(140deg,#c583ff,#5ac8fa); }
   .post{ background:var(--panel-2); border:1px solid var(--line-soft); border-radius:13px; padding:12px 12px 13px; }
   .post-top{ display:flex; align-items:center; gap:7px; margin-bottom:9px; }
-  .avatar{ width:20px; height:20px; border-radius:50%; flex:none; }
-  .a1{ background:linear-gradient(140deg,#d9a441,#e0654a); }
-  .a2{ background:linear-gradient(140deg,#5b8fbf,#4caf7d); }
   .handle{ font-size:10.5px; font-weight:600; color:var(--dim); }
   .handle span{ font-weight:400; color:var(--faint); }
   .post-text{ font-size:13px; line-height:1.45; font-weight:500; color:var(--ink); }
-  .post-text em{ font-style:normal; border-bottom:1.5px solid rgba(224,101,74,.65); }
-  .skeleton{ height:8px; border-radius:99px; background:rgba(242,241,234,.07); margin-top:10px; }
-  .skeleton.s2{ width:72%; }
   .stage-note{
-    text-align:center; font-family:var(--serif); font-style:italic; font-weight:300;
+    position:relative; text-align:center; font-family:var(--serif); font-style:italic; font-weight:300;
     font-size:15px; color:var(--faint); margin:26px 0 0;
   }
 
@@ -358,9 +364,9 @@
     <div>
       <h1>No one ever taught us to read a feed.</h1>
       <p class="lede">
-        Half of American teens say the news just arrives — on a phone, between a friend's post and an ad,
-        never saying where it came from. <b>Infodemic is a game that makes a room full of kids slow that
-        feed down</b>, check what's in it, and argue their way to one thing they can all stand behind.
+        The feed doesn't stop. <b>Infodemic is a classroom game that makes a room full of kids stop it</b>
+        &mdash; call one post on instinct, dig into it together, and argue their way to one thing they can all
+        stand behind.
       </p>
       <div class="cta-row">
         <a class="btn" href="#demo">Play a round</a>
@@ -368,35 +374,27 @@
       </div>
     </div>
 
-    <div>
-      <div class="stage">
-        <div class="col">
-          <p class="seat">Maya's feed</p>
-          <div class="phone">
-            <div class="notch"></div>
-            <div class="post">
-              <div class="post-top"><div class="avatar a1"></div><div class="handle">Student Voice <span>· 2h</span></div></div>
-              <div class="post-text">BREAKING: they're taking your phone <em>all day</em> in September. Pushed through over break — no student got to speak.</div>
-            </div>
-            <div class="skeleton"></div>
-            <div class="skeleton s2"></div>
-          </div>
-        </div>
-        <div class="col offset">
-          <p class="seat">Devon's feed</p>
-          <div class="phone">
-            <div class="notch"></div>
-            <div class="post">
-              <div class="post-top"><div class="avatar a2"></div><div class="handle">Metro Desk <span>· 2h</span></div></div>
-              <div class="post-text">Board voted 5&ndash;2 to lock phones <em>during class</em> from September. Students keep them at lunch.</div>
-            </div>
-            <div class="skeleton"></div>
-            <div class="skeleton s2"></div>
-          </div>
+    <div class="rage" aria-hidden="true">
+      <div class="fire f1"></div><div class="fire f2"></div><div class="fire f3"></div>
+      <div class="rage-win">
+        <div class="rage-track">
+          <div class="post"><div class="post-top"><div class="avatar a1"></div><div class="handle">Eco Facts Daily <span>· 2h</span></div></div><div class="post-text">Everyone's finally waking up to this: every single ChatGPT question quietly drains a full bottle of water. Unpacking the shocking truth ⬇️</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a2"></div><div class="handle">Breaking Politics Now <span>· 1h</span></div></div><div class="post-text">🚨 BREAKING: senator COLLAPSES getting into his car. Share this before it gets taken down.</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a3"></div><div class="handle">NBC News <span>· 4h</span></div></div><div class="post-text">Wire reporting: a heat wave has pushed 50M+ people under heat alerts.</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a4"></div><div class="handle">Sports Drama 24 <span>· 3h</span></div></div><div class="post-text">Either they cropped him out on purpose or they think we're too dumb to notice. Which one is it? 😤</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a5"></div><div class="handle">Daily Haul Finds <span>· 5h</span></div></div><div class="post-text">A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a5"></div><div class="handle">Fact Check Daily <span>· ✓ · 3h</span></div></div><div class="post-text">We put the viral &ldquo;cooling&rdquo; chart next to the full 40-year dataset. Here's the part that was cut off.</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a1"></div><div class="handle">Eco Facts Daily <span>· 2h</span></div></div><div class="post-text">Everyone's finally waking up to this: every single ChatGPT question quietly drains a full bottle of water. Unpacking the shocking truth ⬇️</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a2"></div><div class="handle">Breaking Politics Now <span>· 1h</span></div></div><div class="post-text">🚨 BREAKING: senator COLLAPSES getting into his car. Share this before it gets taken down.</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a3"></div><div class="handle">NBC News <span>· 4h</span></div></div><div class="post-text">Wire reporting: a heat wave has pushed 50M+ people under heat alerts.</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a4"></div><div class="handle">Sports Drama 24 <span>· 3h</span></div></div><div class="post-text">Either they cropped him out on purpose or they think we're too dumb to notice. Which one is it? 😤</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a5"></div><div class="handle">Daily Haul Finds <span>· 5h</span></div></div><div class="post-text">A lawsuit says a popular skincare brand tested positive for a cancer-linked chemical.</div></div>
+          <div class="post"><div class="post-top"><div class="avatar a5"></div><div class="handle">Fact Check Daily <span>· ✓ · 3h</span></div></div><div class="post-text">We put the viral &ldquo;cooling&rdquo; chart next to the full 40-year dataset. Here's the part that was cut off.</div></div>
         </div>
       </div>
-      <p class="stage-note">Same story. Different feeds. Now they have to talk.</p>
+      <p class="stage-note">This is the speed it arrives at. The game is what happens when you stop it.</p>
     </div>
+  </div>
   </div>
 
   <!-- ================= PROBLEM ================= -->
