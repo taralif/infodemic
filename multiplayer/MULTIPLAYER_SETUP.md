@@ -62,9 +62,19 @@ What's still local-only (by design, not a bug): which screen you're on, which ca
 
 Verified via a Node test harness (`test_multiplayer_sync.js`, run against a mocked backend simulating two browser tabs) before this was handed off — confirmed room join, live player sync, shared round-timer adoption, per-player vote merging (not clobbering), and board/filing sync all work correctly at the logic level. That's not the same as testing against real Supabase infrastructure, so still worth doing the manual walkthrough above at least once.
 
+## Rounds 3/4 sync + per-player slices (9/7/2026)
+
+**If your Supabase project already exists:** re-run only the last block of `schema.sql` (the `alter table players add column ... slice` + `players_update_all` policy). It is idempotent. (It was applied to the Infodemic project on 9/7/2026.)
+
+What changed: everything one player owns — Round 1 votes, ready-taps, the Round 3 spot, the Round 4 note / 🚩 flags / ratings — now lives in a `slice` JSONB column on that player's own `players` row, written only by that phone (`InfodemicSync.updatePlayerSlice`, serialized). `rooms.state` keeps only team state: the clock, triage, the case file, and Round 4's shared write clock (`r3clock`). Realtime now also listens for `UPDATE` on `players`. This removes the ~100ms lost-update hazard below.
+
+Every "everyone's in" gate is computed from the slices on whichever phone sees the last one land: the team-gated tours, Round 1's all-votes-in, **Ready to go!** (everyone must tap), the spot flash (60s ceiling), rating opening (every note in, or 90s + 20s grace), and File it (every rating in, 60s ceiling). The winner is computed on every phone from the same synced ratings with a deterministic tie-break (most helpful → most cites → quietest author), so File it on any phone files the same note everywhere.
+
+Verified 9/7 with `Claude outputs/walk_multiplayer.js` (`solo`, `room`, `room2`) against `mock-supabase-sync.js` — two phones through FILED, zero errors.
+
 ## Known simplifications (deliberate, for MVP speed)
 
-- **Last-write-wins.** The whole game state lives in one JSONB blob per room, read-modify-written on every update. If two players save at the exact same instant, one write can overwrite the other. Fine for a small, cooperative table; would need real conflict handling for anything more adversarial or higher-scale.
+- **Last-write-wins (team state only, since 9/7/2026).** The clock, triage and case file live in one JSONB blob per room, read-modify-written on every update; per-player state is on each player's own row and can't be clobbered. Two near-simultaneous exhibit adds are unioned in `syncBoard`.
 - **No vote-hiding at the database level.** When Round 1 votes get wired in next week, they'll sync to everyone's client in real time — hiding them until reveal will be done in the UI only (not rendering other players' votes early), not enforced server-side. A technically savvy player could see votes early via browser dev tools. Acceptable for a trusted-group MVP demo; flagged so it doesn't get forgotten if this ever goes public/competitive.
 - **Open RLS policies.** Anyone with a room code can read/write that room — no auth, no per-player write restrictions. Matches "no accounts" design decision, but also means no real cheat-proofing.
 - **No reconnect/disconnect handling yet.** If a player closes the tab, their `players` row just sits there — no "left the game" state. Deferred per the staged-MVP scope.

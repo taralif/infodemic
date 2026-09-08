@@ -141,7 +141,8 @@
   .pullquote small a:hover{ color:var(--ink); border-color:var(--ink); }
 
   /* ---------- beats ---------- */
-  .beats{ display:grid; grid-template-columns:repeat(3,1fr); gap:46px; }
+  .beats{ display:grid; grid-template-columns:repeat(4,1fr); gap:34px; }
+  @media (max-width:1100px){ .beats{ grid-template-columns:repeat(2,1fr); gap:40px; } }
   @media (max-width:860px){ .beats{ grid-template-columns:1fr; gap:40px; } }
   .beat .bnum{ font-size:11px; font-weight:700; letter-spacing:1.6px; color:var(--blue); margin-bottom:15px; }
   .beat h3{ font-family:var(--serif); font-weight:400; font-size:25px; letter-spacing:-.6px; margin:0 0 11px; }
@@ -434,32 +435,38 @@
   <!-- ================= HOW IT PLAYS ================= -->
   <section id="how">
     <div class="eyebrow"><span>How it plays</span><span class="count">02</span></div>
-    <h2>Three rounds per story, about ten minutes.</h2>
+    <h2>Four rounds per story, about ten minutes.</h2>
     <p class="sub">Everyone's on their own phone. The game happens between them, out loud, in the room.</p>
 
     <div class="beats">
       <div class="beat">
         <div class="bnum">01</div>
-        <h3>Judge on instinct</h3>
+        <h3>Gut check</h3>
         <p>The whole feed lands in sixty seconds. Thumbs only, no time to think — that's the honest baseline, because it's how everyone reads a feed when nobody's watching.</p>
       </div>
       <div class="beat">
         <div class="bnum">02</div>
-        <h3>Go check</h3>
-        <p>Search it. Ask an AI. Look up who runs the account and who funds them. Everyone digs through the same evidence — and there's no answer key waiting at the end.</p>
+        <h3>Investigate</h3>
+        <p>The team picks the story it split on and goes to work. Search it. Ask an AI. Look up who runs the account and who funds them. Everything anyone finds lands in one shared case file — and there's no answer key waiting at the end.</p>
       </div>
       <div class="beat">
         <div class="bnum">03</div>
-        <h3>Agree on something</h3>
-        <p>The table writes one community note together, each player holding a different job. It doesn't ship until it survives the skeptic sitting next to them.</p>
+        <h3>Spot the tell</h3>
+        <p>One more look at the post, in silence. Everyone crosses out the part that was working on them — then the real tell is revealed, and so is who caught it.</p>
+      </div>
+      <div class="beat">
+        <div class="bnum">04</div>
+        <h3>Write the note</h3>
+        <p>The team checks the case file together and flags anything that doesn't hold — out loud. Then everyone writes a community note from it, and the one the team rates most helpful goes on the post.</p>
       </div>
     </div>
 
     <div class="bet">
       <div class="label">The bet</div>
-      <p>Every player is handed a different version of the same story.
-        <span>So the disagreement at the table is real rather than staged — and the only way out of it is to go
-        look things up and talk to each other. It's a phone game whose entire point is the conversation in the room.</span>
+      <p>Everyone sees the same feed. Nobody reads it the same way.
+        <span>The first round shows the team exactly where it split — and that disagreement is real, not staged. The only
+        way out of it is to go look things up and talk to each other. It's a phone game whose entire point is the
+        conversation in the room.</span>
       </p>
     </div>
 
@@ -506,9 +513,9 @@
         </div>
         <div class="point">
           <h3>You pick the stories. You never write the spin</h3>
-          <p>What goes in the feed is your call. How each story gets framed — and which player sees which
-             version — is generated at publish time. Nobody can accuse you of stacking the deck when you
-             didn't build the deck.</p>
+          <p>What goes in the feed is your call. How each story gets framed — and what its tell is — is
+             generated at publish time. Nobody can accuse you of stacking the deck when you didn't build
+             the deck.</p>
         </div>
         <div class="point">
           <h3>It tells you when the feed is too easy</h3>

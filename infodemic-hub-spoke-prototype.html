@@ -983,8 +983,14 @@
   .citeflag{width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:14px; flex:none;
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); opacity:.55;}
   .citeflag.on{background:rgba(255,69,58,.2); border-color:rgba(255,69,58,.55); opacity:1;}
-  .citerow.flagged{border-color:rgba(255,69,58,.45);}
+  .citerow.flagged{border-color:rgba(255,69,58,.6); background:rgba(255,69,58,.07); animation:flagin .6s ease-out;}
+  @keyframes flagin{0%{box-shadow:0 0 0 0 rgba(255,69,58,.55);} 100%{box-shadow:0 0 0 10px rgba(255,69,58,0);}}
+  .citeflags{display:flex; align-items:center; gap:6px; margin-top:5px; font-size:11.5px; font-weight:800; color:#ff9f96; line-height:1.3;}
+  .citeflags .r3av{width:18px; height:18px; font-size:8.5px; border:1.5px solid #000;} .citeflags .r3av + .r3av{margin-left:-7px;}
   .speakup{margin-top:8px; font-size:12.5px; font-weight:700; color:#ff9f96; background:rgba(255,69,58,.1); border:1px solid rgba(255,69,58,.3); border-radius:12px; padding:9px 11px; line-height:1.4;}
+  .speakup-ex{margin-top:6px; font-weight:500; color:var(--ios-label); font-size:12.5px; line-height:1.4; padding-left:8px; border-left:2px solid rgba(255,69,58,.45);}
+  .speakup-ex b{color:#ff9f96;}
+  .speakup-ex span{color:var(--ios-label3);}
   .speakup.quiet{color:var(--ios-label2); background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.1); font-weight:600;}
   .doorrule{margin-top:18px; font-size:13.5px; font-weight:700; line-height:1.45; color:#ffc978; background:rgba(255,159,10,.1); border:1px solid rgba(255,159,10,.35); border-radius:14px; padding:11px 14px; max-width:320px;}
   .citehint{font-size:12px; font-weight:700; color:var(--ios-label2); min-height:16px;}
@@ -1550,7 +1556,7 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-09-04 · speak up";
+var BUILD = "2026-09-08 · check the evidence";
 var revealState = {active:false, order:[], index:0};
 // ---------------- TRIAGE (8/31/2026) ----------------
 // Replaces the old "you may only investigate what you disagreed about" gate. The table
@@ -1961,7 +1967,7 @@ function getR3(id){
   var b = getBoard(id);
   if(!b.r3) b.r3 = {
     started:false,        // the gate was answered "Yes — let's write it"
-    beat:"transition",    // transition | spot | wait | flash | defend | write | ratein | rate | file | filed
+    beat:"transition",    // transition | spot | wait | flash | noteintro | flag | writeintro | write | ratein | rate | file | filed
     spot:null,            // your Spotter call: {i:wordIndex, key:tellKey} or {straight:true}
     naming:null,          // word index whose chip panel is open
     rulings:{},           // clipId -> "flag"  (set on the Write screen since 9/4 eve; visible on the board afterwards)
@@ -1979,7 +1985,10 @@ function getR3(id){
 function r3Started(claimId){ var b = BOARD[claimId]; return !!(b && b.r3 && b.r3.started); }
 // The gate that ends Round 2 and opens Round 3: enough pooled evidence to write from.
 // Same constant the deleted board tour used — it was always the same idea.
-function r3Open(claimId){ return getBoard(claimId).board.length >= BOARD_TOUR_EVIDENCE_THRESHOLD; }
+// Tara, 9/8: 4 is a SUGGESTION, not a lock — a team that agrees can go early. One exhibit is
+// the floor (a note needs something to cite); at 4 the button pulses and the copy nudges.
+function r3Open(claimId){ return getBoard(claimId).board.length >= R3_MIN_EVIDENCE; }
+var R3_MIN_EVIDENCE = 1;
 // The team has passed the evidence gate on this story and is writing, not looking.
 function r3Writing(claimId){ return r3Started(claimId) && !getBoard(claimId).filed; }
 // The story the note gate is about: past the threshold, not filed, not yet answered "yes".
@@ -2009,6 +2018,8 @@ function r3NpcDrafts(claim){
 }
 function claimNumber(id){ return "INF-" + String(4000 + id*137).slice(-5); }
 function letterFor(i){ return String.fromCharCode(65+i); }
+var MY_ID = "you";   // the hub-spoke player's pid (matches the multiplayer file)
+function r3Names(players){ return players.map(function(p){ return p.isYou ? "you" : p.name; }).join(", "); }
 function P(id){ return PLAYERS.filter(function(p){ return p.id===id; })[0]; }
 function r3Av(pid, cls){ var p = P(pid); return '<span class="r3av '+(cls||"")+'" style="background:'+p.color+'" title="'+p.name+'">'+p.initial+'</span>'; }
 
@@ -2683,7 +2694,7 @@ function renderCardBack(claim, variant){
   var mode = cardMode[claim.id];
   if(!mode || mode==="board") mode = "case";
   var board = getBoard(claim.id);
-  var nEx = board.board.length, needEx = BOARD_TOUR_EVIDENCE_THRESHOLD, enough = nEx >= needEx;
+  var nEx = board.board.length, needEx = BOARD_TOUR_EVIDENCE_THRESHOLD, enough = nEx >= needEx, canGo = nEx >= R3_MIN_EVIDENCE;
   var html = '<div class="cardback-head">';
   html += '<span class="cardback-flipclose" onclick="flipCard('+claim.id+')">↩</span>';
   // Tara, 9/4 evening: while investigating, the headline is NOT repeated up here — the
@@ -2716,8 +2727,8 @@ function renderCardBack(claim, variant){
     // HOME. Framing line + the standing goal line (cluster A, reworded 9/3 evening) sit
     // directly above the list they're counting — that was the whole point of the move.
     var goalTxt;
-    if(nEx === 0)        goalTxt = 'Add at least '+needEx+' pieces of evidence to your case file. Then your team writes the community note.';
-    else if(!enough)     goalTxt = nEx+' in your case file — add at least '+(needEx-nEx)+' more. Then your team writes the community note.';
+    if(nEx === 0)        goalTxt = 'Aim for '+needEx+' pieces of evidence in your case file. Then your team writes the community note.';
+    else if(!enough)     goalTxt = nEx+' in your case file — aim for '+needEx+'. Your team can go early if everyone agrees.';
     else                 goalTxt = 'Enough in your case file. Keep digging, or tell your team you\'re ready.';
     html += '<div class="cardback-frame">'+(enough ? 'Your case is building. 🗂️' : 'Now gather the evidence. 🗂️')+'<span class="goal'+(enough?' done':'')+'">'+goalTxt+'</span></div>';
     html += renderToolPills(claim);
@@ -2736,8 +2747,8 @@ function renderCardBack(claim, variant){
   // the button is that decision.
   if(homeMode && mode==="case"){
     html += '<div class="cardback-foot">';
-    html += '<button class="readybtn'+(enough?' pulse':'')+'"'+(enough?'':' disabled')+' onclick="readyForNote('+claim.id+')">Ready to go! →</button>';
-    html += '<div class="readynote">'+(enough ? 'Tap when your team agrees you\'re done looking.' : 'Unlocks at '+needEx+' pieces of evidence · '+nEx+' so far')+'</div>';
+    html += '<button class="readybtn'+(enough?' pulse':'')+'"'+(canGo?'':' disabled')+' onclick="readyForNote('+claim.id+')">Ready to go! →</button>';
+    html += '<div class="readynote">'+(!canGo ? 'Add at least one piece of evidence first.' : (enough ? 'Tap when your team agrees you\'re done looking.' : 'Only '+nEx+' so far — '+needEx+' is the goal, but your team can go early if everyone agrees.'))+'</div>';
     html += '</div>';
   }
   return html;
@@ -2765,7 +2776,7 @@ function renderToolPills(claim){
 var justAddedClipId = null;
 function renderCaseFile(claim){
   var b = getBoard(claim.id), need = BOARD_TOUR_EVIDENCE_THRESHOLD;
-  var html = '<div class="sectionhead casehead">Your case file <span class="cnt">'+b.board.length+' / '+need+' MIN</span></div>';
+  var html = '<div class="sectionhead casehead">Your case file <span class="cnt">'+b.board.length+' / '+need+' GOAL</span></div>';
   html += '<div class="groupcard">';
   var postEng = BASE_ENGAGEMENT[claim.id] || 10;
   // Tara, 9/4 evening: the post is the thing everything else is ABOUT, and it's no longer
@@ -3068,6 +3079,7 @@ function renderR3(){
   r3ScreenKey = key;
   var ta = document.getElementById("r3ta"), focus = ta && document.activeElement===ta, pos = focus ? ta.selectionStart : 0;
   var R = {transition:r3RenderTransition, spot:r3RenderSpot, wait:r3RenderWait, flash:r3RenderFlash, noteintro:r3RenderNoteIntro,
+           flag:r3RenderFlag, writeintro:r3RenderWriteIntro,
            write:r3RenderWrite, ratein:r3RenderRateIn, rate:r3RenderRate, file:r3RenderFile};
   el.innerHTML = (R[r.beat] || r3RenderTransition)(claim, r);
   el.className = "onboard-scrim active";
@@ -3092,10 +3104,49 @@ function r3RenderTransition(claim, r){
 // here, and here goes straight to Write. What survives of Defend: a 🚩 on every cite row of
 // the Write screen, and one rule — "speak up: if you flag evidence, tell your team why."
 function r3RenderNoteIntro(claim, r){
-  return '<div class="r3full"><div class="onboard-kicker">Round 4 · Community note</div><div class="onboard-big">📝</div>'+
+  // Tara, 9/8: checking the evidence is its OWN beat (talk) before the silent 90s write —
+  // "the 90s is already tight for writing." (Ported from the multiplayer file; solo has no wait.)
+  return '<div class="r3full"><div class="onboard-kicker">Round 4 · Community note</div><div class="onboard-big">🗂️</div>'+
+    '<div class="onboard-title">First, check the case file together.</div>'+
+    '<div class="onboard-sub">Go through the evidence as a team. Then everyone writes a note from it — the one your team rates most helpful goes on the post.</div>'+
+    '<div class="doorrule">🚩 Flag anything that doesn\'t hold. Your team sees it the moment you do — say why, out loud, and ask them why.</div>'+
+    '<div class="onboard-cta"><button class="r3btn" onclick="r3Go('+claim.id+',\'flag\')">Check the evidence</button></div></div>';
+}
+// ---- 3b · CHECK THE EVIDENCE (talk): the rows with 🚩 toggles; flags + who set them ----
+function r3ExhibitRowHTML(claim, e, opts){
+  var r = getR3(claim.id), mine = r.rulings[e.clipId]==="flag", who = r3FlaggersOf(claim.id, e.clipId), fl = who.length>0;
+  var strip = "";
+  if(fl){
+    var them = who.filter(function(pid){ return pid!==MY_ID; }).map(P).filter(Boolean);
+    var line = mine ? (them.length ? 'You and '+r3Names(them)+' flagged this — say why.' : 'You flagged this — tell your team why.')
+                    : (them.length===1 ? them[0].name+' flagged this — ask them why.' : r3Names(them)+' flagged this — ask them why.');
+    strip = '<span class="citeflags">'+who.map(function(pid){ return r3Av(pid); }).join("")+'<span>🚩 '+escapeHtml(line)+'</span></span>';
+  }
+  var on = opts.cite && r.cites.indexOf(e.clipId)>=0;
+  var h = '<div class="citerow'+(on?" on":"")+(fl?" flagged":"")+'"'+(opts.cite ? ' onclick="r3ToggleCite('+claim.id+',\''+e.clipId+'\')"' : '')+'><span class="citelet">'+e.letter+(fl?'<i class="mark f">🚩</i>':'')+'</span>'+
+    '<span class="citebody"><span class="citetext">'+escapeHtml(e.clip.text)+'</span><span class="citewho">'+escapeHtml(r3ClipWho(e.clip))+' · '+(P(e.owner).isYou?"you":P(e.owner).name)+' added it</span>'+strip+'</span>';
+  if(opts.flag) h += '<span class="citeflag'+(mine?" on":"")+'" title="'+(mine?"unflag":"flag it")+'" onclick="r3ToggleFlag('+claim.id+',\''+e.clipId+'\', event)">🚩</span>';
+  if(opts.cite) h += '<span class="citetick">'+(on?"✓":"")+'</span>';
+  return h+'</div>';
+}
+function r3RenderFlag(claim, r){
+  var h = '<div class="r3col"><div class="r3scroll">';
+  h += '<div class="r3kick">Round 4 · Check the evidence <span class="mode talk">talk</span></div>';
+  h += '<div class="r3title">Does all of this hold up?</div>';
+  h += '<div class="r3sub">Read the case file together. 🚩 anything that doesn\'t hold — everyone sees it the moment you do. Say why. Flagged evidence stays citable.</div>';
+  h += '<div class="citerows">'+r3Exhibits(claim.id).map(function(e){ return r3ExhibitRowHTML(claim, e, {flag:true}); }).join("")+'</div>';
+  var b = getBoard(claim.id), n = b.board.filter(function(cid){ return r3Flagged(claim.id, cid); }).length;
+  h += '<div class="citehint'+(n?"":" good")+'">'+(n ? n+' of '+b.board.length+' flagged — talk it through, then Done.' : 'Nothing flagged yet — the file holds. Done when you\'ve talked it through.')+'</div>';
+  h += '</div><div class="r3foot"><button class="r3btn" id="r3flagDone" onclick="r3FlagDone('+claim.id+')">Done — let\'s write</button></div></div>';
+  return h;
+}
+// Solo: no teammates to wait on — Done goes straight to the write door.
+function r3FlagDone(claimId){ getR3(claimId).flagDone = true; r3Go(claimId, "writeintro"); }
+// ---- 4a · the write door: a change of job (talk → silent) gets its own card ----
+function r3RenderWriteIntro(claim, r){
+  return '<div class="r3full"><div class="onboard-kicker">Round 4 · Write</div><div class="onboard-big">📝</div>'+
     '<div class="onboard-title">Now write what actually happened.</div>'+
-    '<div class="onboard-sub">Everyone writes a note from the case file. The one your team rates most helpful goes on the post.</div>'+
-    '<div class="doorrule">🚩 Speak up. If you flag a piece of evidence, tell your team why — out loud.</div>'+
+    '<div class="onboard-sub">Silent, 90 seconds. One or two plain sentences, citing the evidence — flagged or not. The note your team rates most helpful goes on the post.</div>'+
     '<div class="onboard-cta"><button class="r3btn" onclick="r3Go('+claim.id+',\'write\')">Start writing</button></div></div>';
 }
 
@@ -3215,6 +3266,28 @@ function r3ToggleFlag(claimId, clipId, ev){
   if(r.rulings[clipId]==="flag") delete r.rulings[clipId]; else r.rulings[clipId] = "flag";
   render();
 }
+// Who has flagged this exhibit — solo: only you (the multiplayer file adds teammates' slices).
+function r3FlaggersOf(claimId, clipId){ return getR3(claimId).rulings[clipId]==="flag" ? [MY_ID] : []; }
+// The Defend spirit, as lines: the flagger is told to speak up. Shown on Rate and File, where
+// the cite rows aren't on screen, with the exhibit QUOTED so the team sees what was flagged (Tara, 9/8).
+function r3FlagLines(claimId, withText){
+  var b = getBoard(claimId), byPid = {};
+  b.board.forEach(function(cid){ r3FlaggersOf(claimId, cid).forEach(function(pid){ (byPid[pid] = byPid[pid] || []).push(cid); }); });
+  function exLines(cids){
+    if(!withText) return "";
+    return cids.map(function(cid){ var e = r3Exhibit(claimId, cid); if(!e) return "";
+      return '<div class="speakup-ex"><b>Exh '+e.letter+'</b> “'+escapeHtml(e.clip.text)+'” <span>'+escapeHtml(r3ClipWho(e.clip))+' · '+(P(e.owner) && P(e.owner).isYou ? "you" : (P(e.owner)||{}).name)+' added it</span></div>'; }).join("");
+  }
+  function letters(cids){ var L = cids.map(function(cid){ return letterFor(b.board.indexOf(cid)); }); return L.length===1 ? 'Exhibit '+L[0] : 'Exhibits '+L.join(", "); }
+  var h = "";
+  if(byPid[MY_ID]) h += '<div class="speakup">🚩 You flagged '+letters(byPid[MY_ID])+' — speak up and tell your team why.'+exLines(byPid[MY_ID])+'</div>';
+  Object.keys(byPid).forEach(function(pid){
+    if(pid===MY_ID) return;
+    var p = P(pid); if(!p) return;
+    h += '<div class="speakup">🚩 '+escapeHtml(p.name)+' flagged '+letters(byPid[pid])+' — ask them why.'+exLines(byPid[pid])+'</div>';
+  });
+  return h;
+}
 function r3RenderWrite(claim, r){
   var b = getBoard(claim.id), straight = !claim.cardTell;
   var elapsed = r.writeStartedAt ? Math.min(90, (Date.now()-r.writeStartedAt)/1000) : 0;
@@ -3224,18 +3297,9 @@ function r3RenderWrite(claim, r){
   h += '<div class="r3title">Write what actually happened.</div>';
   h += '<div class="r3lbl">What actually happened</div>';
   h += '<textarea class="communitynote r3ta" id="r3ta" placeholder="Say it plainly, in one or two sentences. A reader who only sees the post should get the real picture." oninput="r3Type('+claim.id+', this)">'+escapeHtml(r.text)+'</textarea>';
-  h += '<div class="r3lbl">Cite your evidence · 🚩 flag what doesn\'t hold</div>';
-  var flagged = [];
-  h += '<div class="citerows">'+r3Exhibits(claim.id).map(function(e){
-    var on = r.cites.indexOf(e.clipId)>=0, fl = r.rulings[e.clipId]==="flag";
-    if(fl) flagged.push(e.letter);
-    return '<div class="citerow'+(on?" on":"")+(fl?" flagged":"")+'" onclick="r3ToggleCite('+claim.id+',\''+e.clipId+'\')"><span class="citelet">'+e.letter+(fl?'<i class="mark f">🚩</i>':'')+'</span>'+
-      '<span class="citebody"><span class="citetext">'+escapeHtml(e.clip.text)+'</span><span class="citewho">'+escapeHtml(r3ClipWho(e.clip))+' · '+(P(e.owner).isYou?"you":P(e.owner).name)+' added it'+(fl?' · 🚩 flagged':'')+'</span></span>'+
-      '<span class="citeflag'+(fl?" on":"")+'" title="'+(fl?"unflag":"flag it")+'" onclick="r3ToggleFlag('+claim.id+',\''+e.clipId+'\', event)">🚩</span>'+
-      '<span class="citetick">'+(on?"✓":"")+'</span></div>';
-  }).join("")+'</div>';
-  // The Defend spirit, as one line: the moment you flag something, say why.
-  if(flagged.length) h += '<div class="speakup">🚩 You flagged '+(flagged.length===1 ? 'Exhibit '+flagged[0] : 'Exhibits '+flagged.join(", "))+' — speak up and tell your team why.</div>';
+  h += '<div class="r3lbl">Cite your evidence</div>';
+  // Flags were set on the Check-the-evidence beat; here they're shown (who flagged it), not toggled.
+  h += '<div class="citerows">'+r3Exhibits(claim.id).map(function(e){ return r3ExhibitRowHTML(claim, e, {cite:true}); }).join("")+'</div>';
   var hint = r.cites.length===0 ? "Tap at least one exhibit." : (r.cites.length===1 ? "A second source makes it stronger." : "Cited: "+r3CiteLabel(claim.id, r.cites));
   h += '<div class="citehint'+(r.cites.length>=2?" good":"")+'">'+hint+'</div>';
   h += '<div class="autoline"><div class="r3lbl"><span>auto</span> from your call + the real tell</div><div class="autotext'+(straight?" g":"")+'">'+r3AutoLine(claim, true)+'</div></div>';
@@ -3300,6 +3364,7 @@ function r3RenderRate(claim, r){
   h += '<div class="r3kick">Round 4 · Rate <span class="mode">silent</span></div>';
   h += '<div class="r3title">Which note helps a reader most?</div>';
   h += '<div class="r3sub">No names. Rate every note but your own. No lobbying.</div>';
+  h += r3FlagLines(claim.id, true);
   notes.forEach(function(n){
     var mine = n.pid==="you";
     h += '<div class="r3notecard'+(mine?" mine":"")+'"><div class="ntop">'+n.label+(mine?' · yours':'')+'<span class="cnt"><b>'+n.cites.length+'</b> '+(n.cites.length===1?"source":"sources")+' cited</span></div>';
@@ -3319,6 +3384,7 @@ function r3RenderFile(claim, r){
   var res = r.result || (r.result = r3ComputeResult(claim.id)), w = res.winner, p = P(w.pid), straight = !claim.cardTell;
   var h = '<div class="r3col"><div class="r3scroll"><div class="r3kick">Round 4 · File it <span class="mode talk">talk</span></div>';
   h += '<div class="r3title">The team’s note.</div>';
+  h += r3FlagLines(claim.id, true);
   h += '<div class="readout">'+(p.isYou ? "Your note — read it out." : p.name+"’s note — "+p.name+", read it out.")+'</div>';
   h += '<div class="r3notecard win"><div class="byline">'+r3Av(w.pid,"big")+'<div><div class="name">'+(p.isYou?"Your note":p.name+"’s note")+'</div><div class="sub">rated most helpful · '+w.cites.length+' '+(w.cites.length===1?"source":"sources")+' cited</div></div></div>'+
     '<div class="nbody">'+escapeHtml(w.text)+'</div><div class="nauto'+(straight?" g":"")+'">'+r3AutoLine(claim, true)+'</div><div class="ncites">'+r3CiteLabel(claim.id, w.cites)+'</div></div>';
