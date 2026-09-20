@@ -248,9 +248,16 @@ var InfodemicSync = (function () {
   // to {inserted, errors} even on partial failure (some topics can fail while
   // others succeed); throws only if the function itself is unreachable or the
   // whole run failed.
-  function refreshStoryCandidates() {
+  // v13 (9/20/2026) headlines first. One invoker, three callers:
+  //   pullHeadlines()            -> {mode:"headlines"}: NewsData only, no model call, APPENDS
+  //                                 status='headline' rows. Free. Resolves {inserted, skipped_duplicates, deal, errors}.
+  //   generatePackages(ids, f)   -> {mode:"package", ids, force}: writes ONE package per id onto the
+  //                                 same row (status writing -> ready | failed). ~1 min each, runs in
+  //                                 parallel. Resolves {ready, failed, skipped, meta}.
+  //   refreshStoryCandidates()   -> kept for old callers; now the same as pullHeadlines().
+  function invokeGenerator(body) {
     var db = ensureClient();
-    return db.functions.invoke("generate-drop-candidates", { method: "POST" }).then(function (res) {
+    return db.functions.invoke("generate-drop-candidates", { method: "POST", body: body || {} }).then(function (res) {
       if (res.error) {
         // supabase-js's FunctionsHttpError.message is just "Edge Function
         // returned a non-2xx status code" — the actual reason (missing
@@ -258,14 +265,10 @@ var InfodemicSync = (function () {
         // raw Response, and has to be read out explicitly.
         var ctx = res.error.context;
         if (ctx && typeof ctx.json === "function") {
-          return ctx.json().catch(function () { return null; }).then(function (body) {
-            // Two different error shapes come back from the function: a
-            // single {error} string (e.g. a missing secret, checked before
-            // any topic runs) or {inserted:0, errors:[{subject,message}]}
-            // (every topic failed individually, e.g. bad API keys).
-            var msg = body && (
-              body.error ||
-              (body.errors && body.errors.length && body.errors.map(function (e) { return e.subject + ": " + e.message; }).join(" | "))
+          return ctx.json().catch(function () { return null; }).then(function (payload) {
+            var msg = payload && (
+              payload.error ||
+              (payload.errors && payload.errors.length && payload.errors.map(function (e) { return e.subject + ": " + e.message; }).join(" | "))
             );
             throw new Error(msg || res.error.message);
           });
@@ -275,6 +278,14 @@ var InfodemicSync = (function () {
       return res.data;
     });
   }
+  function pullHeadlines() { return invokeGenerator({ mode: "headlines" }); }
+  // effort:"medium" = capped thinking (9/20, measured). Sonnet thinks by default and, left alone, spent
+  // 8-9k tokens / 100+ s thinking — past Supabase's free-plan 150s request limit. There is no token budget
+  // on this model, only the effort dial: "low" is as good as off (0-20 thinking tokens, ~23s); "medium"
+  // thought ~1,000 tokens, 36s, ~8c, passed the rule-checker first try with invented outlet names.
+  // thinking:"off" borrowed real outlet names ("The Verge", "Science Daily") in 2 of 4 stories.
+  function generatePackages(ids, force) { return invokeGenerator({ mode: "package", ids: ids, force: !!force, effort: "medium" }); }
+  function refreshStoryCandidates() { return pullHeadlines(); }
 
   function getPlayers(code) {
     var db = ensureClient();
@@ -396,6 +407,8 @@ var InfodemicSync = (function () {
     getDropForRoom: getDropForRoom,
     enterCode: enterCode,
     getStoryCandidates: getStoryCandidates,
-    refreshStoryCandidates: refreshStoryCandidates
+    refreshStoryCandidates: refreshStoryCandidates,
+    pullHeadlines: pullHeadlines,
+    generatePackages: generatePackages
   };
 })();

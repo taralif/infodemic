@@ -5,311 +5,300 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>INFODEMIC — Content Pipeline (Teacher Console)</title>
 <style>
+  /* Design pass 9/20/2026. Rules of the sheet:
+     - Text is never lighter than --text-3 (>= 5.5:1 on every surface). Borders and decoration use --line.
+     - Body copy is 15px; nothing a teacher has to READ is under 13px (the mini phone is a picture, not copy).
+     - One eyebrow on the page (above the title). Sections are real headings: h1 > h2 > h3, sentence case.
+     - One filled-blue button per view (Publish). "Add" is the filled green action; everything else is quiet. */
   :root{
-    --bg:#0d0d0f; --grid:#38383a; --panel:#1c1c1e; --panel2:#2c2c2e;
-    --ink:#ffffff; --dim:rgba(235,235,245,.6); --faint:rgba(235,235,245,.32);
-    --green:#30d158; --red:#ff453a; --gold:#ff9f0a;
-    --blue:#0a84ff; --blue-soft:rgba(10,132,255,.13); --blue-line:rgba(10,132,255,.34);
-    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    --bg:#0e0f13; --surface:#16181d; --surface-2:#1e2027; --surface-3:#272a33; --line:#30343e; --line-strong:#454a57;
+    --text:#f5f6f8; --text-2:#c9cdd6; --text-3:#a0a6b3;
+    --blue:#5aa6ff; --blue-fill:#2f7de6; --blue-soft:rgba(90,166,255,.12); --blue-line:rgba(90,166,255,.45);
+    --green:#46d98a; --green-soft:rgba(70,217,138,.11); --green-line:rgba(70,217,138,.45);
+    --gold:#ffbd4a; --gold-soft:rgba(255,189,74,.1); --gold-line:rgba(255,189,74,.42);
+    --red:#ff7a70; --red-soft:rgba(255,122,112,.1); --red-line:rgba(255,122,112,.45);
+    /* names the script's inline styles still use */
+    --ink:var(--text); --dim:var(--text-2); --faint:var(--text-3); --grid:var(--line); --panel:var(--surface); --panel2:var(--surface-2);
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","Helvetica Neue",Arial,sans-serif;
     --mono:'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    --r-lg:18px; --r-md:12px; --r-sm:8px;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
-    -webkit-font-smoothing:antialiased;
-  }
-  button{font-family:inherit;}
-  :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
-
-  .wrap{max-width:1180px; margin:0 auto; padding:0 26px 70px;}
-  header{
-    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px;
-    padding:22px 26px 18px; border-bottom:1px solid var(--grid); max-width:1180px; margin:0 auto;
-  }
-  .brand{font-size:21px; font-weight:800; letter-spacing:3px;}
-  .sub{font-size:10.5px; font-weight:700; color:var(--blue); letter-spacing:1.1px; text-transform:uppercase; margin-top:6px;}
-  .mocktag{
-    font-size:11px; color:var(--gold); border:1px solid rgba(255,159,10,.4); background:rgba(255,159,10,.1);
-    border-radius:9px; padding:6px 11px; letter-spacing:.4px; font-weight:700;
-  }
-
-  .steps{display:flex; gap:8px; flex-wrap:wrap; padding:18px 0 4px;}
-  .step{
-    display:flex; align-items:center; gap:9px; background:var(--panel); border:1px solid var(--grid);
-    border-radius:13px; padding:10px 15px 10px 11px; font-size:13px; color:var(--faint); cursor:pointer;
-  }
-  .step .n{
-    width:21px; height:21px; border-radius:50%; display:grid; place-items:center;
-    background:var(--panel2); color:var(--faint); font-size:11px; font-weight:800; flex:0 0 auto;
-  }
-  .step.done{color:var(--dim);}
-  .step.done .n{background:rgba(48,209,88,.16); color:var(--green);}
-  .step.active{border-color:var(--blue-line); background:var(--blue-soft); color:var(--ink); font-weight:700;}
-  .step.active .n{background:var(--blue); color:#fff;}
-  .step[disabled]{opacity:.4; cursor:default;}
-
-  h2.sec{font-size:12px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; color:var(--blue); margin:0;}
-
-  .lexicon{
-    display:flex; flex-wrap:wrap; gap:0 26px; margin-top:16px; padding:12px 15px;
-    background:var(--panel2); border:1px solid var(--grid); border-left:3px solid var(--blue);
-    border-radius:12px; font-size:12.5px; line-height:1.7; color:var(--faint);
-  }
-  .lexicon span{white-space:normal;}
-  .lexicon b{color:var(--ink); font-weight:700;}
-  .lexicon i{color:var(--dim); font-style:normal;}
-  .count{font-size:12px; color:var(--dim); font-variant-numeric:tabular-nums;}
-
-  .cols{display:flex; gap:22px; align-items:flex-start; padding-top:16px;}
-  @media (max-width:960px){ .cols{flex-direction:column;} }
-  .maincol{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:11px;}
-
-  .pullbar{
-    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
-    background:var(--panel2); border:1px solid var(--grid); border-radius:13px; padding:11px 14px;
-  }
-  .pullbar .when{font-size:12px; color:var(--faint); line-height:1.5;}
-  .pullbar .when b{color:var(--dim); font-weight:600;}
-
-  .story{
-    background:var(--panel); border:1px solid var(--grid); border-radius:17px; padding:15px 17px;
-    display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
-  }
-  .story.in{border-color:rgba(48,209,88,.45); background:linear-gradient(0deg,rgba(48,209,88,.05),rgba(48,209,88,.05)),var(--panel);}
-  .story.fresh{border-left:3px solid var(--blue);}
-  .story .body{min-width:0;}
-  .meta{display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-bottom:7px;}
-  .tag{
-    font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
-    padding:3px 8px; border-radius:7px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
-  }
-  .tag.subject{color:var(--blue); border-color:var(--blue-line); background:var(--blue-soft);}
-  .tag.new{color:var(--gold); border-color:rgba(255,159,10,.35); background:rgba(255,159,10,.1);}
-  .tag.chip{color:#ff6b62; border-color:rgba(255,69,58,.4); background:rgba(255,69,58,.1); text-transform:none; letter-spacing:.2px;}
-  .tag.straight{color:var(--green); border-color:rgba(48,209,88,.4); background:rgba(48,209,88,.1);}
-  .tag.dup{color:var(--gold); border-color:rgba(255,159,10,.5); background:rgba(255,159,10,.14); text-transform:none; letter-spacing:.2px;}
-  .post{font-size:13.5px; line-height:1.45; margin:0 0 6px; color:var(--ink);}
-  .post b{background:rgba(255,69,58,.18); border-radius:4px; padding:0 2px;}
-  .feeditem .tag{flex:0 0 auto; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  /* claims MVP: the rail used to grow to its longest nowrap feed row (min-width:auto); pin it so rows ellipsize instead */
-  .cols .rail{min-width:0; flex-basis:440px;}
-  .hl{font-size:16px; font-weight:700; line-height:1.35; margin:0 0 5px; text-wrap:balance;}
-  .src{font-size:12px; color:var(--faint);}
-
-  .btn{
-    font-size:12.5px; font-weight:700; letter-spacing:.2px; padding:9px 14px; border-radius:10px;
-    border:1px solid var(--grid); background:var(--panel2); color:var(--ink); cursor:pointer; white-space:nowrap;
-  }
-  .btn:hover{border-color:var(--blue-line);}
-  .btn.primary{background:var(--blue); border-color:var(--blue); color:#fff;}
-  .btn.primary:hover{filter:brightness(1.12);}
-  .btn.add{background:var(--green); border-color:var(--green); color:#04140a;}
-  .btn.add:hover{filter:brightness(1.08);}
-  .btn.ghost{background:transparent; color:var(--dim);}
-  .btn.small{padding:6px 10px; font-size:11.5px;}
-  .btn.big{width:100%; padding:15px 18px; font-size:15px; border-radius:14px;}
-  .btn:disabled{opacity:.38; cursor:default;}
-  .btn.stub{border-style:dashed; color:var(--faint); cursor:not-allowed;}
-  .btn.stub:hover{border-color:var(--grid);}
-
-  .rail{flex:0 0 340px; position:sticky; top:16px; display:flex; flex-direction:column; gap:14px;}
-  @media (max-width:960px){ .rail{position:static; flex:1 1 auto; width:100%;} }
-  .box{background:var(--panel); border:1px solid var(--grid); border-radius:17px; padding:15px 17px;}
-  .boxhead{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:12px;}
-
-  .playrow{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:var(--panel2); border:1px solid var(--grid); border-radius:12px; padding:10px 12px; margin-bottom:13px;
-  }
-  .playrow .lbl{font-size:13px; color:var(--dim);}
-  .playrow .lbl b{color:var(--ink);}
-  .stepper{display:flex; align-items:center; gap:8px;}
-  .stepper button{
-    width:30px; height:30px; border-radius:9px; background:var(--panel); border:1px solid var(--grid);
-    color:var(--ink); font-size:16px; cursor:pointer; line-height:1;
-  }
-  .stepper button:hover:not(:disabled){border-color:var(--blue-line);}
-  .stepper button:disabled{opacity:.3; cursor:default;}
-  .stepper .val{font-size:19px; font-weight:800; min-width:26px; text-align:center; font-variant-numeric:tabular-nums;}
-
-  .feeditem{
-    display:flex; align-items:center; gap:9px; background:var(--panel2); border:1px solid var(--grid);
-    border-radius:11px; padding:9px 10px; margin-bottom:7px;
-  }
-  .feeditem .pos{font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums; width:15px; flex:0 0 auto;}
-  .feeditem .t{flex:1 1 auto; min-width:0; font-size:12.5px; line-height:1.35; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .feeditem.saved{opacity:.55; border-style:dashed;}
-  .feeditem .x{background:none; border:none; color:var(--faint); font-size:15px; cursor:pointer; padding:0 2px; line-height:1;}
-  .feeditem .x:hover{color:var(--red);}
-  .arrows{display:flex; flex-direction:column; gap:1px;}
-  .arrows button{background:none; border:none; color:var(--faint); cursor:pointer; font-size:9px; line-height:1; padding:1px;}
-  .arrows button:hover:not(:disabled){color:var(--blue);}
-  .arrows button:disabled{opacity:.25; cursor:default;}
-
-  .zonehead{
-    font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; font-weight:700;
-    color:var(--faint); margin:14px 0 8px; display:flex; align-items:center; gap:9px;
-  }
-  .zonehead::after{content:""; flex:1 1 auto; height:1px; background:var(--grid);}
-  .zonehead.first{margin-top:0;}
-  .zonenote{font-size:11.5px; color:var(--faint); line-height:1.55; margin:-2px 0 9px;}
-
-  .empty{font-size:12.5px; color:var(--faint); font-style:italic; line-height:1.55;}
-
-  .endcards{display:flex; gap:9px;}
-  .endcard{
-    flex:1 1 0; text-align:left; padding:11px 12px; border-radius:12px; cursor:pointer;
-    background:var(--panel2); border:1px solid var(--grid); color:var(--dim);
-  }
-  .endcard .t{font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:3px;}
-  .endcard .d{font-size:11.5px; line-height:1.45;}
-  .endcard.on{background:var(--blue-soft); border-color:var(--blue-line);}
-  .segmented{display:flex; gap:6px; margin-top:11px;}
-  .segmented button{
-    flex:1 1 0; font-size:13px; font-weight:700; padding:8px 6px; border-radius:10px; cursor:pointer;
-    background:var(--panel2); border:1px solid var(--grid); color:var(--faint);
-  }
-  .segmented button.on{background:var(--blue); border-color:var(--blue); color:#fff;}
-
-  .shapecard{display:flex; border:1px solid var(--grid); border-radius:12px; overflow:hidden; background:var(--panel2); margin-top:12px;}
-  .shapecard div{flex:1 1 0; padding:11px 8px; text-align:center; border-right:1px solid var(--grid);}
-  .shapecard div:last-child{border-right:none;}
-  .shapecard .k{font-size:9.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--faint); font-weight:700;}
-  .shapecard .v{font-size:17px; font-weight:800; margin-top:4px; font-variant-numeric:tabular-nums;}
-
-  .warn{
-    display:flex; gap:9px; align-items:flex-start; font-size:12.5px; line-height:1.55; color:var(--gold);
-    background:rgba(255,159,10,.09); border:1px solid rgba(255,159,10,.32); border-radius:12px;
-    padding:11px 13px; margin-top:12px;
-  }
-
-  .codebox{background:var(--panel); border:1px solid var(--green); border-radius:18px; padding:26px 22px; text-align:center;}
-  .codeword{font-family:var(--mono); font-size:46px; font-weight:800; letter-spacing:4px; color:var(--green); line-height:1;}
-  .codesub{font-size:13px; color:var(--dim); margin-top:12px; line-height:1.6;}
-
-  .tablehead{
-    display:flex; align-items:baseline; gap:8px; margin:14px 0 8px; font-size:12.5px; font-weight:700;
-  }
-  .tablehead:first-child{margin-top:0;}
-  .tablehead .code{font-family:var(--mono); color:var(--green);}
-  .tablehead .n{font-size:11px; color:var(--faint); font-weight:600;}
-  .tablehead.loose .code{color:var(--gold);}
-  .player{
-    display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--grid);
-    border-radius:11px; padding:9px 11px; margin-bottom:6px;
-  }
-  .player .av{width:24px; height:24px; border-radius:7px; background:var(--blue-soft); display:grid; place-items:center; font-size:12px;}
-  .player .nm{flex:1 1 auto; font-size:13.5px;}
-  .player.loose{border-style:dashed; opacity:.72;}
-  .player .st{font-size:11px; color:var(--faint);}
-
-  .nextnote{
-    font-size:12.5px; line-height:1.6; color:var(--faint); border:1px dashed var(--grid);
-    border-radius:12px; padding:12px 14px; margin-top:12px;
-  }
-  .nextnote b{color:var(--gold);}
-
-  .callout{
-    margin-top:30px; border-top:1px solid var(--grid); padding-top:18px;
-    font-size:12.5px; line-height:1.7; color:var(--faint); max-width:78ch;
-  }
-  .callout b{color:var(--dim);}
-  .callout code{font-family:var(--mono); font-size:11.5px; color:var(--dim);}
-  .callout ul{margin:8px 0 0; padding-left:18px;}
-  .callout li{margin-bottom:5px;}
-  .hide{display:none;}
-
-  /* ---- live-console additions on top of the mock's styles ---- */
-  .field{
-    width:100%; background:var(--panel2); border:1px solid var(--grid); border-radius:10px;
-    color:var(--ink); font-size:13px; padding:9px 11px; margin-bottom:8px; font-family:var(--sans);
-  }
-  .field:focus{outline:none; border-color:var(--blue-line);}
-  .publish-hint{font-size:12px; color:var(--faint); margin-top:10px; line-height:1.55;}
-  .code-display{
-    margin-top:14px; padding:18px; background:var(--panel2); border:1px solid var(--green); border-radius:14px; text-align:center;
-  }
-  .code-display .code-word{
-    font-family:var(--mono); font-size:30px; font-weight:800; letter-spacing:2px; color:var(--green);
-  }
-  .code-display .code-sub{font-size:12px; color:var(--dim); margin-top:8px; line-height:1.55; text-align:left;}
-  .export-panel{margin-top:12px;}
-  .export-link{font-size:12px; color:var(--dim); text-decoration:underline; cursor:pointer; background:none; border:none; padding:0;}
-  textarea.export-out{
-    width:100%; min-height:180px; background:var(--panel2); color:var(--dim); border:1px solid var(--grid);
-    border-radius:10px; font-family:var(--mono); font-size:11px; padding:10px; line-height:1.5; margin-top:10px;
-  }
-  .pullerr{color:var(--red); font-size:12px; line-height:1.5; margin-top:7px;}
-  .notwired{
-    font-size:12.5px; line-height:1.6; color:var(--faint); border:1px dashed var(--grid);
-    border-radius:12px; padding:13px 14px;
-  }
-  .notwired b{color:var(--dim);}
-  /* ---- session settings (advisory until the game reads them) ---- */
-  .inert-badge{
-    font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
-    color:var(--gold); background:rgba(255,159,10,.1); border:1px solid rgba(255,159,10,.34);
-    border-radius:7px; padding:3px 8px;
-  }
-  .inertnote{
-    font-size:12px; line-height:1.6; color:var(--faint); border:1px dashed rgba(255,159,10,.3);
-    background:rgba(255,159,10,.04); border-radius:11px; padding:11px 13px; margin-top:12px;
-  }
-  .inertnote b{color:var(--gold);}
-  .sublabel{
-    font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; font-weight:700;
-    color:var(--faint); margin:2px 0 8px;
-  }
-  .suggestline{
-    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px;
-    font-size:12.5px; color:var(--dim); line-height:1.5;
-  }
-  .suggestline b{color:var(--ink);}
-  .feednote{font-size:12px; color:var(--faint); line-height:1.55; margin:-2px 0 11px;}
-  /* .cols aligns to flex-start, which on a narrow screen stacks the columns and
-     lets each size to its max-content instead of the container — that is what
-     pushed the page sideways at 414px. */
-  @media (max-width:960px){
-    .cols{align-items:stretch;}
-    .maincol, .rail{width:100%; max-width:100%;}
-  }
-
-  /* console_extra is appended after the base sheet, so its display rules would
-     otherwise beat .hide on equal specificity — keep the toggle authoritative. */
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:var(--sans); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;}
+  button,input,select,textarea{font-family:inherit; font-size:inherit;}
+  :focus-visible{outline:3px solid var(--blue); outline-offset:2px; border-radius:6px;}
+  a{color:inherit;}
   .hide{display:none !important;}
+  .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+
+  /* ---- page frame ---- */
+  header.top{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; max-width:1240px; margin:0 auto; padding:18px 28px; border-bottom:1px solid var(--line);}
+  .brand{font-size:17px; font-weight:800; letter-spacing:.22em;}
+  .brand span{color:var(--text-3); font-weight:600; letter-spacing:0; margin-left:12px; font-size:14px;}
+  .buildstamp{font-size:13px; color:var(--text-3); font-family:var(--mono);}
+  .wrap{max-width:1240px; margin:0 auto; padding:0 28px 80px;}
+  .pagehead{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; padding:30px 0 22px;}
+  .eyebrow{font-size:12.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin:0 0 8px;}
+  h1{font-size:30px; line-height:1.15; font-weight:750; letter-spacing:-.015em; margin:0; text-wrap:balance;}
+  .lede{font-size:16px; color:var(--text-2); margin:8px 0 0; max-width:62ch;}
+  h2.sec{font-size:19px; line-height:1.25; font-weight:700; letter-spacing:-.005em; margin:0; color:var(--text);}
+  h3.qgroup{font-size:15px; font-weight:700; margin:0; color:var(--text); display:flex; align-items:baseline; gap:10px;}
+  h3.qgroup .n{font-size:13.5px; font-weight:500; color:var(--text-3);}
+  .count{font-size:14px; color:var(--text-2); font-variant-numeric:tabular-nums;}
+
+  .steps{display:flex; gap:6px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:5px;}
+  .step{display:flex; align-items:center; gap:9px; background:transparent; border:0; border-radius:999px; padding:8px 16px 8px 9px; font-size:14.5px; font-weight:600; color:var(--text-2); cursor:pointer; min-height:40px;}
+  .step .n{width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--surface-3); color:var(--text-2); font-size:13px; font-weight:700; flex:none;}
+  .step:hover:not([disabled]){color:var(--text);}
+  .step.done .n{background:var(--green-soft); color:var(--green);}
+  .step.active{background:var(--surface-3); color:var(--text);}
+  .step.active .n{background:var(--blue-fill); color:#fff;}
+  .step[disabled]{color:var(--text-3); cursor:default;}
+
+  .cols{display:flex; gap:28px; align-items:flex-start;}
+  .maincol{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:14px;}
+  .rail{flex:0 0 400px; min-width:0; position:sticky; top:16px; display:flex; flex-direction:column; gap:16px; max-height:calc(100vh - 32px); overflow:auto; padding-bottom:4px;}
+  .cols .rail{flex-basis:400px;}
+  @media (max-width:1020px){ .cols{flex-direction:column; align-items:stretch;} .rail{position:static; flex:1 1 auto; width:100%; max-height:none;} .maincol{width:100%;} }
+
+  /* ---- buttons: one scale, three weights ---- */
+  .btn{font-size:14.5px; font-weight:650; padding:9px 16px; min-height:40px; border-radius:10px; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--text); cursor:pointer; white-space:nowrap; line-height:1.2;}
+  .btn:hover:not(:disabled){border-color:var(--text-3); background:var(--surface-3);}
+  .btn.primary{background:var(--blue-fill); border-color:var(--blue-fill); color:#fff;}
+  .btn.primary:hover:not(:disabled){background:#3d8af0; border-color:#3d8af0;}
+  .btn.add{background:var(--green); border-color:var(--green); color:#062313; font-weight:750;}
+  .btn.add:hover:not(:disabled){background:#5fe39c; border-color:#5fe39c;}
+  .btn.ghost{background:transparent; border-color:transparent; color:var(--text-2);}
+  .btn.ghost:hover:not(:disabled){background:var(--surface-2); border-color:var(--line);}
+  .btn.small{padding:7px 12px; min-height:36px; font-size:14px;}
+  .btn.big{width:100%; padding:15px 18px; min-height:54px; font-size:17px; font-weight:700; border-radius:14px;}
+  .btn:disabled{opacity:1; background:var(--surface-2); border-color:var(--line); color:var(--text-3); cursor:not-allowed;}
+  .btn.infeed{background:var(--green-soft); border-color:var(--green-line); color:var(--green);}
+  .btn.infeed:hover:not(:disabled){background:rgba(70,217,138,.18); border-color:var(--green);}
+  .addwrap{flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:5px; text-align:right;}
+  .addnote{font-size:13px; color:var(--text-3); line-height:1.3; white-space:nowrap;}
+
+  /* ---- the stories toolbar ---- */
+  .pullbar{display:flex; justify-content:space-between; align-items:flex-end; gap:18px; padding:2px 0 4px;}
+  .pullbar > div{min-width:0;}
+  .pullbar .btn{flex:none;}
+  @media (max-width:640px){ .pullbar{flex-wrap:wrap;} }
+  .pullbar .when{font-size:14.5px; color:var(--text-2); line-height:1.5;}
+  .pullbar .when b{color:var(--text); font-weight:650;}
+  .notice{display:flex; gap:10px; align-items:flex-start; font-size:14.5px; line-height:1.5; border-radius:var(--r-md); padding:12px 14px; border:1px solid var(--line); background:var(--surface); color:var(--text-2);}
+  .notice b{color:var(--text);}
+  .notice.gold{border-color:var(--gold-line); background:var(--gold-soft); color:var(--gold);}
+  .pullerr{color:var(--red); font-size:14px; line-height:1.5; margin-top:8px;}
+  .poolline{font-size:14px; color:var(--gold); line-height:1.5;}
+  .publish-wait{font-size:14px; color:var(--gold); line-height:1.5; margin-top:10px;}
+
+  /* ---- tags: sentence case, readable ---- */
+  .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:9px;}
+  .tag{font-size:13px; font-weight:600; line-height:1.25; padding:3px 9px; border-radius:999px; background:var(--surface-3); color:var(--text-2); border:1px solid transparent;}
+  .tag.subject{color:var(--text-2); background:var(--surface-3);}
+  .tag.new,.tag.dup,.tag.weak{color:var(--gold); border-color:var(--gold-line); background:var(--gold-soft);}
+  .tag.chip,.tag.tell{color:var(--red); border-color:var(--red-line); background:var(--red-soft);}
+  .tag.straight,.tag.strong{color:var(--green); border-color:var(--green-line); background:var(--green-soft);}
+  .tag.dealt{color:var(--text-2); border:1px dashed var(--line-strong); background:transparent;}
+
+  /* ---- a written story: the full card ---- */
+  .qsec{display:flex; flex-direction:column; gap:12px; margin-top:10px;}
+  .qsec:first-child{margin-top:0;}
+  .story{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 20px; display:flex; gap:18px; align-items:flex-start; justify-content:space-between;}
+  .story.in{border-color:var(--green-line); background:linear-gradient(0deg,var(--green-soft),var(--green-soft)),var(--surface);}
+  .story .body{flex:1 1 auto; min-width:0;}
+  .post{font-size:17px; line-height:1.45; font-weight:500; margin:0 0 10px; color:var(--text); text-wrap:pretty;}
+  .post b{background:var(--red-soft); border-radius:4px; padding:0 3px; font-weight:650;}
+  .post.faint{font-size:14.5px; font-weight:400; color:var(--text-3); margin:4px 0 0; font-style:normal;}
+  .ageline{font-size:13px; color:var(--text-3); margin-top:9px;}
+  .pkgerr{font-size:14px; color:var(--red); line-height:1.45; margin-top:8px;}
+  .article{display:flex; gap:12px; align-items:flex-start; margin-top:4px; padding:11px 13px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--line);}
+  .article .th{flex:none; width:72px; height:54px; border-radius:var(--r-sm); background-size:cover; background-position:center; background-color:var(--surface-3);}
+  .article .th.none{display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--text-3); text-align:center; line-height:1.2;}
+  .article .ln{min-width:0; flex:1;}
+  .article .ol{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--text-2); margin-bottom:3px;}
+  .article .ol > span:nth-child(2){min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .article .ol .fav{width:14px; height:14px; border-radius:3px; background-size:cover; background-color:#fff; flex:none;}
+  .article .ol .r2{margin-left:auto; font-size:13px; color:var(--text-3); white-space:nowrap;}
+  .rh{font-size:15px; line-height:1.35; color:var(--text); font-weight:600;}
+  .rh a{text-decoration:underline; text-decoration-color:var(--line-strong); text-underline-offset:3px;}
+  .rh a:hover{text-decoration-color:var(--text);}
+  .article .ds{font-size:13.5px; color:var(--text-3); margin-top:4px; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+
+  /* ---- a headline: the compact row (nothing is written yet, so there is nothing to preview) ---- */
+  .qlist{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); overflow:hidden;}
+  .story.row{background:transparent; border:0; border-radius:0; border-top:1px solid var(--line); padding:14px 18px; gap:14px; align-items:center;}
+  .story.row:first-child{border-top:0;}
+  .story.row.in{background:var(--green-soft);}
+  .story.row.failed{background:var(--red-soft);}
+  .story.row .th{flex:none; width:72px; height:54px; border-radius:var(--r-sm); background-size:cover; background-position:center; background-color:var(--surface-3); align-self:flex-start; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--text-3);}
+  .story.row .ol{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--text-2); margin-bottom:2px; flex-wrap:wrap;}
+  .story.row .ol .fav{width:14px; height:14px; border-radius:3px; background-size:cover; background-color:#fff; flex:none;}
+  .story.row .ds{font-size:13.5px; color:var(--text-3); margin-top:3px; line-height:1.45; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;}
+  .story.row .meta{margin:7px 0 0;}
+  .spin{display:inline-block; width:12px; height:12px; border:2px solid var(--line-strong); border-top-color:var(--text); border-radius:50%; animation:spin .8s linear infinite; vertical-align:-2px; margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion:reduce){ .spin{animation-duration:2.4s;} html{scroll-behavior:auto;} }
+  @media (max-width:640px){ .story, .story.row{flex-wrap:wrap;} .addwrap{width:100%; align-items:stretch; text-align:left;} .addnote{max-width:none;} .mini{display:none;} }
+
+  /* ---- the mini phone: a picture of Round 1, not copy ---- */
+  .mini{flex:0 0 132px; width:132px; height:236px; border-radius:18px; overflow:hidden; position:relative; background:#05060a; border:1px solid rgba(255,255,255,.14); align-self:flex-start;}
+  .mini .bg{position:absolute; inset:0; background-size:cover; background-position:center; filter:saturate(.9);}
+  .mini .bg.none{background:linear-gradient(200deg, hsl(200,55%,22%), #05060a 70%);}
+  .mini .scrim{position:absolute; left:0; right:0; bottom:0; height:70%; background:linear-gradient(0deg, rgba(0,0,0,.92) 25%, rgba(0,0,0,.45) 65%, transparent);}
+  .mini .r{position:absolute; top:7px; left:8px; font-size:6.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:rgba(255,255,255,.8); background:rgba(0,0,0,.5); border-radius:999px; padding:2px 5px;}
+  .mini .b{position:absolute; left:8px; right:8px; bottom:8px; display:flex; flex-direction:column; gap:4px;}
+  .mini .acct{font-size:6.5px; font-weight:700; color:#fff; background:rgba(255,255,255,.16); border-radius:999px; padding:2px 6px; align-self:flex-start; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .mini .cap{font-size:7.5px; font-weight:800; line-height:1.3; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;}
+  .mini .cap.faint{color:rgba(255,255,255,.6); font-weight:600; font-style:italic; text-shadow:none;}
+  .mini .lc{display:flex; align-items:center; gap:4px; background:rgba(20,20,24,.78); border:1px solid rgba(255,255,255,.18); border-radius:5px; padding:3px 5px; min-width:0;}
+  .mini .lc .th{flex:none; width:16px; height:16px; border-radius:3px; background-size:cover; background-position:center; background-color:#333;}
+  .mini .lc .fav{flex:none; width:8px; height:8px; border-radius:2px; background-size:cover; background-color:#fff;}
+  .mini .lc .dom{font-size:6.5px; font-weight:700; color:rgba(255,255,255,.75); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .mini .lights{display:flex; gap:4px; margin-top:1px;}
+  .mini .lights span{width:12px; height:12px; border-radius:50%; border:1px solid rgba(255,255,255,.3);}
+  .mini.nophoto::after{content:"no photo"; position:absolute; top:26px; left:8px; right:8px; font-size:7px; font-weight:700; color:#ffd58a; background:rgba(0,0,0,.5); border-radius:4px; padding:3px 5px; text-align:center;}
+
+  /* ---- debug-only clue pool (poolPanel() from DevTools) ---- */
+  .pool{margin-top:10px; padding:10px 12px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--line);}
+  .pool .ph{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--text-2); margin-bottom:6px;}
+  .pool .ph .n{margin-left:auto; font-weight:500; color:var(--text-3);}
+  .pool .cl{display:flex; gap:8px; align-items:flex-start; padding:5px 0; border-top:1px solid var(--line); font-size:13.5px; line-height:1.4; color:var(--text-2);}
+  .pool .cl:first-of-type{border-top:0;}
+  .pool .cl .ico,.pool .rc .ico{flex:none; width:18px; text-align:center;}
+  .pool .cl .who{color:var(--text); font-weight:600;}
+  .pool .cl > span:nth-child(2){flex:1 1 0; min-width:0;}
+  .pool .cl .tag{flex:none; align-self:center; max-width:190px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .pool .rc{display:flex; gap:8px; align-items:flex-start; padding:6px 0 1px; margin-top:4px; border-top:1px dashed var(--gold-line); font-size:13.5px; line-height:1.4; color:var(--gold);}
+  .pool .warn{margin-top:6px; font-size:13.5px; color:var(--gold);}
+  .pool .why{margin-top:5px; font-size:13.5px; color:var(--text-3); font-style:italic;}
+
+  /* ---- the rail ---- */
+  .box{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px;}
+  .box.feedbox{border-color:var(--line-strong);}
+  .boxhead{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:12px;}
+  .feednote{font-size:14px; color:var(--text-3); line-height:1.5; margin:-4px 0 12px;}
+  .feednote:empty{display:none;}
+  .feeditem{display:grid; grid-template-columns:18px minmax(0,1fr) auto auto; column-gap:10px; row-gap:5px; align-items:center; background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r-md); padding:10px 8px 10px 12px; margin-bottom:8px;}
+  .feeditem .pos{grid-row:1 / span 2; align-self:start; padding-top:1px;}
+  .feeditem .tag{grid-column:2; grid-row:2; justify-self:start;}
+  .feeditem .arrows, .feeditem .x{grid-row:1 / span 2;}
+  #playlist .feeditem{grid-template-columns:18px minmax(0,1fr);}
+  .feeditem .pos{font-size:14px; font-weight:700; color:var(--text-3); font-variant-numeric:tabular-nums; width:16px; flex:none;}
+  .feeditem .t{min-width:0; font-size:14.5px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .feeditem .tag{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .feeditem.saved{opacity:.7; border-style:dashed;}
+  .feeditem.pending{border-style:dashed; background:transparent;}
+  .feeditem.pending .t{color:var(--text-3);}
+  .feeditem.pending.failed{border-color:var(--red-line); background:var(--red-soft);}
+  .feeditem.pending.failed .t{color:var(--red);}
+  .feeditem .x{background:none; border:0; color:var(--text-3); font-size:20px; cursor:pointer; width:32px; height:32px; border-radius:8px; line-height:1; flex:none;}
+  .feeditem .x:hover{color:var(--red); background:var(--red-soft);}
+  .arrows{display:flex; flex-direction:column; gap:0; flex:none;}
+  .arrows button{background:none; border:0; color:var(--text-3); cursor:pointer; font-size:11px; line-height:1; width:28px; height:18px; border-radius:5px;}
+  .arrows button:hover:not(:disabled){color:var(--text); background:var(--surface-3);}
+  .arrows button:disabled{opacity:.3; cursor:default;}
+
+  .empty{font-size:14.5px; color:var(--text-3); line-height:1.55; font-style:normal;}
+  .emptystate{border:1.5px dashed var(--line-strong); border-radius:var(--r-md); padding:22px 18px; text-align:center;}
+  .emptystate .art{display:flex; justify-content:center; gap:6px; margin-bottom:14px;}
+  .emptystate .art i{display:block; width:34px; height:48px; border-radius:7px; border:1.5px dashed var(--line-strong);}
+  .emptystate .art i:nth-child(3){border-style:solid; border-color:var(--green-line); background:var(--green-soft); transform:translateY(-4px);}
+  .emptystate .ti{font-size:16px; font-weight:700; color:var(--text); margin:0 0 4px;}
+  .emptystate p{margin:0; font-size:14.5px; color:var(--text-2); line-height:1.5;}
+  .emptystate p + p{margin-top:8px; color:var(--text-3); font-size:14px;}
+  .emptystate.wide{padding:34px 24px; background:var(--surface);}
+  .emptystate.wide .btn{margin-top:16px;}
+
+  .playrow{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;}
+  .playrow .lbl{font-size:15px; font-weight:600; color:var(--text);}
+  .stepper{display:flex; align-items:center; gap:10px;}
+  .stepper button{width:40px; height:40px; border-radius:10px; background:var(--surface-2); border:1px solid var(--line-strong); color:var(--text); font-size:20px; cursor:pointer; line-height:1;}
+  .stepper button:hover:not(:disabled){border-color:var(--text-3); background:var(--surface-3);}
+  .stepper button:disabled{color:var(--text-3); border-color:var(--line); cursor:not-allowed;}
+  .stepper .val{font-size:24px; font-weight:750; min-width:30px; text-align:center; font-variant-numeric:tabular-nums;}
+  .zonenote{font-size:14px; color:var(--text-3); line-height:1.5; margin:0 0 16px;}
+  .sublabel{font-size:15px; font-weight:600; color:var(--text); margin:0 0 8px;}
+  .segmented{display:flex; gap:6px;}
+  .segmented button{flex:1 1 0; font-size:14.5px; font-weight:600; padding:9px 4px; min-height:40px; border-radius:10px; cursor:pointer; background:var(--surface-2); border:1px solid var(--line-strong); color:var(--text-2);}
+  .segmented button:hover{color:var(--text); border-color:var(--text-3);}
+  .segmented button.on{background:var(--blue-soft); border-color:var(--blue); color:var(--text);}
+  .suggestline{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; font-size:14.5px; color:var(--text-2); line-height:1.5;}
+  .suggestline b{color:var(--text);}
+  .shapecard{display:flex; border-radius:var(--r-md); background:var(--surface-2); margin-top:16px;}
+  .shapecard div{flex:1 1 0; padding:12px 8px; text-align:center; border-right:1px solid var(--line);}
+  .shapecard div:last-child{border-right:0;}
+  .shapecard .v{font-size:22px; font-weight:750; font-variant-numeric:tabular-nums; line-height:1.2;}
+  .shapecard .k{font-size:13px; color:var(--text-3); margin-top:2px;}
+  .warn{display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.5; color:var(--gold); background:var(--gold-soft); border:1px solid var(--gold-line); border-radius:var(--r-md); padding:12px 14px; margin-top:12px;}
+  .warn b{color:#ffd58a;}
+  .inert-badge{font-size:13px; font-weight:600; color:var(--gold); background:var(--gold-soft); border:1px solid var(--gold-line); border-radius:999px; padding:2px 10px; white-space:nowrap;}
+  details.inertnote{margin-top:14px; font-size:14px; line-height:1.55; color:var(--text-3);}
+  details.inertnote summary{cursor:pointer; color:var(--text-2); font-weight:600; list-style-position:outside; margin-left:16px;}
+  details.inertnote p{margin:8px 0 0;}
+  .inertnote{font-size:14px; line-height:1.55; color:var(--text-3); margin-top:14px;}
+  .inertnote b{color:var(--text-2);}
+
+  label.fl{display:block; font-size:14px; font-weight:600; color:var(--text-2); margin:0 0 5px;}
+  .field{width:100%; background:var(--surface-2); border:1px solid var(--line-strong); border-radius:10px; color:var(--text); font-size:15px; padding:10px 12px; min-height:42px; margin-bottom:12px;}
+  .field::placeholder{color:var(--text-3);}
+  .field:focus{outline:3px solid var(--blue); outline-offset:1px;}
+  .publish-hint{font-size:14px; color:var(--text-3); margin-top:12px; line-height:1.5;}
+  .export-panel{margin-top:12px;}
+  .export-link{font-size:14px; color:var(--text-2); text-decoration:underline; text-underline-offset:3px; cursor:pointer; background:none; border:0; padding:6px 0;}
+  textarea.export-out{width:100%; min-height:200px; background:var(--surface-2); color:var(--text-2); border:1px solid var(--line); border-radius:10px; font-family:var(--mono); font-size:13px; padding:12px; line-height:1.5; margin-top:10px;}
+
+  /* ---- step 2 ---- */
+  .codebox{background:linear-gradient(180deg,var(--green-soft),transparent 70%),var(--surface); border:1px solid var(--green-line); border-radius:22px; padding:36px 26px; text-align:center;}
+  .codebox .say{font-size:16px; color:var(--text-2); margin:0 0 14px;}
+  .codeword{font-family:var(--mono); font-size:64px; font-weight:800; letter-spacing:.08em; color:var(--green); line-height:1;}
+  .codesub{font-size:15px; color:var(--text-2); margin:18px auto 0; line-height:1.6; max-width:60ch;}
+  .notwired{font-size:14.5px; line-height:1.55; color:var(--text-3);}
+  .notwired b{color:var(--text-2);}
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <div class="brand">INFODEMIC</div>
-    <div class="sub">Content pipeline — teacher console</div>
-  </div>
+<header class="top">
+  <div class="brand">INFODEMIC<span>Teacher console</span></div>
+  <div class="buildstamp">build 2026-09-20 · headlines first (v13) · design pass</div>
 </header>
 
 <div class="wrap">
 
-  <div class="steps">
-    <button class="step active" id="s1" data-go="1"><span class="n">1</span>Build the feed</button>
-    <button class="step" id="s2" data-go="2"><span class="n">2</span>Publish</button>
+  <div class="pagehead">
+    <div>
+      <p class="eyebrow">Content pipeline</p>
+      <h1 id="pagetitle">Build today’s feed</h1>
+      <p class="lede" id="pagelede">Pick the stories your class will scroll past in Round 1. Publishing gives you one word to read to the room.</p>
+    </div>
+    <nav class="steps" aria-label="Steps">
+      <button class="step active" id="s1" data-go="1"><span class="n">1</span>Build the feed</button>
+      <button class="step" id="s2" data-go="2"><span class="n">2</span>Publish</button>
+    </nav>
   </div>
 
   <!-- ================= STEP 1 ================= -->
-  <section id="pane1">
+  <section id="pane1" aria-labelledby="pagetitle">
     <div class="cols">
       <div class="maincol">
         <div class="pullbar">
-          <div class="when" id="pull-line"></div>
-          <button class="btn small primary" id="refresh-btn">Pull more stories →</button>
+          <div>
+            <h2 class="sec">Stories</h2>
+            <div class="when" id="pull-line" aria-live="polite"></div>
+          </div>
+          <button class="btn" id="refresh-btn">Pull headlines →</button>
         </div>
-        <div class="pullerr hide" id="pull-error"></div>
+        <div class="notice gold hide" id="mock-note"><span aria-hidden="true">⚠</span><span><b style="color:inherit">These are sample stories.</b> The console couldn’t reach the story pool, so nothing here is today’s news. Check your connection and reload.</span></div>
+        <div class="pullerr hide" id="pull-error" role="alert"></div>
+        <div class="poolline hide" id="pool-line"></div>
 
-        <div id="queue" style="display:flex;flex-direction:column;gap:11px;"></div>
+        <div id="queue" style="display:flex;flex-direction:column;gap:14px;"></div>
       </div>
 
-      <aside class="rail">
-        <div class="box">
+      <aside class="rail" aria-label="Your session">
+        <div class="box feedbox">
           <div class="boxhead">
             <h2 class="sec">Your feed</h2>
             <span class="count" id="fcount">0 stories</span>
@@ -317,28 +306,55 @@
 
           <div class="feednote" id="feednote"></div>
           <div id="feedlist"></div>
-          <div class="empty" id="fempty">Nothing here yet. Add stories from the left — everything you add gets served in Round 1.</div>
-          <button class="btn ghost small" id="clearbtn" style="margin-top:11px;width:100%;">Clear the feed</button>
+          <div class="emptystate" id="fempty">
+            <div class="art" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+            <p class="ti">No stories yet</p>
+            <p>Add stories from the list. Every player sees the whole feed in Round 1.</p>
+            <p>Most sessions use about five: mostly spun, one or two straight.</p>
+          </div>
+          <button class="btn ghost small" id="clearbtn" style="margin-top:6px;width:100%;">Clear the feed</button>
         </div>
 
         <div class="box">
+          <div class="boxhead"><h2 class="sec">Publish</h2></div>
+          <label class="fl" for="curated-by">Your name <span style="font-weight:400;color:var(--text-3)">(optional)</span></label>
+          <input id="curated-by" class="field" placeholder="e.g. Ms. Rivera" autocomplete="off">
+          <label class="fl" for="context-select">Where you’re playing</label>
+          <select id="context-select" class="field">
+            <option value="general">General</option>
+            <option value="classroom">Classroom</option>
+            <option value="family">Family</option>
+          </select>
+          <button class="btn primary big" id="publish-btn">Publish this session →</button>
+          <div class="pullerr hide" id="publish-error" role="alert"></div>
+          <div class="publish-wait hide" id="publish-wait" aria-live="polite"></div>
+          <div class="publish-hint">You’ll get one word for the whole room. Each table’s first player turns it into that table’s own code.</div>
+          <div class="export-panel">
+            <button class="export-link" id="export-link">View draft for vetting (Markdown) ▾</button>
+            <div id="export-panel-body" style="display:none;">
+              <textarea class="export-out" id="export-out" readonly aria-label="Draft for vetting, Markdown"></textarea>
+              <button class="btn small" id="copy-md-btn" style="margin-top:8px;">Copy Markdown</button>
+            </div>
+          </div>
+        </div>
+        <div class="box">
           <div class="boxhead">
-            <h2 class="sec">This session</h2>
-            <span class="inert-badge">not enforced yet</span>
+            <h2 class="sec">Session length</h2>
+            <span class="inert-badge">Not enforced yet</span>
           </div>
 
           <div class="playrow">
             <div class="lbl">Cases they file<b id="caseshint"></b></div>
             <div class="stepper">
               <button id="minus" aria-label="Fewer cases">&minus;</button>
-              <span class="val" id="nval">2</span>
+              <span class="val" id="nval" aria-live="polite">2</span>
               <button id="plus" aria-label="More cases">+</button>
             </div>
           </div>
-          <div class="zonenote" id="casesnote" style="margin:-6px 0 13px;"></div>
+          <div class="zonenote" id="casesnote"></div>
 
-          <div class="sublabel">How long you've got</div>
-          <div class="segmented" id="minutes">
+          <div class="sublabel" id="minutes-label">How long you’ve got</div>
+          <div class="segmented" id="minutes" role="group" aria-labelledby="minutes-label">
             <button data-m="30">30 min</button><button data-m="45">45 min</button>
             <button data-m="60">60 min</button><button data-m="90">90 min</button>
           </div>
@@ -348,48 +364,30 @@
           </div>
 
           <div class="shapecard">
-            <div><div class="k">Runs about</div><div class="v" id="shape-min">&mdash;</div></div>
-            <div><div class="k">Cases</div><div class="v" id="shape-cases">&mdash;</div></div>
-            <div><div class="k">In the feed</div><div class="v" id="shape-feed">&mdash;</div></div>
+            <div><div class="v" id="shape-min">&mdash;</div><div class="k">Runs about</div></div>
+            <div><div class="v" id="shape-cases">&mdash;</div><div class="k">Cases</div></div>
+            <div><div class="v" id="shape-feed">&mdash;</div><div class="k">In the feed</div></div>
           </div>
-          <div class="zonenote" style="margin:9px 0 0;">Round 1 shows the whole feed in 60 seconds. A case they actually chase &mdash; gut check, investigation, note &mdash; runs about 10 minutes.</div>
+          <div class="zonenote" style="margin:12px 0 0;">Round 1 shows the whole feed in 60 seconds. A case they actually chase &mdash; gut check, investigation, note &mdash; runs about 10 minutes.</div>
 
           <div class="warn hide" id="dupchip">
-            <span>&#9888;</span>
+            <span aria-hidden="true">&#9888;</span>
             <span id="dupchip-text"></span>
           </div>
 
           <div class="warn hide" id="allstraight">
-            <span>&#9888;</span>
+            <span aria-hidden="true">&#9888;</span>
             <span>Nothing in this feed plays spun &mdash; no two players would see a different version, so there's nothing to disagree about. Add one more story.</span>
           </div>
 
-          <div class="inertnote">
-            <b>Nothing here reaches the game yet.</b> The table currently files two cases and picks the
+          <details class="inertnote">
+            <summary>Why isn’t this enforced yet?</summary>
+            <p><b>Nothing here reaches the game yet.</b> The table currently files two cases and picks the
             second one itself. This number only shapes what you see on this screen; wiring it into play
-            is waiting on the multiplayer conversation.
-          </div>
+            is waiting on the multiplayer conversation.</p>
+          </details>
         </div>
 
-        <div class="box">
-          <div class="boxhead"><h2 class="sec">Publish</h2></div>
-          <input id="curated-by" class="field" placeholder="Your name (optional)" autocomplete="off">
-          <select id="context-select" class="field">
-            <option value="general">General</option>
-            <option value="classroom">Classroom</option>
-            <option value="family">Family</option>
-          </select>
-          <button class="btn primary big" id="publish-btn">Publish this session →</button>
-          <div class="pullerr hide" id="publish-error"></div>
-          <div class="publish-hint">Generates one word for the whole room. Each table's first player turns it into that table's own code.</div>
-          <div class="export-panel">
-            <button class="export-link" id="export-link">View draft for vetting (Markdown) ▾</button>
-            <div id="export-panel-body" style="display:none;">
-              <textarea class="export-out" id="export-out" readonly></textarea>
-              <button class="btn small" id="copy-md-btn" style="margin-top:8px;">Copy Markdown</button>
-            </div>
-          </div>
-        </div>
       </aside>
     </div>
   </section>
@@ -399,17 +397,17 @@
     <div class="cols">
       <div class="maincol">
         <div class="codebox">
-          <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:14px;">Read this word to the room</div>
+          <p class="say">Read this word to the room</p>
           <div class="codeword" id="code">—</div>
           <div class="codesub" id="codesub"></div>
-          <button class="btn small" id="copy-code-btn" style="margin-top:14px;">Copy word</button>
+          <button class="btn" id="copy-code-btn" style="margin-top:20px;">Copy word</button>
         </div>
 
-        <div class="box" style="margin-top:16px;">
-          <div class="boxhead"><h2 class="sec">What they'll play</h2><span class="count" id="playsummary"></span></div>
+        <div class="box" style="margin-top:4px;">
+          <div class="boxhead"><h2 class="sec">What they’ll play</h2><span class="count" id="playsummary"></span></div>
           <div id="playlist"></div>
           <div id="savedsummary" class="empty" style="margin-top:10px;"></div>
-          <div class="inertnote" style="margin-top:12px;">
+          <div class="inertnote">
             <b>All of it publishes.</b> Round 1 serves the whole feed; the cases number is how many of
             them a table takes all the way through. Which ones those are is the table's call at triage —
             that choice is the lesson, so it isn't yours to make here.
@@ -419,12 +417,11 @@
 
       <aside class="rail">
         <div class="box">
-          <div class="boxhead"><h2 class="sec">Who's in</h2></div>
-          <div class="notwired">
-            <b>Not wired up yet.</b> This is where the tables that joined your word will show — who's
-            at which table, and who typed the word but never sat down. Reading that back needs a
-            query the sync layer doesn't have, and removing someone needs a lobby control the game
-            doesn't have. Both are the next piece of work, not something this screen is faking.
+          <div class="boxhead"><h2 class="sec">Who’s in</h2><span class="inert-badge">Coming soon</span></div>
+          <div class="emptystate">
+            <p class="ti">You’ll see tables here</p>
+            <p>Who’s at which table, and who typed the word but never sat down.</p>
+            <p>Not built yet — for now, check the room.</p>
           </div>
         </div>
 
@@ -436,10 +433,19 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="multiplayer/supabase-sync.js?v=2026-09-07-claimsmvp"></script>
+<script src="multiplayer/supabase-sync.js?v=2026-09-20-ui"></script>
 
 <script>
 var TELL_NAMES = {
+  // 9/18: the SIX TikTok-Age tells (generator v12 plants one per spun story). Draft labels —
+  // Abbie has not reviewed; nothing keys off a label. The old chip / 17-tell names stay below
+  // so v9-v11 rows and older published drops still badge.
+  "feel": "It's written to make you feel it",
+  "grift": "Somebody gets paid if I believe it",
+  "viral": "It's made to go viral",
+  "coordination": "Everyone started saying it at the same time",
+  "joke": "It's a joke",
+  "delay": "It says the fix is pointless",
   "made-to-feel-it": "Written to make you feel it",
   "everyones-doing-it": "Everyone\u2019s already doing it",
   "rushing-you": "Rushing you",
@@ -459,6 +465,11 @@ var TELL_NAMES = {
   "they-fixed-it": "They fixed it themselves"
 };
 function tellName(key){ return TELL_NAMES[key] || key; }
+var TELL_IDS6 = ["feel", "grift", "viral", "coordination", "joke", "delay"];
+var WEAK_REASON_NAMES = { gain: "gains if I believe it", one_story: "one person's story", no_proof: "no proof", off_topic: "off topic" };
+function weakReasonName(r){ return WEAK_REASON_NAMES[r] || (TELL_IDS6.indexOf(r) !== -1 ? "lens: " + r : String(r || "")); }
+var LOOK_ICONS = { official: "\ud83c\udfdb\ufe0f", outlet: "\ud83d\udcf0", explainer: "\ud83d\udcd8", creator: "\u25b6\ufe0f", samephrase: "\ud83d\udd01" };
+var LOOK_LABELS = { official: "document", outlet: "news site", explainer: "explainer", creator: "video", samephrase: "same-phrase search" };
 
 // ---- claims MVP (9/7/2026): one post per story, CARD tell only ----
 // A story's `post` is {headline, card_tell, card_words}: card_tell is one of the
@@ -476,6 +487,18 @@ var OLD_TACTIC_TO_CHIP = {
   "Whataboutism": "what-about-them"
 };
 function postOf(d){
+  // v13 (9/20): a row with no package yet (status headline | writing | failed). Nothing to show but
+  // the tell the deal assigned at pull time; `straight` follows the deal so the feed warnings work
+  // before a package exists.
+  if (d.status && d.status !== "ready"){
+    var dl = TELL_IDS6.indexOf(d.dealt) === -1 ? "straight" : d.dealt;
+    return { headline: "", tell: null, why: "", card_tell: null, card_words: null, straight: dl === "straight", legacy: false, pending: true, dealt: dl };
+  }
+  // v12 (9/18): `post.planted` = {tell, receipts, why}; tell is one of TELL_IDS6 or null (straight).
+  if (d.post && d.post.headline && d.post.planted){
+    var pt = TELL_IDS6.indexOf(d.post.planted.tell) === -1 ? null : d.post.planted.tell;
+    return { headline: d.post.headline, tell: pt, why: d.post.planted.why || "", card_tell: null, card_words: null, straight: !pt, legacy: false, v12: true };
+  }
   if (d.post && d.post.headline){
     var ct = CHIP_KEYS.indexOf(d.post.card_tell) === -1 ? null : d.post.card_tell;
     return { headline: d.post.headline, card_tell: ct, card_words: ct ? (d.post.card_words || null) : null, straight: !ct, legacy: false };
@@ -493,11 +516,145 @@ function postOf(d){
   }
   return { headline: (plain && plain.claim) || d.headline || "", card_tell: null, card_words: null, straight: true, legacy: true };
 }
+// ---- 9/10 media: what the kid sees ------------------------------------------
+function domainOf(s){
+  var u = (s.media && s.media.source_url) || s.url || "";
+  var m = String(u).match(/^(?:https?:\/\/)?(?:www\.)?([^\/?#]+)/i);
+  return m ? m[1].toLowerCase() : (s.source || "");
+}
+function dateOf(s){
+  if (!s.date) return "";
+  var d = new Date(s.date.replace(" ", "T") + (/[Zz]|[+-]\d\d:?\d\d$/.test(s.date) ? "" : "Z"));
+  return isNaN(d) ? String(s.date) : d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"numeric"});
+}
+function esc(u){ return String(u || "").replace(/["\\)]/g, function(c){ return "%" + c.charCodeAt(0).toString(16); }); }
+// A ~1/3-scale Round 1 card: photo background, caption, link card with the OUTLET
+// only. The real headline never renders here — that is Round 2's reveal.
+function miniCard(s, po){
+  var m = s.media || {}, img = m.image_url || null, bg = s.background || {};
+  var el = document.createElement("div"); el.className = "mini" + (img ? "" : " nophoto");
+  var acct = (bg.displayName || s.source || "") + (bg.followers ? " · " + bg.followers : "");
+  el.innerHTML =
+    '<div class="bg' + (img ? '' : ' none') + '"' + (img ? ' style="background-image:url(' + esc(img) + ')"' : '') + '></div><div class="scrim"></div>' +
+    '<div class="r">Round 1</div>' +
+    '<div class="b"><div class="acct"></div><div class="cap"></div>' +
+    '<div class="lc"><span class="th"' + (img ? ' style="background-image:url(' + esc(img) + ')"' : '') + '></span>' +
+    '<span class="fav"' + (m.source_icon ? ' style="background-image:url(' + esc(m.source_icon) + ')"' : '') + '></span><span class="dom"></span></div>' +
+    '<div class="lights"><span style="background:var(--red)"></span><span style="background:var(--gold)"></span><span style="background:var(--green)"></span></div></div>';
+  el.querySelector(".acct").textContent = acct;
+  var cap = el.querySelector(".cap");
+  if (po.pending){ cap.className = "cap faint"; cap.textContent = "post not written yet"; el.querySelector(".acct").textContent = "account not written yet"; }
+  else cap.textContent = po.headline || "";
+  el.querySelector(".dom").textContent = domainOf(s);
+  el.title = "What the kid sees in Round 1 — the outlet, not the headline";
+  return el;
+}
+// The article under the post: outlet, date, real headline, description. This
+// is what tapping the link card opens in Round 2.
+function articleStrip(s){
+  var m = s.media || {}, img = m.image_url || null;
+  var el = document.createElement("div"); el.className = "article";
+  var th = document.createElement("div"); th.className = "th" + (img ? "" : " none");
+  if (img) th.style.backgroundImage = "url(" + esc(img) + ")"; else th.textContent = "no photo";
+  var ln = document.createElement("div"); ln.className = "ln";
+  var ol = document.createElement("div"); ol.className = "ol";
+  var fav = document.createElement("span"); fav.className = "fav"; if (m.source_icon) fav.style.backgroundImage = "url(" + esc(m.source_icon) + ")";
+  var src = document.createElement("span"); src.textContent = (s.source || "") + " · " + domainOf(s) + (dateOf(s) ? " · " + dateOf(s) : "");
+  var r2 = document.createElement("span"); r2.className = "r2"; r2.textContent = "Opens in Round 2";
+  ol.appendChild(fav); ol.appendChild(src); ol.appendChild(r2);
+  var rh = document.createElement("div"); rh.className = "rh";
+  if (s.url){ var a = document.createElement("a"); a.href = s.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = s.headline || ""; rh.appendChild(a); }
+  else rh.textContent = s.headline || "";
+  ln.appendChild(ol); ln.appendChild(rh);
+  if (m.description){ var ds = document.createElement("div"); ds.className = "ds"; ds.textContent = m.description; ln.appendChild(ds); }
+  el.appendChild(th); el.appendChild(ln);
+  return el;
+}
+function tellOf(po){ if (po.pending) return po.dealt === "straight" ? null : po.dealt; return po.tell || po.card_tell || null; }
 function chipBadge(po){
   var t = document.createElement("span");
+  if (po.pending){ t.className = "tag dealt"; t.textContent = po.dealt === "straight" ? "straight" : tellName(po.dealt);
+    t.title = "Dealt at pull time \u2014 the post will be written " + (po.dealt === "straight" ? "straight, with nothing planted" : "with this tell planted") + " when you add it to a feed"; return t; }
   if (po.straight){ t.className = "tag straight"; t.textContent = "straight"; }
+  else if (po.tell){ t.className = "tag tell"; t.textContent = tellName(po.tell); t.title = po.why ? "planted: " + po.why : ""; }
   else { t.className = "tag chip"; t.textContent = tellName(po.card_tell); t.title = po.card_words ? "leans on \u201c" + po.card_words + "\u201d" : ""; }
   return t;
+}
+// ---- 9/18 the clue pool (generator v12) -------------------------------------------------
+// Every clip with a look (the four 1c looks + the same-phrase receipt) and the reddit thread,
+// with its strength tag; then the receipt line(s) for the planted tell; then mix warnings.
+function poolClips(s){
+  return (s.clips || []).filter(function(c){ return c && (c.look || c.strength); });
+}
+function receiptLines(s){
+  var post = s.post || {}, pl = post.planted, b = s.background || {};
+  if (!pl || !pl.tell) return [];
+  var what = {
+    art:  "the article \u2014 " + ((post.article && post.article.receipt) || "its plainer wording next to the post"),
+    bg:   pl.tell === "joke" ? "Background check \u2014 " + (b.displayName || "") + " " + (b.handle || "") + " \u00b7 \u201c" + (b.bio || "") + "\u201d"
+                             : "Background check \u2014 \u201c" + (((b.funding || [])[1] || {}).v || "") + "\u201d",
+    shop: "link in bio \u2014 " + (b.shop && b.shop.item ? b.shop.item.name + " (" + b.shop.item.price + "): " + b.shop.item.pitch : "(no shop on the account!)"),
+    ver:  "version history \u2014 " + (b.versions && b.versions.rows ? b.versions.rows.length + " tries, the wildest pinned at " + b.versions.rows[b.versions.rows.length-1].n + " views" : "(no versions on the account!)"),
+    phr:  (function(){ var p = (s.clips || []).filter(function(c){ return c.id === "phr"; })[0]; return "same-phrase search \u2014 " + (p && p.receipt ? p.receipt : "(no phr clip!)"); })()
+  };
+  return (pl.receipts || []).map(function(r){ return what[r] || r; });
+}
+function mixWarnings(s, po){
+  var clips = poolClips(s), weak = 0, strong = 0, off = 0, w = [];
+  clips.forEach(function(c){ if (c.strength === "weak"){ weak++; if (c.weak_reason === "off_topic") off++; } else if (c.strength === "strong") strong++; });
+  if (!clips.length) return w;
+  if (po.straight){ if (weak > 1) w.push("straight story with " + weak + " weak clues (rule: at most 1)"); }
+  else {
+    if (weak < 2) w.push("tell story with only " + weak + " weak clue" + (weak === 1 ? "" : "s") + " (rule: 2\u20133)");
+    if (weak > 3) w.push("tell story with " + weak + " weak clues (rule: 2\u20133)");
+    if (strong < 2) w.push("only " + strong + " strong clue" + (strong === 1 ? "" : "s") + " \u2014 not enough to write an honest note (rule: \u2265 2)");
+  }
+  if (off > 1) w.push(off + " off-topic clues (rule: at most 1)");
+  var looks = {}; clips.forEach(function(c){ if (c.look && c.look !== "samephrase") looks[c.look] = (looks[c.look] || 0) + 1; });
+  Object.keys(looks).forEach(function(k){ if (looks[k] > 1) w.push("two " + LOOK_LABELS[k] + " clues (rule: one per look)"); });
+  if (po.tell && !receiptLines(s).length) w.push("planted " + tellName(po.tell) + " but no receipt on the row");
+  return w;
+}
+function poolPanel(s, po){
+  var clips = poolClips(s);
+  if (!clips.length && !(po && po.v12)) return null;
+  var el = document.createElement("div"); el.className = "pool";
+  var weak = clips.filter(function(c){ return c.strength === "weak"; }).length;
+  var ph = document.createElement("div"); ph.className = "ph";
+  ph.innerHTML = "<span>Clue pool</span><span class=\"n\"></span>";
+  ph.querySelector(".n").textContent = clips.length + " clue" + (clips.length === 1 ? "" : "s") + " \u00b7 " + (clips.length - weak) + " strong \u00b7 " + weak + " weak \u00b7 teacher view only";
+  el.appendChild(ph);
+  clips.forEach(function(c){
+    var row = document.createElement("div"); row.className = "cl";
+    var ico = document.createElement("span"); ico.className = "ico"; ico.textContent = LOOK_ICONS[c.look] || "\ud83d\udcac";
+    var tx = document.createElement("span");
+    var who = document.createElement("span"); who.className = "who"; who.textContent = (c.name || c.who || "") + (c.look ? " \u00b7 " + (LOOK_LABELS[c.look] || c.look) : "") + " \u2014 ";
+    tx.appendChild(who); tx.appendChild(document.createTextNode(c.text || ""));
+    var tag = document.createElement("span");
+    if (c.strength === "weak"){ tag.className = "tag weak"; tag.textContent = "weak \u00b7 " + weakReasonName(c.weak_reason); }
+    else if (c.strength === "strong"){ tag.className = "tag strong"; tag.textContent = "strong"; }
+    else { tag.className = "tag"; tag.textContent = c.tell ? "receipt" : "clue"; }
+    row.appendChild(ico); row.appendChild(tx); row.appendChild(tag);
+    el.appendChild(row);
+  });
+  receiptLines(s).forEach(function(line){
+    var row = document.createElement("div"); row.className = "rc";
+    var ico = document.createElement("span"); ico.className = "ico"; ico.textContent = "\ud83e\uddfe";
+    var tx = document.createElement("span"); tx.textContent = tellName(po.tell) + " \u2192 " + line;
+    row.appendChild(ico); row.appendChild(tx); el.appendChild(row);
+  });
+  if (po && po.tell && po.why){ var why = document.createElement("div"); why.className = "why"; why.textContent = po.why; el.appendChild(why); }
+  var warns = mixWarnings(s, po);
+  if (warns.length){ var w = document.createElement("div"); w.className = "warn"; w.textContent = "\u26a0 " + warns.join(" \u00b7 "); el.appendChild(w); }
+  return el;
+}
+// Which of the six tells this pool never planted (a decline or a topic error dropped it).
+function poolCoverageLine(){
+  if (storiesSource !== "live") return "";
+  // v13: the deal is on every row from pull time, so coverage counts headlines too.
+  var have = {}; STORIES.forEach(function(s){ var t = tellOf(postOf(s)); if (t) have[t] = true; });
+  var missing = TELL_IDS6.filter(function(t){ return !have[t]; });
+  return missing.length ? "Tells not in this pool: " + missing.map(tellName).join(" \u00b7 ") + " \u2014 pull headlines again for more." : "";
 }
 function postLine(po){
   var el = document.createElement("p"); el.className = "post";
@@ -515,7 +672,7 @@ function postLine(po){
 // Chips that appear on more than one story in the feed. MVP: a warning only.
 function dupChips(){
   var seen = {}, dups = [];
-  FEED.forEach(function(d){ var po = postOf(d); if (!po.card_tell) return; seen[po.card_tell] = (seen[po.card_tell]||0) + 1; });
+  FEED.forEach(function(d){ var t = tellOf(postOf(d)); if (!t) return; seen[t] = (seen[t]||0) + 1; });
   Object.keys(seen).forEach(function(k){ if (seen[k] > 1) dups.push(k); });
   return dups;
 }
@@ -773,6 +930,12 @@ var storiesSource = "mock";   // "mock" | "live"
 var storiesPulledAt = null;
 var refreshing = false;
 var refreshError = null;
+var storiesLoaded = false; // the first read of the pool has come back (either way)
+var pullNote = "";        // v13: a plain (non-error) line about the last pull
+var PENDING = {};         // v13: storyId -> ms when THIS tab asked for its package (call still open)
+var pollTimer = null;
+var STALL_MS = 5 * 60000; // a row 'writing' longer than this with no open call here = stalled
+var TOPIC_ORDER = ["World","Politics","Disaster","Health","Science","Tech","Media","Gaming","Sports","Brands"];
 
 var FEED = [];            // [{storyId, subject, source, url, headline, variants, hook, background, clips}]
 var sessionCases = DEFAULT_CASES;
@@ -800,7 +963,60 @@ function cardFromStory(story){
   return { storyId: story.id, subject: story.subject, source: story.source, url: story.url,
            headline: story.headline, variants: story.lenses || [],
            post: story.post || null, straight: !!story.straight,
-           hook: story.hook || null, background: story.background || null, clips: story.clips || [] };
+           media: story.media || null, date: story.date || null,
+           hook: story.hook || null, background: story.background || null, clips: story.clips || [],
+           status: story.status || "ready", dealt: story.dealt || null, packageError: story.packageError || null };
+}
+function statusOf(s){ return s.status || "ready"; }
+function storyById(id){ for (var i=0;i<STORIES.length;i++){ if (STORIES[i].id === id) return STORIES[i]; } return null; }
+function isStalled(s){
+  return statusOf(s) === "writing" && !PENDING[s.id] && s.generatedAt && (Date.now() - Date.parse(s.generatedAt) > STALL_MS);
+}
+function modelName(m){ return /sonnet/i.test(m||"") ? "Sonnet" : /haiku/i.test(m||"") ? "Haiku" : /opus/i.test(m||"") ? "Opus" : (m || ""); }
+function shortDate(iso){ var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(undefined, {month:"short", day:"numeric"}); }
+// The feed holds COPIES of cards. A copy made from a headline is a placeholder; swap in the real
+// card (same position) as soon as its story has a package.
+function syncFeed(){
+  FEED = FEED.map(function(d){
+    if ((d.status || "ready") === "ready") return d;
+    var s = storyById(d.storyId);
+    return s ? cardFromStory(s) : d;
+  });
+}
+function feedNotReady(){ return FEED.filter(function(d){ return (d.status || "ready") !== "ready"; }); }
+// Add to feed on a headline: the placeholder joins the feed now, the package is written in the
+// background (~1 min), the teacher keeps picking. `force` re-claims a stalled row.
+function startPackage(s, force){
+  if (inFeed(s.id) === -1) FEED.push(cardFromStory(s));
+  s.status = "writing"; s.packageError = null; PENDING[s.id] = Date.now();
+  syncFeed(); renderAll();
+  syncCall(function(){ return InfodemicSync.generatePackages([s.id], !!force); }).then(function(res){
+    delete PENDING[s.id];
+    if (res && res.meta && res.meta.length) console.info("package written:", res.meta[0]);
+    var claimFail = (res && res.failed && res.failed.length) ? res.failed[0] : null;
+    if (claimFail) console.warn("package failed:", claimFail);
+    return loadStories().then(function(){
+      var cur = storyById(s.id);
+      if (claimFail && cur && statusOf(cur) === "headline"){ cur.status = "failed"; cur.packageError = claimFail.message || "Couldn’t start writing this one."; }
+    });
+  }, function(err){
+    delete PENDING[s.id];
+    return loadStories().then(function(){
+      // The call died but the function may still be writing: trust the row. Only a row that never
+      // left 'headline' is marked failed here, with the transport error.
+      var cur = storyById(s.id);
+      if (cur && statusOf(cur) === "headline"){ cur.status = "failed"; cur.packageError = errText(err); }
+    });
+  }).then(function(){ syncFeed(); renderAll(); schedulePoll(); });
+}
+// While anything is being written (here or in another tab), re-read the table every 10s.
+function schedulePoll(){
+  if (pollTimer || storiesSource !== "live") return;
+  if (!STORIES.some(function(s){ return statusOf(s) === "writing"; })) return;
+  pollTimer = setTimeout(function(){
+    pollTimer = null;
+    loadStories().then(function(){ syncFeed(); renderAll(); schedulePoll(); });
+  }, 10000);
 }
 function inFeed(id){
   for (var i=0;i<FEED.length;i++){ if (FEED[i].storyId === id) return i; }
@@ -837,53 +1053,163 @@ function orderedFeed(){ return FEED.slice(); }
 // ---- candidate list -------------------------------------------------------
 function renderPullBar(){
   var when = (storiesSource === "live" && storiesPulledAt)
-    ? " · pulled " + new Date(storiesPulledAt).toLocaleString()
+    ? " \u00b7 pulled " + new Date(storiesPulledAt).toLocaleString()
     : "";
-  $("pull-line").innerHTML = "<b>" + STORIES.length + " stories</b> to choose from" + when +
-    (refreshing ? " · pulling and generating…" : "");
+  var ready = STORIES.filter(function(s){ return statusOf(s) === "ready"; }).length;
+  var heads = STORIES.length - ready;
+  $("pull-line").innerHTML = (storiesSource === "live"
+      ? "<b>" + heads + " headline" + (heads === 1 ? "" : "s") + "</b> \u00b7 <b>" + ready + " ready to play</b>" + when
+      : "<b>" + STORIES.length + " sample stories</b>") +
+    (refreshing ? " \u00b7 pulling headlines\u2026" : (pullNote ? " \u00b7 " + pullNote : ""));
   var btn = $("refresh-btn");
   btn.disabled = refreshing;
-  btn.textContent = refreshing ? "Pulling + generating…" : "Pull more stories →";
+  btn.textContent = refreshing ? "Pulling headlines\u2026" : "Pull headlines \u2192";
+  btn.title = "Free \u2014 pulls fresh headlines only. A story\u2019s post and clues are written when you add it to a feed.";
   var err = $("pull-error");
   err.className = refreshError ? "pullerr" : "pullerr hide";
   err.textContent = refreshError || "";
+  $("mock-note").className = (storiesSource === "mock" && storiesLoaded) ? "notice gold" : "notice gold hide";
+  var pl = $("pool-line"), cov = poolCoverageLine();
+  pl.className = cov ? "poolline" : "poolline hide";
+  pl.textContent = cov;
 }
 
+// v13: ready packages first (newest written first), then everything without a package grouped by
+// topic so a topic's candidates read together, newest pull first inside a group.
+function queueOrder(){
+  var ts = function(v){ var n = Date.parse(v || ""); return isNaN(n) ? 0 : n; };
+  var ready = STORIES.filter(function(s){ return statusOf(s) === "ready"; });
+  if (storiesSource === "live") ready.sort(function(a, b){ return ts(b.generatedAt) - ts(a.generatedAt); });
+  var rest = STORIES.filter(function(s){ return statusOf(s) !== "ready"; });
+  var rank = function(s){ var i = TOPIC_ORDER.indexOf(s.subject); return i === -1 ? 99 : i; };
+  rest.sort(function(a, b){ return rank(a) - rank(b) || String(a.subject).localeCompare(String(b.subject)) || ts(b.pulledAt) - ts(a.pulledAt); });
+  return { ready: ready, rest: rest };
+}
+function groupHead(label, n){
+  var g = document.createElement("h3"); g.className = "qgroup";
+  var a = document.createElement("span"); a.textContent = label;
+  var b = document.createElement("span"); b.className = "n"; b.textContent = n;
+  g.appendChild(a); g.appendChild(b); return g;
+}
+function addWrap(btn, note){
+  var w = document.createElement("div"); w.className = "addwrap"; w.appendChild(btn);
+  if (note){ var nt = document.createElement("div"); nt.className = "addnote"; nt.textContent = note; w.appendChild(nt); }
+  return w;
+}
+// A WRITTEN story: the full card — mini Round 1 phone, the post, the article under it.
+function readyCard(s){
+  var isIn = inFeed(s.id) !== -1;
+  var el = document.createElement("article"); el.className = "story" + (isIn ? " in" : "");
+  var body = document.createElement("div"); body.className = "body";
+  var meta = document.createElement("div"); meta.className = "meta";
+  var t1 = document.createElement("span"); t1.className = "tag subject"; t1.textContent = s.subject; meta.appendChild(t1);
+  var po = postOf(s);
+  meta.appendChild(chipBadge(po));
+  body.appendChild(meta); body.appendChild(postLine(po)); body.appendChild(articleStrip(s));
+  if (s.generatedAt){
+    var ag = document.createElement("div"); ag.className = "ageline";
+    ag.textContent = "Written " + shortDate(s.generatedAt) + (s.model ? " \u00b7 " + modelName(s.model) : "") + " \u00b7 free to reuse";
+    body.appendChild(ag);
+  }
+  // Tara 9/18: no Clue pool panel on the card. poolPanel() stays as a DevTools debug view; the mix warnings ride on the badge.
+  var warns = mixWarnings(s, po); if (warns.length){ var b = meta.querySelector(".tag.tell, .tag.straight"); if (b){ b.textContent += " \u26a0"; b.title = (b.title ? b.title + "\n" : "") + "\u26a0 " + warns.join(" \u00b7 "); } }
+  el.appendChild(miniCard(s, po));
+  var btn = document.createElement("button");
+  btn.className = isIn ? "btn infeed" : "btn add";
+  btn.textContent = isIn ? "\u2713 In your feed" : "+ Add to feed";
+  if (isIn) btn.title = "Click to take it back out";
+  btn.setAttribute("aria-pressed", isIn ? "true" : "false");
+  btn.onclick = function(){
+    var i = inFeed(s.id);
+    if (i !== -1){ FEED.splice(i,1); } else { FEED.push(cardFromStory(s)); }
+    renderAll();
+  };
+  el.appendChild(body); el.appendChild(addWrap(btn, null));
+  return el;
+}
+// A HEADLINE: a compact row. Nothing is written yet, so there is no phone to preview — just the real
+// article, the tell it was dealt, and the one action.
+function headlineRow(s){
+  var st = statusOf(s), stalled = isStalled(s), isIn = inFeed(s.id) !== -1;
+  var m = s.media || {}, img = m.image_url || null, po = postOf(s);
+  var el = document.createElement("article"); el.className = "story row " + st + (isIn ? " in" : "");
+  var th = document.createElement("div"); th.className = "th"; th.setAttribute("aria-hidden", "true");
+  if (img) th.style.backgroundImage = "url(" + esc(img) + ")"; else th.textContent = "no photo";
+  var body = document.createElement("div"); body.className = "body";
+  var ol = document.createElement("div"); ol.className = "ol";
+  var fav = document.createElement("span"); fav.className = "fav"; if (m.source_icon) fav.style.backgroundImage = "url(" + esc(m.source_icon) + ")";
+  var src = document.createElement("span"); src.textContent = (s.source || "") + (dateOf(s) ? " \u00b7 " + dateOf(s) : "");
+  ol.appendChild(fav); ol.appendChild(src);
+  var rh = document.createElement("div"); rh.className = "rh";
+  if (s.url){ var a = document.createElement("a"); a.href = s.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = s.headline || ""; rh.appendChild(a); }
+  else rh.textContent = s.headline || "";
+  body.appendChild(ol); body.appendChild(rh);
+  if (m.description && st === "headline"){ var ds = document.createElement("div"); ds.className = "ds"; ds.textContent = m.description; body.appendChild(ds); }
+  var meta = document.createElement("div"); meta.className = "meta";
+  var lead = document.createElement("span"); lead.className = "post faint"; lead.style.margin = "0";
+  if (st === "writing" && !stalled){ var sp = document.createElement("span"); sp.className = "spin"; lead.appendChild(sp); lead.appendChild(document.createTextNode("Writing the post and clues\u2026")); }
+  else lead.textContent = st === "headline" ? "Will be written as" : stalled ? "Stalled while writing \u2014 was going to be" : "Couldn\u2019t be written \u2014 was going to be";
+  meta.appendChild(lead);
+  if (!(st === "writing" && !stalled)) meta.appendChild(chipBadge(po));
+  body.appendChild(meta);
+  if (st === "failed" && s.packageError){
+    var pe = document.createElement("div"); pe.className = "pkgerr";
+    pe.textContent = s.packageError.length > 200 ? s.packageError.slice(0, 200) + "\u2026" : s.packageError; pe.title = s.packageError;
+    body.appendChild(pe);
+  }
+  var btn = document.createElement("button"), note = null;
+  if (st === "writing" && !stalled){ btn.className = "btn small"; btn.disabled = true; btn.textContent = "Writing\u2026"; note = "about 40 seconds"; }
+  else if (st === "headline"){
+    btn.className = "btn add"; btn.textContent = "+ Add to feed"; note = "writes the post \u00b7 about 40s";
+    btn.title = "Adds it to your feed and writes its post and clues now. You can keep picking.";
+    btn.onclick = function(){ startPackage(s, false); };
+  } else { btn.className = "btn"; btn.textContent = "Try again"; btn.onclick = function(){ startPackage(s, stalled); }; }
+  el.appendChild(th); el.appendChild(body); el.appendChild(addWrap(btn, note));
+  return el;
+}
+function queueCard(s){ return statusOf(s) === "ready" ? readyCard(s) : headlineRow(s); }
 function renderQueue(){
   var host = $("queue"); host.innerHTML = "";
-  STORIES.forEach(function(s){
-    var isIn = inFeed(s.id) !== -1;
-    var el = document.createElement("article");
-    el.className = "story" + (isIn ? " in" : "");
-    var body = document.createElement("div"); body.className = "body";
-    var meta = document.createElement("div"); meta.className = "meta";
-    var t1 = document.createElement("span"); t1.className = "tag subject"; t1.textContent = s.subject;
-    meta.appendChild(t1);
-    var po = postOf(s);
-    meta.appendChild(chipBadge(po));
-    // The POST is what players see; the pulled headline is the audit trail.
-    var h = postLine(po);
-    var src = document.createElement("div"); src.className = "src";
-    src.textContent = "From: " + s.headline + " — " + s.source + " · " + s.url + " (as pulled — not player-facing)";
-    body.appendChild(meta); body.appendChild(h); body.appendChild(src);
-    var btn = document.createElement("button");
-    btn.className = isIn ? "btn small" : "btn add";
-    btn.textContent = isIn ? "✓ In your feed" : "+ Add";
-    btn.onclick = function(){
-      var i = inFeed(s.id);
-      if (i !== -1){ FEED.splice(i,1); } else { FEED.push(cardFromStory(s)); }
-      renderAll();
-    };
-    el.appendChild(body); el.appendChild(btn);
-    host.appendChild(el);
+  var q = queueOrder();
+  if (q.ready.length){
+    var rs = document.createElement("section"); rs.className = "qsec";
+    if (q.rest.length || storiesSource === "live") rs.appendChild(groupHead("Ready to play", q.ready.length + (q.ready.length === 1 ? " story" : " stories") + " \u00b7 already written, free to reuse"));
+    q.ready.forEach(function(s){ rs.appendChild(readyCard(s)); });
+    host.appendChild(rs);
+  }
+  var last = null, list = null;
+  q.rest.forEach(function(s){
+    if (s.subject !== last){
+      last = s.subject;
+      var n = q.rest.filter(function(x){ return x.subject === s.subject; }).length;
+      var sec = document.createElement("section"); sec.className = "qsec";
+      sec.appendChild(groupHead(s.subject, n + " headline" + (n === 1 ? "" : "s")));
+      list = document.createElement("div"); list.className = "qlist";
+      sec.appendChild(list); host.appendChild(sec);
+    }
+    list.appendChild(headlineRow(s));
   });
+  // Empty states. Live pool with no fresh headlines: say what Pull does and that it is free.
+  if (storiesSource === "live" && !q.rest.length){
+    var es = document.createElement("div"); es.className = "emptystate wide";
+    es.innerHTML = '<p class="ti">No fresh headlines</p><p>Pull today\u2019s news to see what you could add. It\u2019s free \u2014 a story is only written when you add it to a feed.</p>';
+    var pb = document.createElement("button"); pb.className = "btn"; pb.textContent = "Pull headlines \u2192";
+    pb.onclick = function(){ $("refresh-btn").click(); };
+    es.appendChild(pb); host.appendChild(es);
+  }
+  if (!STORIES.length){
+    var e0 = document.createElement("div"); e0.className = "emptystate wide";
+    e0.innerHTML = '<p class="ti">Nothing to show yet</p><p>Pull headlines to load today\u2019s stories.</p>';
+    host.appendChild(e0);
+  }
 }
 
 // ---- the feed -------------------------------------------------------------
 function renderFeed(){
   var host = $("feedlist"); host.innerHTML = "";
   var has = FEED.length > 0;
-  $("fempty").className = has ? "empty hide" : "empty";
+  $("fempty").className = has ? "emptystate hide" : "emptystate";
+  $("clearbtn").className = has ? "btn ghost small" : "btn ghost small hide";
   $("fcount").textContent = FEED.length + (FEED.length === 1 ? " story" : " stories");
   $("feednote").textContent = has
     ? "Round 1 serves all of these in 60 seconds. Which ones the table then works through is their call at triage — that choice is the lesson."
@@ -896,18 +1222,24 @@ function renderFeed(){
     row.className = "feeditem";
     var pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (idx+1);
     var po = postOf(d);
-    var t = document.createElement("span"); t.className = "t"; t.textContent = po.headline; t.title = po.headline;
+    var st = d.status || "ready";
+    if (st !== "ready") row.className += (st === "failed" ? " pending failed" : " pending");
+    var t = document.createElement("span"); t.className = "t";
+    if (po.pending){
+      t.textContent = (st === "failed" ? "couldn\u2019t write this one \u2014 " : "writing\u2026 ") + (d.headline || "");
+      t.title = st === "failed" ? (d.packageError || "Try again from the story list, or take it out.") : "Its post and clues are being written (about a minute). It joins the feed when it\u2019s done.";
+    } else { t.textContent = po.headline; t.title = po.headline; }
     var badge = chipBadge(po);
-    if (po.card_tell && dups.indexOf(po.card_tell) !== -1){ badge.className = "tag dup"; badge.title = "Another story in this feed carries this chip"; }
+    if (tellOf(po) && dups.indexOf(tellOf(po)) !== -1){ badge.className = "tag dup"; badge.title = po.tell ? "Another story in this feed plants this same tell \u2014 a feed should not repeat a primary" : "Another story in this feed carries this chip"; }
 
     var arr = document.createElement("span"); arr.className = "arrows";
-    var up = document.createElement("button"); up.textContent = "▲"; up.disabled = idx === 0; up.title = "Move up";
+    var up = document.createElement("button"); up.textContent = "▲"; up.disabled = idx === 0; up.title = "Move up"; up.setAttribute("aria-label", "Move up");
     up.onclick = function(){ var v = FEED.splice(idx,1)[0]; FEED.splice(idx-1,0,v); renderAll(); };
-    var dn = document.createElement("button"); dn.textContent = "▼"; dn.disabled = idx === FEED.length-1; dn.title = "Move down";
+    var dn = document.createElement("button"); dn.textContent = "▼"; dn.disabled = idx === FEED.length-1; dn.title = "Move down"; dn.setAttribute("aria-label", "Move down");
     dn.onclick = function(){ var v = FEED.splice(idx,1)[0]; FEED.splice(idx+1,0,v); renderAll(); };
     arr.appendChild(up); arr.appendChild(dn);
 
-    var x = document.createElement("button"); x.className = "x"; x.textContent = "×"; x.title = "Take out of the feed";
+    var x = document.createElement("button"); x.className = "x"; x.textContent = "×"; x.title = "Take out of the feed"; x.setAttribute("aria-label", "Take out of the feed");
     x.onclick = function(){ FEED.splice(idx,1); renderAll(); };
 
     row.appendChild(pos); row.appendChild(t); row.appendChild(badge); row.appendChild(arr); row.appendChild(x);
@@ -958,13 +1290,24 @@ function renderSession(){
       "). One lesson per story reads better \u2014 consider swapping one out. It still publishes."
     : "";
 
-  $("publish-btn").disabled = FEED.length === 0;
+  var waiting = feedNotReady();
+  $("publish-btn").disabled = FEED.length === 0 || waiting.length > 0;
+  var pw = $("publish-wait");
+  if (waiting.length){
+    var nf = waiting.filter(function(d){ return d.status === "failed"; }).length, nw = waiting.length - nf;
+    pw.className = "publish-wait";
+    pw.textContent = (nw ? nw + (nw === 1 ? " story is" : " stories are") + " still being written" : "") + (nw && nf ? " and " : "") +
+      (nf ? nf + (nf === 1 ? " story" : " stories") + " couldn\u2019t be written" : "") +
+      (nf ? " \u2014 try again from the story list or take " + (nf === 1 ? "it" : "them") + " out. " : ". ") + "Publish unlocks when every story in the feed is ready.";
+  } else { pw.className = "publish-wait hide"; pw.textContent = ""; }
   $("s2").disabled = !publishedCode;
+  $("s2").title = publishedCode ? "" : "Publish a session first";
 }
 
 // ---- publish --------------------------------------------------------------
 function cardsForPublish(){
-  return orderedFeed().map(function(d){
+  // v13: a story without a package never publishes (the button is gated too).
+  return orderedFeed().filter(function(d){ return (d.status || "ready") === "ready"; }).map(function(d){
     return {
       id: d.storyId, subject: d.subject, source: d.source, sourceUrl: d.url, headline: d.headline,
       // claims MVP: the game reads `post`; `variants` only rides along for old rows.
@@ -975,7 +1318,11 @@ function cardsForPublish(){
       // hook/clips publishes with none of it and the game shows its empty state.
       hook: d.hook || null,
       background: d.background || null,
-      clips: d.clips || []
+      clips: d.clips || [],
+      // 9/10: the pulled article's photo/outlet. Round 1 = photo + outlet on the
+      // card; Round 2 opens the article (headline is `headline`, date is `date`).
+      media: d.media || null,
+      date: d.date || null
     };
   });
 }
@@ -1000,8 +1347,9 @@ function buildExport(){
   lines.push("|---|---|---|");
   cards.forEach(function(d, i){
     var po = postOf(d);
-    var vtext = "**[" + (po.straight ? "straight" : tellName(po.card_tell)) + "]** " + String(po.headline).replace(/\|/g,"/") +
-                (po.card_words ? " _(leans on \u201c" + po.card_words + "\u201d)_" : "");
+    var vtext = "**[" + (po.straight ? "straight" : tellName(tellOf(po))) + "]** " + String(po.headline).replace(/\|/g,"/") +
+                (po.card_words ? " _(leans on \u201c" + po.card_words + "\u201d)_" : "") +
+                (po.tell && po.why ? " _(planted: " + String(po.why).replace(/\|/g,"/") + ")_" : "");
     lines.push("| "+(i+1)+" | "+d.subject+" | "+vtext+" |");
   });
   lines.push("");
@@ -1040,7 +1388,11 @@ function go(n){
   [1,2].forEach(function(i){
     $("pane"+i).className = (i === n) ? "" : "hide";
     $("s"+i).className = "step" + (i === n ? " active" : (i < n ? " done" : ""));
+    if (i === n) $("s"+i).setAttribute("aria-current", "step"); else $("s"+i).removeAttribute("aria-current");
   });
+  $("pagetitle").textContent = n === 2 ? "You’re published" : "Build today’s feed";
+  $("pagelede").textContent = n === 2 ? "Read the word out loud. Each table’s first player types it to start their table."
+                                        : "Pick the stories your class will scroll past in Round 1. Publishing gives you one word to read to the room.";
   window.scrollTo({top:0, behavior:"smooth"});
   renderAll();
 }
@@ -1075,7 +1427,7 @@ Array.prototype.forEach.call(document.querySelectorAll(".step"), function(s){
 });
 
 $("publish-btn").addEventListener("click", function(){
-  if (!FEED.length) return;
+  if (!FEED.length || feedNotReady().length) return;
   var btn = this;
   var errBox = $("publish-error");
   btn.disabled = true; btn.textContent = "Publishing…";
@@ -1132,25 +1484,35 @@ $("copy-md-btn").addEventListener("click", function(){
 // never touches FEED: the feed holds copies of the cards, so stories already
 // added survive a refresh even though their candidate row is gone.
 function rowToStory(row){
+  var st = row.status || "ready";
+  // Our own call is open but the function hasn't claimed the row yet: keep showing 'writing'.
+  if (st === "headline" && PENDING[row.id]) st = "writing";
   return {
     id: row.id, subject: row.subject, source: row.source, date: row.date,
     headline: row.headline, url: row.url, lenses: row.variants || [],
     post: row.post || null, straight: !!row.straight,
-    hook: row.hook || null, background: row.background || null, clips: row.clips || []
+    media: row.media || null,
+    hook: row.hook || null, background: row.background || null, clips: row.clips || [],
+    status: st, dealt: row.dealt || null, packageError: row.package_error || null,
+    model: row.model || null, generatedAt: row.generated_at || null, pulledAt: row.pulled_at || null
   };
 }
 function loadStories(){
   return syncCall(function(){ return InfodemicSync.getStoryCandidates(); }).then(function(rows){
+    storiesLoaded = true;
     if (rows && rows.length){
       STORIES = rows.map(rowToStory);
       storiesSource = "live";
-      storiesPulledAt = rows[0].pulled_at || new Date().toISOString();
+      storiesPulledAt = rows.reduce(function(m, r){ return (r.pulled_at && (!m || r.pulled_at > m)) ? r.pulled_at : m; }, null) || new Date().toISOString();
     } else {
       STORIES = MOCK_STORIES.slice();
       storiesSource = "mock";
       storiesPulledAt = null;
     }
   }).catch(function(err){
+    storiesLoaded = true;
+    // v13: a failed re-read (the 10s poll) keeps what is on screen; only a failed FIRST load falls back.
+    if (storiesSource === "live"){ console.warn("loadStories failed, keeping the current list:", err); return; }
     console.error("loadStories failed, falling back to mock data:", err);
     STORIES = MOCK_STORIES.slice();
     storiesSource = "mock";
@@ -1160,22 +1522,19 @@ function loadStories(){
 
 $("refresh-btn").onclick = function(){
   if (refreshing) return;
-  refreshing = true; refreshError = null; renderPullBar();
-  syncCall(function(){ return InfodemicSync.refreshStoryCandidates(); }).then(function(result){
+  refreshing = true; refreshError = null; pullNote = ""; renderPullBar();
+  syncCall(function(){ return InfodemicSync.pullHeadlines(); }).then(function(result){
+    result = result || {};
     if (result.errors && result.errors.length){
-      console.warn("Story generation had partial failures:", result.errors);
+      console.warn("Headline pull had partial failures:", result.errors);
       refreshError = result.errors.length + " topic(s) didn't come through (" +
-        result.errors.map(function(e){ return e.subject; }).join(", ") + ") — showing whatever did generate.";
+        result.errors.map(function(e){ return e.subject; }).join(", ") + ") \u2014 showing whatever did.";
     }
-    if (!result.inserted){
-      refreshing = false;
-      refreshError = refreshError || "Pull failed — no candidates were generated. Check that both API key secrets are set on the Edge Function.";
-      renderPullBar();
-      return;
-    }
+    pullNote = result.inserted ? result.inserted + " new headline" + (result.inserted === 1 ? "" : "s")
+                               : "no new headlines since the last pull";
     return loadStories().then(function(){
       refreshing = false;
-      renderAll();
+      syncFeed(); renderAll(); schedulePoll();
     });
   }).catch(function(err){
     refreshing = false;
@@ -1185,7 +1544,7 @@ $("refresh-btn").onclick = function(){
 };
 
 renderAll();
-loadStories().then(renderAll);
+loadStories().then(function(){ syncFeed(); renderAll(); schedulePoll(); });
 </script>
 </body>
 </html>
