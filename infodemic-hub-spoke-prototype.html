@@ -436,6 +436,38 @@
   .caseghost .slot{ width:22px; height:22px; border-radius:6px; border:1.5px dashed rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800; flex:none; }
   .resultrow.justadded{ animation:rowin .45s cubic-bezier(.2,.9,.3,1) both; }
   @keyframes rowin{ from{opacity:0; transform:translateY(8px); background:rgba(48,209,88,.18);} to{opacity:1; transform:none; background:transparent;} }
+  .r2post{margin-bottom:12px;} .r2post .postmedia .im{height:72px;}
+  .qrows{display:flex; flex-direction:column; gap:6px; margin:0 0 14px;}
+  .qrow{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:var(--ios-bg3); border:1px solid rgba(255,255,255,.08); cursor:pointer;}
+  .qrow .qi{font-size:20px; flex:none;} .qrow .qtx{flex:1 1 auto; min-width:0; display:flex; flex-direction:column;}
+  .qrow .qtx b{font-size:14px; font-weight:800;} .qrow .qtx small{font-size:11.5px; font-weight:600; color:var(--ios-label2); margin-top:1px;}
+  .qrow .qend{flex:none; font-size:12px; font-weight:800; color:var(--ios-label3);} .qrow .qend{min-width:18px; text-align:right;}
+  .qrow.got{border-color:rgba(48,209,88,.45);} .qrow.got .qend{color:#9bebb4;}
+  .qhead{margin:0 0 12px;} .qhead .qt{font-size:16px; font-weight:800;} .qhead .qs{font-size:12.5px; font-weight:600; color:var(--ios-label2); margin-top:3px; line-height:1.35;}
+  .evcard{background:var(--ios-bg3); border-radius:12px; padding:12px; margin-bottom:10px;}
+  .evlbl{font-size:10.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label3); margin-bottom:8px;}
+  .evim{height:150px; border-radius:8px; background:#2c2c2e center/cover; margin-bottom:4px;} .evhint{font-size:11.5px; color:var(--ios-label2); margin-top:6px;}
+  .askairow{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; margin-top:6px; border-radius:12px; background:rgba(123,97,255,.14); font-size:14px; font-weight:800; cursor:pointer;} .askairow .go{color:var(--ios-label2);}
+  .weakpick{margin-top:8px; display:flex; flex-direction:column; gap:6px;} .weakpick .wq{font-size:12px; font-weight:800; color:#ff9f96;}
+  .weakpick .wr{text-align:left; font:inherit; font-size:12.5px; font-weight:700; color:#fff; background:rgba(255,69,58,.14); border:1px solid rgba(255,69,58,.4); border-radius:10px; padding:8px 10px; cursor:pointer;}
+  .weakpick .wx{font-size:11.5px; font-weight:700; color:var(--ios-label2); cursor:pointer; align-self:flex-start;}
+  .weakpick.board .wq{color:#b3261e;} .weakpick.board .wr{color:#222; background:#fff4f3; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; font-size:11px; padding:6px 8px;} .weakpick.board .wx{color:#666; font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
+  .weakrule{font-size:11px; font-weight:600; color:var(--ios-label2); margin-top:3px;}
+  .bdpane .bdrules{width:280px; margin-left:-140px; font-size:15px; padding:12px 12px 10px;}
+  .bdchalnote .wf{display:flex; align-items:center; gap:5px;} .bdchalnote .wf + .wf{margin-top:3px;}
+  .bdchalnote small{display:block; font-weight:600; opacity:.85; margin-top:2px;}
+  .obq{margin:10px 0; display:flex; flex-direction:column; gap:6px; text-align:left;} .obq b{font-weight:800;}
+  .notecue{margin:2px 0 8px; padding:10px 12px; border-radius:12px; background:rgba(10,132,255,.12); border:1px solid rgba(10,132,255,.35);}
+  .notecue .nk{display:flex; align-items:center; gap:6px; font-size:13px; font-weight:800;} .notecue .nk .cnt{margin-left:auto; font-size:11px; font-weight:800; color:#7cc0ff;}
+  .notecue .ng{font-size:12px; font-weight:600; color:var(--ios-label2); margin-top:3px; line-height:1.35;}
+  .bdhead .bdbeat{white-space:normal; overflow:visible; text-overflow:clip; max-width:38%; line-height:1.3;}
+  .bdpane .bdclip.thepost .postmedia .im{height:70px!important;}
+  .boardptr{font-size:12.5px; font-weight:700; color:var(--ios-label2); padding:4px 4px 12px;}
+  .xsrcline .cluechip{flex:none; font-family:ui-monospace, Menlo, monospace; font-size:10.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; background:#0f1419; color:#fff; border-radius:3px; padding:2px 6px; margin-top:1px; white-space:nowrap;}
+  .xsrcline .u{font-weight:800;} .xsrcline .kind{color:#536471; font-size:11.5px; font-weight:600; text-transform:lowercase;}
+  .xsrcline.on .cluechip{background:#1d9bf0;}
+  .bdpane .bdclip.cited{clip-path:none!important; box-shadow:0 0 0 4px #1d9bf0, 0 8px 18px rgba(0,0,0,.45);}
+  .bdcited{position:absolute; bottom:-11px; right:10px; z-index:6; background:#1d9bf0; color:#fff; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; font-size:11px; font-weight:800; padding:3px 8px; border-radius:999px; box-shadow:0 2px 4px rgba(0,0,0,.35);}
   .caseteam{ margin:10px 4px 0; font-size:11px; color:var(--ios-label3); font-weight:600; display:flex; align-items:center; gap:6px; }
   .caseteam .r3av{ width:16px; height:16px; font-size:7.5px; } .caseteam .r3av + .r3av{ margin-left:-6px; }
   /* Pinned under the scroll region, so the button never scrolls away and the list can grow. */
@@ -807,7 +839,7 @@
      kids 'get' what they're looking at." If the game names a real thing, it should
      look like that thing — a kid who has used Google and used a chatbot recognises
      both on sight, with no label explaining what they're in. The game layer (the
-     one + Add to case button) hangs off each result rather than replacing it. */
+     one 📌 Pin it button) hangs off each result rather than replacing it. */
   .srchbar{display:flex; align-items:center; gap:8px; background:#fff; border-radius:999px; padding:9px 13px; margin-bottom:9px;}
   .srchbar .q{flex:1; font-size:13px; color:#202124; font-weight:500; line-height:1.3;}
   .srchbar .mag{font-size:13px; color:#5f6368;}
@@ -1301,7 +1333,7 @@
     box-shadow:0 8px 18px rgba(30,15,0,.35); transform:rotate(-1.5deg); background-image:repeating-linear-gradient(transparent 0 25px, rgba(0,0,0,.08) 25px 26px);}
   .bdrules .pinhead{position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #9fd0ff, #2b6fd6 55%, #123a7a); box-shadow:0 3px 4px rgba(0,0,0,.45);}
   .bdrules .t{font-family:var(--bd-mono); font-size:9.5px; letter-spacing:1.4px; text-transform:uppercase; color:var(--ink3); margin-bottom:4px;}
-  .bdrules .l{display:flex; gap:6px;} .bdrules .n{font-weight:700; color:var(--yarn);}
+  .bdrules .l{display:flex; gap:6px;} .bdrules .l + .l{margin-top:6px;} .bdrules .n{font-weight:700; color:var(--yarn);}
   .bdghost{position:absolute; width:232px; height:96px; border:2px dashed rgba(60,30,5,.35); border-radius:3px; z-index:1; display:flex; align-items:center; justify-content:center; font-family:var(--bd-mono); font-size:11px; letter-spacing:1px; color:rgba(60,30,5,.55);}
   .bdstamp{position:absolute; left:50%; margin-left:20px; z-index:8; font-family:var(--bd-mono); font-size:22px; font-weight:700; letter-spacing:3px; color:var(--yarn); border:4px solid var(--yarn); padding:6px 12px; transform:rotate(8deg); opacity:.85; text-transform:uppercase;}
   .bdnote{position:absolute; left:50%; transform:translateX(-50%) rotate(.6deg); width:420px; background:var(--paper); color:var(--ink); padding:20px 16px 12px; z-index:6; font-family:var(--bd-mono); font-size:12.5px; line-height:1.45; box-shadow:0 10px 22px rgba(30,15,0,.4);}
@@ -1430,7 +1462,47 @@
   .arrow{font-size:16px; color:#999; text-align:center; margin:2px 0;}
   .k-reverse .body{font-size:11px; color:#444;}
   .k-reverse .kv{display:flex; justify-content:space-between; padding:3px 0; border-top:.5px solid #eee; font-size:10.5px;} .k-reverse .kv b{color:#c62828;}
-  .bdclip.k-samephrase, .bdclip.k-reverse, .bdclip.k-shop, .bdclip.k-versions, .bdclip.k-swap{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;}
+  .bdclip.k-samephrase, .bdclip.k-shop, .bdclip.k-versions, .bdclip.k-swap{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;}
+  /* ---- the four clue looks (1c, 9/17) — one frame per look; strong and weak are drawn the same ---- */
+  .stype.plain{background:rgba(255,255,255,.1); color:var(--ios-label2);}
+  .k-official{background:#fff!important; color:#1d2a36; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;}
+  .k-official .src{display:flex; align-items:center; gap:8px; background:#eef1f5; border-bottom:2px solid #1d2a36; color:#1d2a36;}
+  .of-seal{width:26px; height:26px; border-radius:50%; border:2px solid #1d2a36; display:flex; align-items:center; justify-content:center; font-family:Georgia,serif; font-weight:900; font-size:13px; flex:none;}
+  .of-iss{font-size:11.5px; font-weight:800; line-height:1.2;} .of-about{font-size:9.5px; color:#55616e; line-height:1.25; margin-top:1px;}
+  .of-title{font-family:Georgia,"Times New Roman",serif; font-size:13.5px; font-weight:700; line-height:1.25; color:#111;}
+  .of-date{font-size:9.5px; color:#55616e; margin:3px 0 6px; font-weight:700;}
+  .k-official .body{font-size:11px; color:#2b3540; line-height:1.4;} .k-official .body p{margin:0 0 5px;}
+  .k-official blockquote{margin:6px 0 0; padding:2px 0 2px 8px; border-left:3px solid #c5ccd6; font-family:Georgia,serif; font-style:italic; font-size:11.5px; color:#1d2a36; line-height:1.35;}
+  .k-official blockquote cite{display:block; font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif; font-style:normal; font-size:9.5px; color:#55616e; margin-top:3px;}
+  .k-outlet{background:#fdfcf8!important; padding-top:20px;}
+  .bdclip.k-outlet{clip-path:polygon(0 0,100% 0,100% 96%,96% 100%,90% 97%,83% 100%,75% 97%,66% 100%,57% 97%,48% 100%,39% 97%,30% 100%,21% 97%,12% 100%,5% 97%,0 100%); padding-bottom:18px;}
+  .k-outlet .src, .k-explainer .src{padding:6px 12px 8px;} .k-outlet .src{border-bottom:2.5px double #111;}
+  .k-outlet .body{font-family:Georgia,serif; font-size:11.5px; color:#222; line-height:1.45;} .k-outlet .body mark, .k-explainer .body mark{background:#fff1a8; color:inherit; padding:0 2px;}
+  .k-outlet .nw-mast, .k-explainer .nw-mast{flex-wrap:wrap;} .bdclip .nw-mast small{margin-left:0;}
+  .ck-kick{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif; font-size:9px; font-weight:800; letter-spacing:1.1px; text-transform:uppercase; color:#555; margin-top:6px;}
+  .ck-by{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif; font-size:9.5px; color:#666; margin-top:4px;}
+  .k-explainer{background:#fff!important; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;}
+  .k-explainer .src{border-bottom:1px solid #e6e6ea;} .k-explainer .nw-mast{font-family:inherit; font-size:12.5px;} .k-explainer .nw-hl{font-family:inherit; font-size:13px;}
+  .k-explainer .ck-kick{display:inline-block; background:#1d2a36; color:#fff; padding:2px 6px; border-radius:3px;}
+  .ck-claim{font-size:11px; font-style:italic; color:#111; border-left:3px solid #1d2a36; padding:1px 0 1px 8px; margin-bottom:6px; line-height:1.35;} .ck-claim small{display:block; font-style:normal; font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:#666;}
+  .k-explainer .body{font-size:11px; color:#333; line-height:1.4;}
+  .ck-links{display:flex; flex-wrap:wrap; gap:4px; margin-top:7px;} .ck-chip{font-size:9.5px; font-weight:700; color:#1d4ed8; background:#eef3ff; border-radius:999px; padding:3px 7px; white-space:nowrap;} .ck-chip small{color:#667; font-weight:600; margin-left:4px;}
+  .k-creator{background:#111!important; color:#fff; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;} .bdclip.k-creator .tag{color:#999;} .bdclip.k-creator .tag .ltr{background:#fff; color:#111;} .bdclip.k-creator .from{color:#ccc;}
+  .vd-frame{position:relative; height:150px; width:62%; margin:0 auto 8px; border-radius:10px; overflow:hidden;}
+  .vd-play{position:absolute; left:50%; top:38%; transform:translate(-50%,-50%); width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff;}
+  .vd-views{position:absolute; top:6px; left:7px; font-size:9px; font-weight:800; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.7);}
+  .vd-cap{position:absolute; left:0; right:0; bottom:0; padding:16px 7px 6px; background:linear-gradient(transparent, rgba(0,0,0,.8)); font-size:9px; line-height:1.3; color:#fff;} .vd-cap span{display:block; margin-top:1px; font-weight:600;}
+  .k-creator .body{font-size:11px; color:#ddd; line-height:1.4;} .k-creator .body small{display:block; font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:#999;}
+  /* the open screen: the same frame, page-sized */
+  .cluepage{min-height:100%;} .cluebig{padding:0 16px 4px; font-size:14px;} .cluebig .src{margin:0 -16px 12px; padding:12px 16px;}
+  .cluebig .nw-mast{font-size:20px;} .cluebig .nw-hl, .cluebig .of-title{font-size:19px; line-height:1.22;} .cluebig.k-explainer .nw-mast{font-size:16px;}
+  .cluebig .of-seal{width:36px; height:36px; font-size:17px;} .cluebig .of-iss{font-size:14px;} .cluebig .of-about, .cluebig .of-date, .cluebig .ck-by, .cluebig .ck-kick{font-size:11px;}
+  .cluebig .body, .cluebig.k-official .body, .cluebig.k-outlet .body, .cluebig.k-explainer .body{font-size:14px; line-height:1.55;} .cluebig .body p{margin:0 0 10px;}
+  .cluebig blockquote{font-size:15px!important; padding-left:12px!important;} .cluebig blockquote cite{font-size:11.5px!important;}
+  .cluebig .ck-claim{font-size:14px; margin-bottom:10px;} .cluebig .ck-chip{font-size:12px; padding:5px 10px;} .cluebig .ck-links{margin-top:12px; gap:6px;}
+  .cluebig.k-outlet{padding-top:0;} .cluebig.k-creator{margin:0; padding:14px 16px 10px;} .cluebig .vd-frame{height:270px; width:62%;} .cluebig .vd-cap{font-size:12px; padding:30px 10px 10px;} .cluebig .vd-views{font-size:11px;} .cluebig .vd-play{width:52px; height:52px; font-size:19px;}
+  .cluebig.k-creator .body{font-size:13.5px;} .cluebig.k-creator .body small{font-size:10px;}
+  .cluepage:has(.k-creator){background:#111;}
   /* the reveal, after filing */
   .planted{margin:16px 0 0; border-radius:14px; padding:13px 14px; background:rgba(255,159,10,.1); border:1px solid rgba(255,159,10,.35); text-align:left;}
   .planted.g{background:rgba(48,209,88,.1); border-color:rgba(48,209,88,.35);}
@@ -1469,7 +1541,7 @@
     <div class="onboard-scrim" id="onboardScrim"></div>
     <div class="onboard-scrim" id="storyScrim"></div>
     <div class="onboard-scrim" id="r3Scrim"></div>
-    <div class="casetoast" id="caseToast"><span class="tk">✓ In your case file</span><span class="ts">The note can only cite what's in here.</span></div>
+    <div class="casetoast" id="caseToast"><span class="tk">📌 Pinned for your note</span><span class="ts">Your team can use it in Round 3.</span></div>
     <div class="home-indicator" onclick="goHome()"></div>
   </div>
   <!-- E3 = E4 (9/10/2026): the laptop board — a second pane, the team's case file as a cork
@@ -1592,14 +1664,14 @@ var CALL_META = {
 // team checked. Loaded-words swaps (`plain`, `swaps`) pay tell 1 off on every spun post.
 var CLAIMS = [
   {id:1, subject:"Disaster", topic:"a flood clip from the Northeast", hue:205, sourceUrl:"tiktok.com/@stormchaserlive/video/91002", wired:true,
-    hook:"Flood warnings are real and time-sensitive — but is 'streets already underwater' tied to an actual alert, or a clip that's been around?",
+    hook:"Flood warnings are real and time-sensitive — but is 'streets already underwater' what the alert says, or what the caption adds?",
     npcVotes:{maya:"misinfo", diego:"true", priya:"biased"},
     headline:"🚨 BREAKING: flash floods slamming parts of NY & CT right now, streets already underwater. Share this now so people can get out in time 🌊",
     loaded:'<mark>🚨 BREAKING</mark>: flash floods <mark>slamming</mark> parts of NY &amp; CT <mark>right now</mark>, streets <mark>already underwater</mark>. <mark>Share this now</mark> so people can get out in time 🌊',
     plain:"The National Weather Service issued a flash flood warning for parts of southeastern New York and Connecticut on Sunday morning.",
     swaps:[["slamming","hitting","picked for the feeling, not the forecast"],["right now","Sunday morning (a warning)","a warning is not a flood"],["already underwater","some roads may flood","the video decides that, not the caption"],["Share this now","","asking for a reaction before telling you anything"]],
     tell:null, cardTell:"rushing-you", cardWords:"🚨 BREAKING",
-    planted:{tell:"media", receipts:["rev-1","art-1"], why:"the clip in the post is five years old — the article is a warning, not a flood"},
+    planted:{tell:"feel", receipts:["art-1"], why:"the article is a warning for Sunday morning — 'slamming', 'already underwater' and 'share this now' are the post's words, not the forecast's"},
     media:{image_url:"https://s.yimg.com/lo/mysterio/api/f38e460bca293f1bea0fc2906532f041557dba18e06aec8b50ccd3be4ce9d867/lightyear_networkapi/resizefill_w1200%3Bquality_80%3Bformat_webp/https%3A%2F%2Fmedia.zenfs.com%2Fen%2Flohud-the-journal-news%2F60749bfa3fdbc15a801eee2b4c9aa469.jpg",
            source_icon:"https://i.newsdata.io/yahoo.png", source_url:"https://news.yahoo.com", domain:"news.yahoo.com", outlet:"Yahoo! News"},
     article:{headline:"Flash flood warning issued for parts of New York, Connecticut. See areas", url:"https://www.yahoo.com/news/weather-news/articles/flash-flood-warning-issued-parts-133316674.html",
@@ -1726,24 +1798,20 @@ function escapeHtml(s){
 // The EIGHT tells (Tara's "New Tells for the TikTok Age", 9/8; pending Abbie Richards' review)
 // REPLACE the seventeen as of 9/14/2026 — they were already the note's checkboxes (E2); now
 // they are the library, the receipts and the reveal too. IDS locked by the 9/14 triage (claims-rule-brief-v2):
-// feel, grift, viral, media, synthetic, coordination, joke, delay. `where` says where the receipt lives.
+// feel, grift, viral, coordination, joke, delay. (`media` + `synthetic` SCRAPPED 9/17 — tells interview.) `where` says where the receipt lives.
 var TELLS = [
-  {key:"feel",       name:"It's built to make me feel something",          emoji:"\ud83c\udf36", kind:"red", where:"card", spoke:"post",
-   q:"How does this make me feel? Do I want it to be true?", desc:"Loaded words chosen for the reaction. Swap them for plain ones and the post goes flat \u2014 same facts, no feeling."},
+  {key:"feel",       name:"It's written to make you feel it",               emoji:"\ud83c\udf36", kind:"red", where:"card", spoke:"post",
+   q:"How does this make me feel? Do I want it to be true?", desc:"A charged word where a plain one would do, wording bigger than the story, someone to blame with nothing to check. The receipt is the article\u2019s plainer wording next to the post."},
   {key:"grift",       name:"Somebody gets paid if I believe it",             emoji:"\ud83d\udcb8", kind:"red", where:"dig", spoke:"background",
    q:"Is this account selling something \u2014 a product, a course, a vibe?", desc:"Check the money panel and the link in bio. A product that only makes sense if the post is true is the receipt."},
-  {key:"viral",      name:"It's made to go viral, not to be right",         emoji:"\ud83d\udce3", kind:"red", where:"dig", spoke:"background",
-   q:"Is this trying to get shared, or trying to be true?", desc:"BREAKING, share-before-it\u2019s-deleted, a cliffhanger instead of the point. The receipt is the account\u2019s version history: the wildest version is the one that got pinned."},
-  {key:"media",      name:"The video or photo isn't what it says it is",    emoji:"\ud83d\udd70", kind:"red", where:"dig", spoke:"search",
-   q:"When and where was this really filmed? Does the sound match?", desc:"The footage is real; the date or place isn\u2019t. Open the article and read the dateline; reverse-search the frame."},
-  {key:"synthetic",    name:"It might not be real at all",                    emoji:"\ud83e\udd16", kind:"red", where:"dig", spoke:"background",
-   q:"Is there an actual person behind this account, or is it AI?", desc:"Forty posts a day, zero replies, never sleeps. Account activity is the receipt."},
+  {key:"viral",      name:"It's made to go viral",                         emoji:"\ud83d\udce3", kind:"red", where:"dig", spoke:"background",
+   q:"Is this trying to get shared, or trying to be true?", desc:"BREAKING, stop scrolling, \u2018I wasn\u2019t going to post this\u2019, rage bait \u2014 a wrapper that would work on any story. The receipt is the account\u2019s version history: the wildest version is the one that got pinned."},
   {key:"coordination", name:"Everyone started saying it at the same time",    emoji:"\ud83d\udd01", kind:"red", where:"dig", spoke:"search",
    q:"Can I find this exact phrase in ten other videos this week?", desc:"Search the exact words. Six accounts, the same seven words, two days \u2014 that\u2019s a script, not a consensus."},
-  {key:"joke",       name:"It hides behind 'just a joke' or 'just asking'", emoji:"\ud83c\udfad", kind:"red", where:"dig", spoke:"background",
-   q:"If this were serious, what would believing it look like?", desc:"Look at the last nine posts. If seven of them are the same \u2018question\u2019 and none ever gets answered, the question is the claim."},
-  {key:"delay", name:"It says 'don't bother' instead of 'it's not true'", emoji:"\ud83c\udf79", kind:"red", where:"card", spoke:"search",
-   q:"Is this arguing the thing isn't real, or that nobody should act?", desc:"It never disputes the fact \u2014 it tells you nothing can be done. The receipt is a report showing people are, in fact, doing something."}
+  {key:"joke",       name:"It's a joke",                                   emoji:"\ud83c\udfad", kind:"red", where:"dig", spoke:"background",
+   q:"Is this account joking? Would anyone who saw only this post know?", desc:"The account says it\u2019s satire \u2014 in its name, its handle, its bio. The post, on its own, doesn\u2019t. The receipt is the Background check and the account\u2019s other jokes."},
+  {key:"delay",      name:"It says the fix is pointless",                  emoji:"\ud83c\udf79", kind:"red", where:"card", spoke:"search",
+   q:"Is it saying the thing isn't real, or that the fix isn't worth it?", desc:"Too late, won\u2019t make a difference, someone else should go first, people will get around it \u2014 it never disputes the fact. The receipt is the article showing the fix working or underway."}
 ];
 // Display name is now display-only \u2014 every piece of authored data references a
 // tell by its stable `key`, so rewording a tell is a one-line edit in the array
@@ -1759,25 +1827,37 @@ function tellDesc(key){ return TELL[key] ? TELL[key].desc : ""; }
 
 // Evidence per story. `who` is what a search result would print about the source; `tell`
 // (the 8 keys) marks a RECEIPT clip — pinning it unlocks that tell in the library. Receipt
-// clippings carry a `look` (reverse | samephrase | shop | versions | swap | news) that the
+// clippings carry a `look` (samephrase | shop | versions | swap | news) that the
 // board and the phone render as the thing itself; the article, the shop, the version
 // history and the loaded-words swap are generated from the claim below (see CLAIMS.forEach).
 var CLIPS = {
   1: [
-    {id:"1a", text:"National Weather Service: flash flood WARNING for named counties in southeastern NY and CT, valid for a set window, with roads to avoid.", who:"News / institution", detail:"The official alert, publicly archived with exact zones and an expiration time.", tell:null},
-    {id:"1b", text:"A storm account posts dramatic flood footage captioned 'happening right now in NY & CT'.", who:"Influencer", detail:"The video has no timestamp or location tag.", tell:null},
-    {id:"1c", text:"\"my cousin in Connecticut said her street was wet but not underwater like the video\"", who:"Friend", detail:"A text-message screenshot; no way to check the location.", tell:null},
-    {id:"rev-1", look:"reverse", text:"Reverse image search on the flood clip: the same frame first appeared Sept 2, 2021 — Queens, NY, during Hurricane Ida.", who:"Can't tell — bot or AI?", detail:"Same footage, captioned for at least three unrelated storms since.", tell:"media",
-      reverse:{q:"this frame", now:{label:"the post's clip", meta:"posted Sunday · 'right now'"}, match:{title:"Ida floods Queens streets", outlet:"NY1 · news clip", date:"Sep 2, 2021", place:"Queens, NY"},
-               kv:[["First seen","Sep 2, 2021 · Queens"],["Times reused","3 storms"],["Matches the caption?","No"]]},
-      receipt:"same frame, five years earlier, a different storm"},
+    {id:"off-1", look:"official", who:"Document", kind:"document", name:"National Weather Service", text:"National Weather Service: Flash Flood Warning for parts of southeastern New York and Connecticut, Sunday morning, with an end time.",
+      doc:{issuer:"National Weather Service", about:"U.S. government forecast office · New York, NY", url:"weather.gov/okx/flash-flood-warning", title:"Flash Flood Warning", date:"Issued Sun, Sep 13, 2026 · 9:12 AM · until 12:15 PM",
+           lines:["Thunderstorms are producing heavy rain over parts of southeastern New York and southern Connecticut. Flash flooding is ongoing or expected to begin shortly.","Some roads, underpasses and low spots may flood. Turn around, don't drown.","This warning covers the named counties only, until 12:15 PM."]}},
+    {id:"out-1", look:"outlet", who:"News site", kind:"news site", name:"Hudson Valley Ledger", text:"Hudson Valley Ledger: the warning ended at 12:15; police closed two underpasses for about an hour and nobody was evacuated.",
+      page:{mast:"Hudson Valley Ledger", domain:"hvledger.com", url:"hvledger.com/weather/flood-warning-ends", kicker:"Local · Weather", headline:"Flood warning ends at midday; two underpasses closed for an hour", by:"Dana Ruiz, staff reporter", date:"Sep 13, 2026 · 2:40 PM",
+            body:"Heavy rain moved through Rockland and Westchester counties Sunday morning.", hl:"Police closed two underpasses for about an hour. No streets were evacuated, a county spokesperson said.", after:"The warning ended on time at 12:15 PM."}},
+    {id:"exp-1", look:"explainer", who:"Explainer", kind:"explainer", name:"WeatherWise Daily", text:"WeatherWise Daily explainer: \"Is the Northeast flooding right now?\" It says experts agree floods like this are everywhere now.",
+      page:{mast:"WeatherWise Daily", domain:"weatherwisedaily.com", url:"weatherwisedaily.com/explained/northeast-flooding", kicker:"Explainer", headline:"Is the Northeast flooding right now? What you need to know", by:"", date:"Sep 13, 2026",
+            claim:"\"Flash floods are slamming NY and CT right now.\"", body:"Experts agree that floods like this are hitting more places than ever. Many people say the videos going around show how bad it has become. Studies show storms are getting worse.", links:[]}},
+    {id:"vid-1", look:"creator", who:"Video", kind:"video", name:"@kayla.commutes", text:"@kayla.commutes, filming in her car: \"my cousin's street in Stamford is a RIVER right now.\"",
+      vid:{handle:"@kayla.commutes", name:"Kayla", caption:"my cousin's street in Stamford is a RIVER rn. she said cars are floating. stay home!!", views:"48.2K", ago:"3h", shows:"Kayla talking to the camera from a parked car.", hue:200}},
     {id:"1ai1", text:"Flash flood warnings are real official alerts, but urgent-sounding reposts sometimes reuse old footage — check the timestamp and source before assuming it's happening now.", who:"AI assistant", detail:null, tell:null, source:"ai"},
     {id:"1ai2", text:"Local weather services publish exact zones and expiration times for flood warnings, which is more reliable than a dramatic clip with no location details.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   2: [
-    {id:"2a", text:"CNN's report describes several imperfect Saudi options — talks, limited strikes, or a continued stalemate — not a binary choice.", who:"News / institution", detail:"Named CNN reporters, sourced to regional analysts.", tell:null},
-    {id:"2b", text:"A geopolitics account turned it into 'fight or fold' — a two-way pick.", who:"Influencer", detail:"612K followers, no link to the CNN report.", tell:null},
-    {id:"2c", text:"\"my uncle who follows this stuff says it's way more complicated than the post makes it sound\"", who:"Friend", detail:"A text screenshot, no sources cited.", tell:null},
+    {id:"off-2", look:"official", who:"Document", kind:"document", name:"Meridian Risk Advisory", text:"Meridian Risk Advisory press release: its CEO says Saudi Arabia has two choices and both are bad for shipping.",
+      doc:{issuer:"Meridian Risk Advisory", about:"Security briefings for shipping and energy companies", url:"meridianrisk.com/newsroom/gulf-escalation", title:"Gulf escalation: what companies should expect next", date:"Press release · Sep 13, 2026",
+           lines:["Early results from Meridian's client survey show most shipping firms have no plan for a wider conflict."], quote:{t:"Riyadh has two choices, strike back or hold off, and both raise the risk for anyone moving cargo through the Red Sea. Companies need a plan now.", by:"Meridian's chief executive"}}},
+    {id:"out-2", look:"outlet", who:"News site", kind:"news site", name:"Gulf Dispatch", text:"Gulf Dispatch: analysts name four paths for Saudi Arabia: talks through Oman, limited strikes, stronger border defense, or waiting.",
+      page:{mast:"Gulf Dispatch", domain:"gulfdispatch.com", url:"gulfdispatch.com/analysis/saudi-houthi-paths", kicker:"Analysis", headline:"Riyadh weighs its next move as Houthis advance", by:"Omar Haddad and Lena Fischer", date:"Sep 14, 2026",
+            body:"Saudi officials have not said what they will do next.", hl:"Three regional analysts named four paths: new talks through Oman, limited strikes, stronger border defense, or waiting it out.", after:"All four carry costs, they said."}},
+    {id:"exp-2", look:"explainer", who:"Explainer", kind:"explainer", name:"The Briefing Room", text:"The Briefing Room explainer checks \"there's no third option\" against the CNN report, a UN briefing and conflict data.",
+      page:{mast:"The Briefing Room", domain:"briefingroom.org", url:"briefingroom.org/explainers/saudi-two-options", kicker:"Explainer", headline:"Does Saudi Arabia really have only two options?", by:"Priyanka Nair", date:"Sep 14, 2026",
+            claim:"\"Either they strike back or sit back. There's no third option.\"", body:"The CNN report the posts point to lists several options and calls all of them costly. The UN envoy's briefing on Sep 11 described talks that are still open.", links:[{t:"CNN report", d:"Sep 13"},{t:"UN envoy briefing", d:"Sep 11"},{t:"Conflict data: attacks by month", d:"2026"}]}},
+    {id:"vid-2", look:"creator", who:"Video", kind:"video", name:"@mapguy.explains", text:"@mapguy.explains, pointing at a map: \"there's no third option. everyone who follows this knows it.\"",
+      vid:{handle:"@mapguy.explains", name:"Map Guy", caption:"Saudi vs the Houthis in 40 seconds. there's no third option. everyone who follows this knows it.", views:"1.1M", ago:"1d", shows:"A man pointing at a map of Yemen.", hue:25}},
     {id:"phr-2", look:"samephrase", text:"Searching the exact phrase \"there's no third option\": six accounts posted the same seven words about the Houthis within two days.", who:"Can't tell — bot or AI?", detail:"Word-for-word matches, none linking to the report.", tell:"coordination",
       phrase:{q:"\"there's no third option\" Houthis", count:"Exact matches · this week · 6 accounts",
         hits:[{h:"@GeoPulseNow", t:"…or sit back and look weak. <mark>There's no third option</mark> on the table rn.", d:"Sep 13", c:"#e07a5f"},
@@ -1790,25 +1870,46 @@ var CLIPS = {
     {id:"2ai2", text:"Saudi Arabia's options with the Houthis genuinely are limited and risky, which is likely why the framing feels persuasive even when it's flattened into two choices.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   3: [
-    {id:"3a", text:"The article lists 7 companies testing humanoid robots in select factories — mostly pilot programs, not workforce swaps.", who:"News / institution", detail:"Named industry outlet; specific companies and plants cited.", tell:null},
-    {id:"3b", text:"A tech account claims humanoid robots are already replacing workers everywhere.", who:"Influencer", detail:"612K followers, no specific company or plant named.", tell:null},
-    {id:"3c", text:"\"my uncle works at a car plant and says they got ONE robot arm demo, not a robot takeover\"", who:"Friend", detail:"A personal account — unverifiable, plausible.", tell:null},
+    {id:"off-3", look:"official", who:"Document", kind:"document", name:"Axon Robotics", text:"Axon Robotics press release: early results from its humanoid robots, and its CEO says they are changing the factory floor.",
+      doc:{issuer:"Axon Robotics", about:"Maker of humanoid robots for factories and warehouses", url:"axonrobotics.com/press/pilot-results", title:"Early results from factory pilot programs", date:"Press release · Sep 10, 2026",
+           lines:["Axon robots are now working at three customer sites. Early results show strong interest from plant managers."], quote:{t:"Our humanoids are already changing the factory floor. Every manufacturer will need them.", by:"Axon's chief executive"}}},
+    {id:"out-3", look:"outlet", who:"News site", kind:"news site", name:"TrendWire", text:"TrendWire: \"Factories are quietly swapping workers for humanoid robots.\"",
+      page:{mast:"TrendWire", domain:"trendwire.co", url:"trendwire.co/tech/humanoid-robots-factories", kicker:"Tech · Trending", headline:"Factories are quietly swapping workers for humanoid robots", by:"", date:"Sep 13, 2026",
+            body:"It's the story everyone is talking about.", hl:"Factories are quietly swapping workers for humanoid robots, and nobody's stopping it.", after:"Posts about the robots have been shared millions of times this week."}},
+    {id:"exp-3", look:"explainer", who:"Explainer", kind:"explainer", name:"Plant Floor Weekly", text:"Plant Floor Weekly explainer: counts the robots at each of the seven companies. Most are pilots of a few dozen robots at one plant.",
+      page:{mast:"Plant Floor Weekly", domain:"plantfloorweekly.com", url:"plantfloorweekly.com/explainers/humanoid-robot-count", kicker:"Explainer", headline:"How many humanoid robots are working in factories?", by:"Marcus Bell", date:"Sep 14, 2026",
+            claim:"\"Factories are swapping workers for humanoid robots.\"", body:"We asked all seven companies on the list. Five answered. Most run pilot programs: a few dozen robots at one plant, moving bins and parts. None reported layoffs tied to the robots.", links:[{t:"Interesting Engineering list", d:"Sep 13"},{t:"Company answers (5 of 7)", d:"PDF"},{t:"U.S. factory jobs data", d:"Aug 2026"}]}},
+    {id:"vid-3", look:"creator", who:"Video", kind:"video", name:"@dee.on.the.line", text:"@dee.on.the.line films the one humanoid robot at her plant. It carries bins behind a fence marked PILOT AREA.",
+      vid:{handle:"@dee.on.the.line", name:"Dee", caption:"everyone keeps asking so here's THE robot at our plant. one. it moves bins. that's the whole job.", views:"212K", ago:"2d", shows:"A humanoid robot carrying a bin behind a yellow safety fence. A sign on the fence reads PILOT AREA.", hue:265}},
     {id:"3d", text:"A post amplifying the claim with a stock photo of a robot that doesn't match any real factory.", who:"Can't tell — bot or AI?", detail:"Account has no posting history before this week.", tell:null},
     {id:"3ai1", text:"A handful of companies are piloting humanoid robots in specific tasks — that's very different from robots already running factories broadly.", who:"AI assistant", detail:null, tell:null, source:"ai"},
     {id:"3ai2", text:"Humanoid robots in manufacturing are a real and growing trend, but current deployment is small-scale and experimental, not a full workforce swap yet.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   4: [
-    {id:"4a", text:"The report describes Apple exploring ambient AI that responds to spoken requests without a wake word — still user-activated, not constant recording.", who:"News / institution", detail:"Named tech outlet, citing people familiar with the plans.", tell:null},
-    {id:"4b", text:"Says Apple's AI will 'listen to you all day' starting soon.", who:"Influencer", detail:"No link to any Apple statement or report.", tell:null},
-    {id:"4c", text:"\"my mom saw this and turned off Siri completely lol\"", who:"Friend", detail:"A screenshot of the same post, no added source.", tell:null},
+    {id:"out-4", look:"outlet", who:"News site", kind:"news site", name:"The Circuit", text:"The Circuit: the feature would still start only when the wearer speaks to it, two people familiar with the plans said.",
+      page:{mast:"The Circuit", domain:"thecircuit.news", url:"thecircuit.news/apple-ambient-ai", kicker:"Devices", headline:"Apple tests a Siri that drops the wake word", by:"Hannah Cole", date:"Sep 14, 2026",
+            body:"Apple is testing voice features for future wearables.", hl:"The feature would still start only when the wearer speaks to it, two people familiar with the plans said.", after:"Apple has not announced a product or a date."}},
+    {id:"exp-4", look:"explainer", who:"Explainer", kind:"explainer", name:"Gadget Truths", text:"Gadget Truths explainer: \"Is your phone listening all day?\" It says experts agree phones already do.",
+      page:{mast:"Gadget Truths", domain:"gadgettruths.com", url:"gadgettruths.com/explained/phone-listening", kicker:"Explainer", headline:"Is your phone listening to you all day?", by:"", date:"Sep 13, 2026",
+            claim:"\"Apple's new AI will listen to you all day.\"", body:"Experts agree that phones already listen more than companies admit. Insiders say the new AI will go even further. Many users report ads for things they only talked about.", links:[]}},
+    {id:"vid-4", look:"creator", who:"Video", kind:"video", name:"@jess.unplugged", text:"@jess.unplugged: \"my mom talked about cat food ONE time and got cat food ads. they're already listening.\"",
+      vid:{handle:"@jess.unplugged", name:"Jess", caption:"my mom talked about cat food ONE time and got cat food ads the next day. they're already listening. turn it all off.", views:"640K", ago:"1d", shows:"Jess talking to the camera, holding up her phone.", hue:335}},
     {id:"4d", text:"An account reposting the claim with 'BREAKING' added; original source unclear.", who:"Can't tell — bot or AI?", detail:"Created three weeks ago, mostly reposts.", tell:null},
     {id:"4ai1", text:"There's no confirmed Apple feature that records audio constantly all day — reports describe optional, activation-based listening, not passive surveillance.", who:"AI assistant", detail:null, tell:null, source:"ai"},
     {id:"4ai2", text:"Voice assistants have always required some form of activation to avoid battery and privacy issues; always-listening AI would be a major shift Apple hasn't announced.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
   5: [
-    {id:"5a", text:"A peer-reviewed study found rats exposed to acetaminophen in utero showed changes in uterine and ovarian tissue.", who:"News / institution", detail:"Published in a peer-reviewed journal; conducted on rodents, not humans.", tell:null},
-    {id:"5b", text:"The study's authors caution the findings are preliminary and don't establish a direct risk to human pregnancies.", who:"News / institution", detail:"Quoted from the paper's own discussion section.", tell:null},
-    {id:"5c", text:"A parenting account claims the study 'proves' Tylenol causes infertility in daughters.", who:"Influencer", detail:"No link to the study; the caption overstates the animal-model findings.", tell:null},
+    {id:"off-5", look:"official", who:"Document", kind:"document", name:"The study itself", text:"The study itself: done in rats. The authors write that it does not show the drug causes these changes in people.",
+      doc:{issuer:"Journal of Reproductive Biology", about:"Peer-reviewed research journal", url:"jreprodbio.org/article/2026/prenatal-acetaminophen", title:"Prenatal acetaminophen exposure and reproductive tissue in female rat offspring", date:"Published Sep 9, 2026",
+           lines:["Methods: pregnant rats were given acetaminophen at three doses. Tissue from female offspring was examined at 12 weeks.","Results: changes in uterine and ovarian tissue at the two higher doses.","Limitations: an animal study. It does not show that the drug causes these changes in people."]}},
+    {id:"out-5", look:"outlet", who:"News site", kind:"news site", name:"Great Lakes Health Report", text:"Great Lakes Health Report: the study was done in rats, and the doses were higher than most people take.",
+      page:{mast:"Great Lakes Health Report", domain:"glhealthreport.org", url:"glhealthreport.org/tylenol-pregnancy-rat-study", kicker:"Research", headline:"Rat study links Tylenol in pregnancy to changes in daughters' organs", by:"Alicia Grant", date:"Sep 14, 2026",
+            body:"The study adds to years of mixed research.", hl:"The work was done in rats, and the two doses that showed changes were higher than most people take.", after:"The authors called for studies in humans."}},
+    {id:"exp-5", look:"explainer", who:"Explainer", kind:"explainer", name:"Health Desk", text:"Health Desk explainer: links the study and current pregnancy guidance, and says what a rat study can and can't show.",
+      page:{mast:"Health Desk", domain:"healthdesk.org", url:"healthdesk.org/explainers/tylenol-pregnancy-study", kicker:"Explainer", headline:"What a new Tylenol study in rats can and can't tell us", by:"Dr. Renee Walsh, pharmacist", date:"Sep 14, 2026",
+            claim:"\"A study links Tylenol in pregnancy to changes in daughters' reproductive organs.\"", body:"That is what the study found, in rats. Animal studies show where to look next. They cannot show the same thing happens in people. Guidance for pregnant patients has not changed.", links:[{t:"The study", d:"Sep 9"},{t:"Obstetricians' group guidance", d:"2025"},{t:"FDA page on acetaminophen", d:"updated 2026"}]}},
+    {id:"vid-5", look:"creator", who:"Video", kind:"video", name:"@nursing.with.sam", text:"@nursing.with.sam holds up the printed study and reads the limits section out loud.",
+      vid:{handle:"@nursing.with.sam", name:"Sam · nursing student", caption:"reading the actual Tylenol study so you don't have to panic. page 9, the limits section. it's rats.", views:"88K", ago:"1d", shows:"Sam holding the printed study up to the camera. The line about rats is highlighted.", hue:150}},
     {id:"5d", text:"A repost of the headline with 'doctors don't want you to know this' added.", who:"Can't tell — bot or AI?", detail:"Account has no history before this week.", tell:null},
     {id:"5ai1", text:"This is an animal study, so it can suggest a biological pathway worth studying further, but it can't confirm the same effect happens in humans.", who:"AI assistant", detail:null, tell:null, source:"ai"},
     {id:"5ai2", text:"Acetaminophen safety in pregnancy has been studied for decades with mixed findings — this adds one data point, not a final answer.", who:"AI assistant", detail:null, tell:null, source:"ai"}
@@ -1838,7 +1939,7 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-09-14 · after the play-through";
+var BUILD = "2026-09-20 · six tells, named";
 var revealState = {active:false, order:[], index:0};
 // ---------------- TRIAGE (8/31/2026) ----------------
 // Replaces the old "you may only investigate what you disagreed about" gate. The table
@@ -2313,7 +2414,7 @@ function r3NpcDrafts(claim){
   var ai = clips.filter(function(c){ return c.source==="ai"; })[0];
   return {
     maya: "The story is less dramatic than the post makes it sound.",
-    diego: inst ? inst.text : "There's a named source that says something narrower than the post.",
+    diego: claim.plain || (claim.article && claim.article.lede) || (inst ? inst.text : "There's a named source that says something narrower than the post."),
     priya: ai ? ai.text : "The post overstates what anyone has actually shown."
   };
 }
@@ -2331,7 +2432,7 @@ var ROUND_NAMES = ["Gut check", "Investigation", "Community note"];
 // Tara 9/14 (after playing): "a better information hierarchy for round 1, 2, 3" → the ROUND
 // TITLE is the headline of every screen, its job in one line, and the 1-2-3 strip sits under
 // it, smaller. roundHead() = that block; roundStrip() alone is the small strip.
-var ROUND_JOBS = ["Trust your gut on every post.", "Leave the post. Go check it. Pin what you'd trust.", "Write what actually happened."];
+var ROUND_JOBS = ["Trust your gut on every post.", "Find the clues your community note needs.", "Write what actually happened."];
 function roundHead(now, variant, job){
   return '<div class="rhead '+(variant||"")+'"><div class="rtitle">Round '+now+' · '+ROUND_NAMES[now-1]+'</div>'+(job===false ? '' : '<div class="rjob">'+escapeHtml(job || ROUND_JOBS[now-1])+'</div>')+roundStrip(now, variant)+'</div>';
 }
@@ -2370,7 +2471,7 @@ function r3ExhibitsAdded(claimId, pid){ return r3Exhibits(claimId).filter(functi
 function r3QuietOrder(claimId){
   return PLAYERS.slice().sort(function(a, b){ return (r3ExhibitsAdded(claimId, a.id) - r3ExhibitsAdded(claimId, b.id)) || (a.moves - b.moves); });
 }
-function r3Flagged(claimId, clipId){ return getR3(claimId).rulings[clipId]==="flag"; }
+function r3Flagged(claimId, clipId){ return r3FlaggersOf(claimId, clipId).length>0; }   // 9/17: anyone's flag, not only yours
 function r3CiteLabel(claimId, clipIds){
   var b = getBoard(claimId);
   return (clipIds||[]).map(function(cid){ return "Exh "+letterFor(b.board.indexOf(cid))+(r3Flagged(claimId, cid) ? " 🚩" : ""); }).join(", ");
@@ -2799,7 +2900,7 @@ function renderRound1(){
   html += '<div class="spreadbadge" onclick="openApp(\'spread\')">🔥 '+pr+'%</div>';
   // Pro Tips lives here now instead of on every card's rail — it's not tied to any
   // one story, so it belongs in the persistent header, not repeated per-card.
-  html += '<div class="tipsbadge" onclick="openApp(\'tells\')">🧠</div>';
+  // 🧠 Tells library button removed 9/16 (Tara) — library + tour unreachable for now.
   if(!roundState.ended) html += '<div class="roundbadge'+(roundState.secondsLeft<=10?' urgent':'')+'" id="roundbadge" onclick="forceTimesUp()">⏱ '+roundState.secondsLeft+'s</div>';
   html += '</div></div>';
 
@@ -3012,16 +3113,21 @@ function renderCardBack(claim, variant){
     if(nEx === 0)        goalTxt = 'Aim for '+needEx+' pieces of evidence in your case file. Then your team writes the community note.';
     else if(!enough)     goalTxt = nEx+' in your case file — aim for '+needEx+'. Your team can go early if everyone agrees.';
     else                 goalTxt = 'Enough in your case file. Keep digging, or tell your team you\'re ready.';
-    html += '<div class="cardback-frame">'+(enough ? 'Your case is building. 🗂️' : 'Now gather the evidence. 🗂️')+'<span class="goal'+(enough?' done':'')+'">'+goalTxt+'</span></div>';
+    // 9/16 Round 2 cleanup (Tara, SIMPLIFY): no frame line — the round head's job line states
+    // the goal once. Order = the post (no buttons) → the three tools → the evidence list.
+    html += renderPostBlock(claim);
     html += renderToolPills(claim);
     html += renderCaseFile(claim);
   } else {
     // A tool — a whole screen, one way back. The 🗂️ count is the only trace of home.
-    html += '<div class="cardback-navback" onclick="setCardMode('+claim.id+',\'case\')"><span class="chev">‹</span> Case file<span class="cnt">🗂️ '+nEx+'/'+needEx+'</span></div>';
+    var backTo = (mode==="article" || mode==="clue") ? "search" : "case";
+    html += '<div class="cardback-navback" onclick="setCardMode('+claim.id+',\''+backTo+'\')"><span class="chev">\u2039</span> Back<span class="cnt">Clues '+nEx+' of '+needEx+'</span></div>';
+    html += qHeadHTML(mode);
     if(mode==="search") html += renderClaimSearch(claim);
     else if(mode==="ai") html += renderClaimAI(claim);
+    else if(mode==="evidence") html += renderClaimEvidence(claim);
     else if(mode==="article") html += renderClaimArticle(claim);
-    else if(mode==="reverse") html += renderClaimReverse(claim);
+    else if(mode==="clue") html += renderClaimClue(claim);
     else html += renderClaimBackground(claim);
   }
   html += '</div>';
@@ -3031,8 +3137,8 @@ function renderCardBack(claim, variant){
   // the button is that decision.
   if(homeMode && mode==="case"){
     html += '<div class="cardback-foot">';
-    html += '<button class="readybtn'+(enough?' pulse':'')+'"'+(canGo?'':' disabled')+' onclick="readyForNote('+claim.id+')">Ready to go! →</button>';
-    html += '<div class="readynote">'+(!canGo ? 'Add at least one piece of evidence first.' : (enough ? 'Tap when your team agrees you\'re done looking.' : 'Only '+nEx+' so far — '+needEx+' is the goal, but your team can go early if everyone agrees.'))+'</div>';
+    html += '<button class="readybtn'+(enough?' pulse':'')+'"'+(canGo?'':' disabled')+' onclick="readyForNote('+claim.id+')">Write our note →</button>';
+    if(!canGo) html += '<div class="readynote">Pin at least one clue first.</div>';
     html += '</div>';
   }
   return html;
@@ -3041,39 +3147,69 @@ function renderCardBack(claim, variant){
 // fourth (Compare notes) is this screen's body now. Measured on the mock: three short
 // labels fit a 390px card; the long names and any fourth pill overflow.
 function renderToolPills(claim){
+  // 9/16 (Tara): the three tools are COR's three questions, as rows. A row gets ✓ once
+  // a clue from it is pinned — the checkmarks nudge toward all three; the goal stays 4.
   var b = getBoard(claim.id), clips = CLIPS[claim.id] || [];
-  function onBoardCount(pred){ return b.board.filter(function(id){ var c = clips.filter(function(x){ return x.id===id; })[0]; return c && pred(c); }).length; }
-  var pills = [
-    ["background","bg","🕵️","Background", onBoardCount(function(c){ return c.source==="background"; })],
-    ["search","search","🔍","Search",      onBoardCount(function(c){ return !c.source; })],
-    ["ai","ai","✨","Ask AI",              onBoardCount(function(c){ return c.source==="ai"; })]
+  function n(pred){ return b.board.filter(function(id){ var c = clips.filter(function(x){ return x.id===id; })[0]; return c && pred(c); }).length; }
+  var rows = [
+    ["background","\ud83d\udd75\ufe0f","Background","Who\u2019s behind it?", n(function(c){ return c.source==="background"; })],
+    ["search","\ud83d\udd0d","Search","What do other sources say?", n(function(c){ return c.source!=="background" && c.source!=="ai"; })],
+    ["ai","\u2728","Ask AI","What does AI say? Can you trust it?", n(function(c){ return c.source==="ai"; })]
   ];
-  var html = '<div class="pillrow">';
-  pills.forEach(function(p){
-    html += '<div class="pill '+p[1]+'" onclick="setCardMode('+claim.id+',\''+p[0]+'\')"><span class="ic">'+p[2]+'</span><span>'+p[3]+'</span>'+(p[4]?'<span class="n">'+p[4]+'</span>':'')+'</div>';
+  var html = '<div class="qrows">';
+  rows.forEach(function(r){
+    html += '<div class="qrow'+(r[4]?' got':'')+'" onclick="setCardMode('+claim.id+',\''+r[0]+'\')"><span class="qi">'+r[1]+'</span><span class="qtx"><b>'+r[2]+'</b><small>'+r[3]+'</small></span><span class="qend">'+(r[4] ? '\u2713 '+r[4] : '\u203a')+'</span></div>';
   });
   return html + '</div>';
+}
+var Q_HEADS = {
+  background:["\ud83d\udd75\ufe0f","Who\u2019s behind it?","Who runs this account? Do they get anything if you believe it?"],
+  evidence:["\ud83e\uddfe","What\u2019s the evidence?","What does the post show you? Does it prove what the post says?"],
+  search:["\ud83d\udd0d","What do other sources say?","Look for the same story somewhere else. Do sources you trust report it?"],
+  ai:["\u2728","What does AI say?","AI isn\u2019t a source. Check what it\u2019s based on before you trust it."]
+};
+function qHeadHTML(mode){ var q = Q_HEADS[mode]; if(!q) return ""; return '<div class="qhead"><div class="qt">'+q[0]+' '+q[1]+'</div><div class="qs">'+q[2]+'</div></div>'; }
+function renderClaimEvidence(claim){
+  var m = claim.media, art = (CLIPS[claim.id]||[]).filter(function(c){ return c.source==="article"; })[0], h = '';
+  if(!m && !art) return '<div class="emptystate">This post doesn\u2019t show a photo or link to anything.</div>';
+  if(m){
+    h += '<div class="evcard"><div class="evlbl">The photo in the post</div><div class="evim" style="background-image:url(\''+m.image_url+'\')"></div>';
+    h += '</div>';
+  }
+  if(art && claim.article){
+    var st = clipState[art.id] || {};
+    h += '<div class="evcard"><div class="evlbl">What the post links to</div><div class="ssite"><div class="sfav">'+favHTML(claim)+'</div><div style="min-width:0"><div class="ssitename">'+escapeHtml((m && m.domain) || "")+'</div></div></div>';
+    h += '<div class="stitle">'+escapeHtml(claim.article.headline)+'</div><div class="ssnip">'+escapeHtml(claim.article.date || "")+(claim.article.lede ? ' \u00b7 '+escapeHtml(claim.article.lede) : '')+'</div>';
+    h += '<div class="saddwrap"><button class="btnfilled" onclick="setCardMode('+claim.id+',\'article\')">Read it \u2192</button>'+(st.shared ? '<span class="sadded" style="margin-left:8px">\u2713 Pinned</span>' : '<button class="btnfilled evidence" style="margin-left:8px" onclick="addToBoard('+claim.id+',\''+art.id+'\')">\ud83d\udccc Pin it</button>')+'</div></div>';
+  }
+  return h;
 }
 // The case file as the body of the open story: the post first, then exhibits, then
 // dashed slots for whatever's still short of the minimum. Read-only variants of this
 // list (filed / writing) still come from renderClaimBoard.
 var justAddedClipId = null;
+// 9/16 Round 2 cleanup (Tara): the post is the thing you look AT, so it carries no buttons.
+// Account line is not a tap (Background pill is the one route). Plain headline — the <mark>
+// loaded-word highlights and Say it plain are cut from Round 2 for now. The photo is a
+// picture, not a door: the article is the top Search result, image search lives in Article.
+function renderPostBlock(claim){
+  var bg = claim.background || {}, m = claim.media;
+  var h = '<div class="groupcard r2post"><div class="resultrow thepost">';
+  h += '<div class="postacct" style="cursor:default"><span class="postav" style="background:linear-gradient(160deg, hsl('+claim.hue+',55%,42%), hsl('+claim.hue+',55%,22%));">'+(bg.displayName ? bg.displayName.charAt(0) : posterInitial(claim))+'</span>'
+     + '<span class="postname">'+(bg.displayName || claim.source)+(bg.verified ? ' <span class="vfd">✓</span>' : '')+'</span><span class="postmeta">'+(bg.handle || '')+(bg.followers ? ' · '+bg.followers+' followers' : '')+'</span></div>';
+  h += '<div class="posttext">'+claim.headline+'</div>';
+  // 9/16: the photo lives in "What's the evidence?" now; the post keeps only its link line.
+  if(m) h += '<div class="postmedia" style="cursor:default"><div class="strip">'+favHTML(claim)+escapeHtml(m.domain||"")+'</div></div>';
+  return h+'</div></div>';
+}
 function renderCaseFile(claim){
   var b = getBoard(claim.id), need = BOARD_TOUR_EVIDENCE_THRESHOLD;
-  var html = '<div class="sectionhead casehead">Your case file <span class="cnt">'+b.board.length+' / '+need+' GOAL</span></div>';
+  // 9/16: the clue list reads as the note being built — its sources, before the words.
+  var html = '<div class="notecue"><div class="nk">\u24d8 Your community note <span class="cnt">'+b.board.length+' of '+need+' clues</span></div><div class="ng">Your team writes it in Round 3, using the clues pinned here.</div></div>';
+  // 9/16: with a board on the laptop, the clue list lives there — the phone doesn't repeat it.
+  if(boardVisible()) return html + '<div class="boardptr">\ud83d\udccc Your clues are on the board. Flag weak ones there.</div>';
   html += '<div class="groupcard">';
-  var postEng = BASE_ENGAGEMENT[claim.id] || 10;
-  // Tara, 9/4 evening: the post is the thing everything else is ABOUT, and it's no longer
-  // repeated in the head — so it's the highlighted first row, with its account line (a tap
-  // into Background check, same as the card front on the live story).
-  var bg = claim.background || {};
-  html += '<div class="resultrow thepost"><span class="exhibitlabel">The post you\'re chasing</span>';
-  html += '<div class="postacct" onclick="setCardMode('+claim.id+',\'background\')"><span class="postav" style="background:linear-gradient(160deg, hsl('+claim.hue+',55%,42%), hsl('+claim.hue+',55%,22%));">'+(bg.displayName ? bg.displayName.charAt(0) : posterInitial(claim))+'</span>'
-       + '<span class="postname">'+(bg.displayName || claim.source)+(bg.verified ? ' <span class="vfd">✓</span>' : '')+'</span><span class="postmeta">'+(bg.handle || '')+(bg.followers ? ' · '+bg.followers+' followers' : '')+'</span></div>';
-  html += postTextHTML(claim);
-  html += postMediaHTML(claim);
-  html += '<div class="postengage">❤️ '+formatCount(Math.round(postEng*1000 + claim.id*173))+' &nbsp; 💬 '+formatCount(Math.round(postEng*180 + claim.id*37))+' &nbsp; <span style="color:var(--ios-label3)">'+claim.source+'</span></div>';
-  html += sayItPlainHTML(claim)+'</div>';
+  // 9/16: the post moved out to renderPostBlock (above the tools).
   var allClips = CLIPS[claim.id] || [];
   b.board.forEach(function(clipId, idx){
     var clip = allClips.filter(function(x){ return x.id===clipId; })[0] || {text:clipId, who:"source"};
@@ -3084,23 +3220,18 @@ function renderCaseFile(claim){
     var onLaptop = boardVisible();
     // Tara 9/14 (after playing): the challenge lives on the cork board, not the phone — with a
     // laptop the phone row shows nothing about it (no count, no red). Phone-only keeps the line.
-    html += '<div class="resultrow'+(justAddedClipId===clipId?' justadded':'')+(fl && !onLaptop ?' challenged':'')+'"><span class="exhibitlabel">EXHIBIT '+letterFor(idx)+'</span>';
+    html += '<div class="resultrow'+(justAddedClipId===clipId?' justadded':'')+(fl && !onLaptop ?' challenged':'')+'"><span class="exhibitlabel">CLUE '+letterFor(idx)+'</span>';
     html += '<div class="resulttext" style="margin-top:4px; margin-bottom:3px;">'+origin+clip.text+'</div>';
     html += '<div style="font-size:11.5px; color:var(--ios-label2);">'+r3ClipWho(clip)+' · '+(mineRow ? 'you' : (P(owner)||{name:"someone"}).name)+' added it</div>';
     if(!onLaptop && !b.filed && !r3Writing(claim.id)){
-      var them = who.filter(function(pid){ return pid!==MY_ID; }).map(P).filter(Boolean);
-      var line = !fl ? '' : iDid ? (them.length ? 'You and '+r3Names(them)+' challenged this — say why.' : 'You challenged this — tell your team why.')
-                      : (them.length===1 ? them[0].name+' challenged this — ask them why.' : r3Names(them)+' challenged this — ask them why.');
-      var btn = (!mineRow || iDid) ? '<span class="rowchalbtn'+(iDid?' on':'')+'" onclick="challengeClip('+claim.id+',\''+clipId+'\')">'+(iDid ? 'Withdraw' : '🚩 Challenge')+'</span>' : '';
-      if(fl || btn) html += '<div class="rowchalline">'+(fl ? who.map(function(pid){ return r3Av(pid); }).join("")+'<span>🚩 '+escapeHtml(line)+'</span>' : '<span style="color:var(--ios-label3)">Don\'t trust it?</span>')+btn+'</div>';
+      html += weakRowHTML(claim.id, clipId, mineRow);
     }
     html += '</div>';
   });
   for(var i=b.board.length; i<need; i++){
-    html += '<div class="caseghost"><span class="slot">'+letterFor(i)+'</span>'+(i===b.board.length ? (b.board.length===0 ? 'Nothing here yet — use a tool above to find something.' : 'Next piece of evidence') : '')+'</div>';
+    html += '<div class="caseghost"><span class="slot">'+letterFor(i)+'</span>'+(i===b.board.length ? 'Pin a clue from any question above.' : '')+'</div>';
   }
   html += '</div>';
-  html += '<div class="caseteam">'+PLAYERS.map(function(p){ return r3Av(p.id); }).join('')+'&nbsp; '+(boardVisible() ? 'Everyone on your team sees this — it\'s the board next to you.' : 'Everyone on your team sees this list.')+'</div>';
   justAddedClipId = null;
   return html;
 }
@@ -3126,8 +3257,7 @@ var SRC_LOOK = {
 function renderClaimSearch(claim){
   var html = "";
   if(!claim.wired){ return html + '<div class="emptystate">No results yet for this claim.</div>'; }
-  // 9/14: the reverse-image receipt is NOT a result — you get it by searching the image yourself
-  var clips = CLIPS[claim.id].filter(function(c){ return c.source!=="ai" && c.source!=="background" && c.source!=="post" && c.look!=="reverse"; });
+  var clips = CLIPS[claim.id].filter(function(c){ return c.source!=="ai" && c.source!=="background" && c.source!=="post"; });
   // the real article leads the results; receipts render as the clipping itself
   clips.sort(function(x, y){ return (x.source==="article" ? 0 : 1) - (y.source==="article" ? 0 : 1); });
   var addedCount = clips.filter(function(c){ return clipState[c.id].shared; }).length;
@@ -3135,16 +3265,17 @@ function renderClaimSearch(claim){
   // a single result renders.
   html += '<div class="srchbar"><span class="mag">\ud83d\udd0d</span><span class="q">'+searchQueryFor(claim)+'</span><span class="x">\u2715</span></div>';
   html += '<div class="srchtabs"><span class="srchtab on">All</span><span class="srchtab">Images</span><span class="srchtab">News</span><span class="srchtab">Videos</span></div>';
-  html += '<div class="srchcount">About '+clips.length+' results \u00b7 '+addedCount+' added to your case</div>';
+  html += '<div class="srchcount">About '+clips.length+' results \u00b7 '+addedCount+' pinned</div>';
   clips.forEach(function(c){
     var s = clipState[c.id];
     if(c.source==="article"){
       var m = claim.media || {};
       html += '<div class="sresult"><div class="ssite"><div class="sfav">'+favHTML(claim)+'</div><div style="min-width:0"><div class="ssitename">'+escapeHtml(m.domain||"")+'</div></div><span class="stype inst">'+escapeHtml(m.outlet||"News")+'</span></div>';
       html += '<div class="stitle" onclick="setCardMode('+claim.id+',\'article\')" style="cursor:pointer">'+escapeHtml(claim.article.headline)+'</div><div class="ssnip">'+escapeHtml(claim.article.date)+' — '+escapeHtml(claim.article.lede||"")+'</div>';
-      html += '<div class="saddwrap"><button class="btnfilled" onclick="setCardMode('+claim.id+',\'article\')">Read it →</button>'+(s.shared ? '<span class="sadded" style="margin-left:8px">\u2713 Added to case</span>' : '<button class="btnfilled evidence" style="margin-left:8px" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button>')+'</div></div>';
+      html += '<div class="saddwrap"><button class="btnfilled" onclick="setCardMode('+claim.id+',\'article\')">Read it →</button>'+(s.shared ? '<span class="sadded" style="margin-left:8px">\u2713 Pinned</span>' : '<button class="btnfilled evidence" style="margin-left:8px" onclick="addToBoard('+claim.id+',\''+c.id+'\')">📌 Pin it</button>')+'</div></div>';
       return;
     }
+    if(CLUE_LOOKS[c.look]){ html += clueResultHTML(claim, c); return; }
     if(c.look){
       var lk = SRC_LOOK[c.who] || SRC_LOOK["Friend"];
       html += '<div class="sresult"><div class="ssite"><div class="sfav">'+lk.fav+'</div><div style="min-width:0"><div class="ssitename">'+escapeHtml(receiptKindLabel(c))+'</div></div><span class="stype '+lk.cls+'">'+c.who+'</span></div>';
@@ -3155,8 +3286,8 @@ function renderClaimSearch(claim){
       // Tara 9/14: "i like having reddit threads showing up in the search" — the anonymous
       // repost reads like the thread it would be: r/…, u/…, votes, comments, top comment.
       html += '<div class="sresult">'+redditHTML(claim, c);
-      if(!s.shared) html += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
-      else html += '<div class="sadded">\u2713 Added to case</div>';
+      if(!s.shared) html += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">📌 Pin it</button></div>';
+      else html += '<div class="sadded">\u2713 Pinned</div>';
       html += '</div>';
       return;
     }
@@ -3170,12 +3301,13 @@ function renderClaimSearch(claim){
     // One tap per result, the same tap, in the same place. Repetition is the
     // instruction — nothing else on a result is tappable.
     if(!s.shared){
-      html += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
+      html += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">📌 Pin it</button></div>';
     } else {
-      html += '<div class="sadded">\u2713 Added to case</div>';
+      html += '<div class="sadded">\u2713 Pinned</div>';
     }
     html += '</div>';
   });
+  // 9/16: Ask AI is its own row again — no link from Search.
   return html;
 }
 // A reddit thread: the subreddit from the story's subject, an anonymous poster, votes and a
@@ -3240,15 +3372,14 @@ function renderClaimAI(claim){
     var s = clipState[c.id];
     html += '<div class="airow"><div class="aiav">\u2728</div><div class="aitxt">'+c.text+'</div></div>';
     if(!s.shared){
-      html += '<div class="aiindent"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">+ Add to case</button></div>';
+      html += '<div class="aiindent"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">📌 Pin it</button></div>';
     } else {
-      html += '<div class="aiindent sadded" style="margin-top:6px">\u2713 Added to case</div>';
+      html += '<div class="aiindent sadded" style="margin-top:6px">\u2713 Pinned</div>';
     }
   });
   // Chat-app furniture. It is doing real work: the tools row and the composer are what
   // make a kid read this as "a chatbot", which is the thing being taught about.
   html += '<div class="aitools">\ud83d\udccb &nbsp; \ud83d\udc4d &nbsp; \ud83d\udc4e &nbsp; \u21bb</div>';
-  html += '<div class="aidisc">A confident answer isn\'t a source. It didn\'t look this up for you.</div>';
   html += '<div class="aicomposer"><span class="ph">Ask a follow-up\u2026</span><span class="send">\u2191</span></div>';
   return html;
 }
@@ -3293,9 +3424,9 @@ function renderClaimBackground(claim){
   html += renderFundingPanel(b);
   html += '</div>';
   if(!s.shared){
-    html += '<div class="rowctrl" style="margin-top:12px;"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clipId+'\')">+ Add to case</button></div>';
+    html += '<div class="rowctrl" style="margin-top:12px;"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clipId+'\')">📌 Pin it</button></div>';
   } else {
-    html += '<div class="resolvedtext" style="margin-top:12px;"><span>✓ Added to case</span></div>';
+    html += '<div class="resolvedtext" style="margin-top:12px;"><span>✓ Pinned</span></div>';
   }
   // Track F: what's BEHIND the profile — the link in bio (tell 2's receipt) and the account's
   // other tries at this claim (tell 3's receipt). Read off the account, same as the money panel.
@@ -3327,7 +3458,7 @@ function renderClaimBoard(claim){
   html += '<div class="resulttext" style="margin-top:4px;">'+postVariant.headline+'</div>';
   html += '<div style="font-size:11.5px; color:var(--ios-label2);">'+postVariant.source+' · ❤️ '+postLikes+' · 💬 '+postComments+'</div></div>';
   if(b.board.length===0){
-    html += '<div class="resultrow"><span style="color:var(--ios-label2); font-size:13px;">Nothing else pooled yet — go find something in Search or Ask AI and file it here.</span></div>';
+    html += '<div class="resultrow"><span style="color:var(--ios-label2); font-size:13px;">No clues pinned.</span></div>';
   } else {
     var allClips = CLIPS[claim.id];
     b.board.forEach(function(clipId, idx){
@@ -3340,7 +3471,7 @@ function renderClaimBoard(claim){
       // A ruling from Defend Your Evidence stays visible on the board (B8): ✓ it holds, 🚩 flagged.
       var ruling = b.r3 && b.r3.rulings ? b.r3.rulings[clipId] : null;
       var mark = ruling==="flag" ? ' <span title="flagged while writing">🚩</span>' : '';
-      html += '<div class="resultrow"><span class="exhibitlabel">EXHIBIT '+letterFor(idx)+mark+'</span><div class="resulttext" style="margin-top:4px;">'+origin+clip.text+'</div></div>';
+      html += '<div class="resultrow"><span class="exhibitlabel">CLUE '+letterFor(idx)+mark+'</span><div class="resulttext" style="margin-top:4px;">'+origin+clip.text+'</div></div>';
     });
   }
   html += '</div>';
@@ -3388,7 +3519,7 @@ function renderFiledNote(claim, b){
   }
   html += '<div class="receiptcard">';
   html += '<div class="receiptrow"><span>Case number</span><span>'+(b.caseNo||claimNumber(claim.id))+'</span></div>';
-  html += '<div class="receiptrow"><span>Exhibits attached</span><span>'+b.board.length+'</span></div>';
+  html += '<div class="receiptrow"><span>Clues pinned</span><span>'+b.board.length+'</span></div>';
   html += '<div class="receiptrow"><span>Sources cited</span><span>'+(r3CiteLabel(claim.id, r.sources)||"—")+'</span></div>';
   html += '<div class="receiptrow"><span>Filed</span><span>'+b.filedAt+'</span></div>';
   html += '</div>';
@@ -3408,7 +3539,7 @@ function r3Go(claimId, beat){
   if(beat==="rate" && !r.notes) r3SeedNotes(claimId);
   render();
 }
-var r3ScreenKey = null;
+var r3ScreenKey = null, r3LastScreen = null;
 function renderR3(){
   var el = document.getElementById("r3Scrim");
   if(!el) return;
@@ -3425,8 +3556,11 @@ function renderR3(){
   r3ScreenKey = key;
   var ta = document.getElementById("r3ta"), focus = ta && document.activeElement===ta, pos = focus ? ta.selectionStart : 0;
   var R = {writeintro:r3RenderWriteIntro, write:r3RenderWrite, ratein:r3RenderRateIn, rate:r3RenderRate, file:r3RenderFile};
+  var sc0 = el.querySelector(".r3scroll"), keep = (sc0 && r3LastScreen===claim.id+"|"+r.beat) ? sc0.scrollTop : 0;
+  r3LastScreen = claim.id+"|"+r.beat;
   el.innerHTML = (R[r.beat] || r3RenderWriteIntro)(claim, r);
   el.className = "onboard-scrim active";
+  var sc1 = el.querySelector(".r3scroll"); if(sc1 && keep) sc1.scrollTop = keep;
   if(focus){ var t2 = document.getElementById("r3ta"); if(t2){ t2.focus(); t2.setSelectionRange(pos, pos); } }
 }
 
@@ -3449,7 +3583,7 @@ function r3RenderWriteIntro(claim, r){
   var nCh = getBoard(claim.id).board.filter(function(cid){ return r3Flagged(claim.id, cid); }).length;
   return '<div class="r3full">'+roundStrip(3, "full")+'<div class="onboard-kicker">Round 3 · Community note</div><div class="onboard-big">📝</div>'+
     '<div class="onboard-title">Now write what actually happened.</div>'+
-    '<div class="onboard-sub">Silent, 90 seconds. Is the post misleading? Check the tells you found, say what actually happened in a sentence or two, and cite your evidence'+(nCh ? ' — '+nCh+' exhibit'+(nCh===1?'':'s')+' got challenged; challenged evidence is still citable, it just carries its 🚩' : '')+'. The note your team rates most helpful goes on the post.</div>'+
+    '<div class="onboard-sub">Silent, 90 seconds. Is the post misleading? Check the tells you found, say what actually happened in a sentence or two, and cite your clues'+(nCh ? '. '+nCh+' clue'+(nCh===1?' was':'s were')+' flagged as weak and can\'t be cited' : '')+'. The note your team rates most helpful goes on the post.</div>'+
     '<div class="onboard-cta"><button class="r3btn" onclick="r3Go('+claim.id+',\'write\')">Start writing</button></div></div>';
 }
 
@@ -3465,7 +3599,8 @@ function r3Type(claimId, el){
   var b = document.getElementById("r3writeDone"); if(b) b.disabled = !r3CanWrite(claimId);
 }
 // Submit at: the first question answered + at least one source + 1–280 characters.
-function r3CanWrite(claimId){ var r = getR3(claimId), n = r.text.trim().length; return r.misleading!==null && n>0 && r.text.length<=280 && r.cites.length>=1; }
+function r3LiveCites(claimId){ return getR3(claimId).cites.filter(function(cid){ return !r3Flagged(claimId, cid); }); }
+function r3CanWrite(claimId){ var r = getR3(claimId), n = r.text.trim().length; return r.misleading!==null && n>0 && r.text.length<=280 && r3LiveCites(claimId).length>=1; }
 function r3ToggleCite(claimId, clipId){
   var r = getR3(claimId), i = r.cites.indexOf(clipId), b = getBoard(claimId);
   if(i<0 && r3Flagged(claimId, clipId)) return;      // challenged = uncitable until withdrawn (9/14)
@@ -3473,7 +3608,7 @@ function r3ToggleCite(claimId, clipId){
   r.cites.sort(function(a, c){ return b.board.indexOf(a) - b.board.indexOf(c); });
   render();
 }
-function r3WriteDone(claimId){ if(r3CanWrite(claimId)) r3Go(claimId, "ratein"); }
+function r3WriteDone(claimId){ if(!r3CanWrite(claimId)) return; getR3(claimId).cites = r3LiveCites(claimId); r3Go(claimId, "ratein"); }
 // 🚩 on a cite row: the exhibit stays on the board and stays citable (B8) — a flag is a
 // warning to the team, not a delete. Toggling it is the moment the door's rule points at.
 function r3ToggleFlag(claimId, clipId, ev){
@@ -3492,15 +3627,15 @@ function r3FlagLines(claimId, withText){
   function exLines(cids){
     if(!withText) return "";
     return cids.map(function(cid){ var e = r3Exhibit(claimId, cid); if(!e) return "";
-      return '<div class="speakup-ex"><b>Exh '+e.letter+'</b> “'+escapeHtml(e.clip.text)+'” <span>'+escapeHtml(r3ClipWho(e.clip))+' · '+(P(e.owner) && P(e.owner).isYou ? "you" : (P(e.owner)||{}).name)+' added it</span></div>'; }).join("");
+      return '<div class="speakup-ex"><b>Clue '+e.letter+'</b> “'+escapeHtml(e.clip.text)+'” <span>'+escapeHtml(r3ClipWho(e.clip))+' · '+(P(e.owner) && P(e.owner).isYou ? "you" : (P(e.owner)||{}).name)+' added it</span></div>'; }).join("");
   }
-  function letters(cids){ var L = cids.map(function(cid){ return letterFor(b.board.indexOf(cid)); }); return L.length===1 ? 'Exhibit '+L[0] : 'Exhibits '+L.join(", "); }
+  function letters(cids){ var L = cids.map(function(cid){ return letterFor(b.board.indexOf(cid)); }); return L.length===1 ? 'Clue '+L[0] : 'Clues '+L.join(", "); }
   var h = "";
-  if(byPid[MY_ID]) h += '<div class="speakup">🚩 You challenged '+letters(byPid[MY_ID])+' — speak up and tell your team why.'+exLines(byPid[MY_ID])+'</div>';
+  if(byPid[MY_ID]) h += '<div class="speakup">🚩 You flagged '+letters(byPid[MY_ID])+' as weak. Tell your team why.'+exLines(byPid[MY_ID])+'</div>';
   Object.keys(byPid).forEach(function(pid){
     if(pid===MY_ID) return;
     var p = P(pid); if(!p) return;
-    h += '<div class="speakup">🚩 '+escapeHtml(p.name)+' challenged '+letters(byPid[pid])+' — ask them why.'+exLines(byPid[pid])+'</div>';
+    h += '<div class="speakup">🚩 '+escapeHtml(p.name)+' flagged '+letters(byPid[pid])+' as weak. Ask them why.'+exLines(byPid[pid])+'</div>';
   });
   return h;
 }
@@ -3527,24 +3662,24 @@ function r3RenderWrite(claim, r){
     var k = pre+i, on = !!r.reasons[k];
     h += '<div class="xopt tell'+(on?' on':'')+(mis===null?' dim':'')+'" onclick="r3ToggleReason('+claim.id+',\''+k+'\')"><span class="r sq"></span><span><span class="tt">'+escapeHtml(x.t)+'</span>'+(x.q ? '<span class="tq">'+escapeHtml(x.q)+'</span>' : '')+'</span></div>';
   });
-  h += '<div class="xq">Briefly explain what actually happened, now that you\'ve done your investigation<small>Plain and neutral, like you\'re telling a friend. Back it up with evidence from your case file.</small></div>';
+  h += '<div class="xq">Briefly explain what actually happened, now that you\'ve done your investigation<small>Plain and neutral, like you\'re telling a friend. Back it up with your clues.</small></div>';
   h += '<textarea class="communitynote xta" id="r3ta" maxlength="280" placeholder="Type your note…" oninput="r3Type('+claim.id+', this)">'+escapeHtml(d)+'</textarea>';
   h += '<div class="xcount'+(d.length>280?' over':'')+'" id="r3count">'+d.length+' / 280</div>';
   // Sources: the exhibits, as checkboxes. Checked ones post as links under the note.
   // Challenges were made on the board in Round 2; here they show, they don't toggle.
-  h += '<div class="xsrc"><div class="xlbl">Sources <small>— check the exhibits your note leans on; they post as links under it</small></div>';
+  h += '<div class="xsrc"><div class="xlbl">Sources <small>— check the clues your note uses; they post as links under it</small></div>';
   r3Exhibits(claim.id).forEach(function(e){
     var on = r.cites.indexOf(e.clipId)>=0, fl = r3Flagged(claim.id, e.clipId), ai = e.clip.source==="ai";
     if(fl && on){ r.cites.splice(r.cites.indexOf(e.clipId), 1); on = false; }   // a challenge un-cites it (triage 9/14)
-    h += '<div class="xsrcline'+(on?' on':'')+(fl?' flag dim':'')+'"'+(fl ? '' : ' onclick="r3ToggleCite('+claim.id+',\''+e.clipId+'\')"')+'><span class="r sq"></span><span class="ltr">['+e.letter+']</span>'+
-      '<span><span class="u'+(ai?' nolink':'')+'">'+(ai ? 'chat transcript — no link' : escapeHtml(r3ClipWho(e.clip)))+'</span><span class="q">'+escapeHtml(e.clip.text)+(fl ? ' <b class="fq">🚩 challenged — withdraw the flag to cite it</b>' : '')+'</span></span></div>';
+    h += '<div class="xsrcline'+(on?' on':'')+(fl?' flag dim':'')+'"'+(fl ? '' : ' onclick="r3ToggleCite('+claim.id+',\''+e.clipId+'\')"')+'><span class="r sq"></span><span class="cluechip">Clue '+e.letter+'</span>'+
+      '<span><span class="u'+(ai?' nolink':'')+'">'+escapeHtml(clueName(claim, e.clip))+'</span><span class="kind"> · '+escapeHtml(bdKindLabel(e.clip))+(ai ? ' · no link' : '')+'</span><span class="q">'+escapeHtml(e.clip.text)+(fl ? ' <b class="fq">🚩 flagged as weak — can\'t be cited unless the flag is taken back</b>' : '')+'</span></span></div>';
   });
   h += '</div>';
   // Preview, the way readers see it.
   h += '<div class="xrule"><div class="xq" style="margin-top:0">Preview<small>How it looks on the post if your team rates it most helpful</small></div>';
   h += '<div class="xprev"><div class="ph"><span class="ic">i</span>Readers added context they thought people might want to know</div>';
   h += '<div class="pt'+(d?'':' empty')+'" id="r3prevtext">'+(escapeHtml(d)||'Your note will show here, on the post.')+'</div>';
-  r.cites.forEach(function(cid){ var e = r3Exhibit(claim.id, cid); if(e && e.clip.source!=="ai") h += '<span class="pl">'+escapeHtml(r3ClipWho(e.clip))+' — '+escapeHtml(e.clip.text)+'</span>'; });
+  r.cites.forEach(function(cid){ var e = r3Exhibit(claim.id, cid); if(e && e.clip.source!=="ai") h += '<span class="pl">'+escapeHtml(clueName(claim, e.clip))+' — '+escapeHtml(e.clip.text)+'</span>'; });
   h += '<div class="pf"><span>Rated <b>helpful</b> by your team</span><span class="rate">Is this note helpful?</span></div></div></div>';
   h += '</div></div>';
   var hint = mis===null ? "Answer the first question." : (r.cites.length===0 ? "Check at least one source." : (!d.trim().length ? "Now say what actually happened." : (r.cites.length===1 ? "A second source makes it stronger." : "Cited: "+r3CiteLabel(claim.id, r.cites))));
@@ -3578,14 +3713,16 @@ function r3RenderRateIn(claim, r){
 // matter (B19): a one-cite player note can lose to an NPC's two-cite note.
 function r3SeedNotes(claimId){
   var r = getR3(claimId), b = getBoard(claimId), claim = claimById(claimId), d = r3NpcDrafts(claim), bd = b.board;
-  function pick(idxs){ var out = []; idxs.forEach(function(i){ var c = bd[Math.min(i, bd.length-1)]; if(c && out.indexOf(c)<0) out.push(c); }); return out; }
+  function pick(idxs){ var out = []; idxs.forEach(function(i){ var c = bd[Math.min(i, bd.length-1)]; if(c && out.indexOf(c)<0 && !r3Flagged(claimId, c)) out.push(c); });
+    if(!out.length){ var ok = bd.filter(function(c){ return !r3Flagged(claimId, c); })[0]; if(ok) out.push(ok); }   // a flagged clue never rides a teammate's note either
+    return out; }
   // The three NPCs answer X's questions too. They read the story the way the seed does
   // (a straight story files as "No"); which tells they check is fixed per seat so the
   // Rate screen shows a spread, not the same box three times.
   var mis = claim.cardTell ? "yes" : "no";
   function T(idxs){ return mis==="no" ? [NOTE_NOT_REASONS[2].t] : idxs.map(function(i){ return NOTE_TELLS[i].t; }); }
   r.notes = {
-    you:   {text:r.text.trim(), cites:r.cites.slice(), misleading:r.misleading, tells:noteTellLabels(r.misleading, r.reasons)},
+    you:   {text:r.text.trim(), cites:r3LiveCites(claimId), misleading:r.misleading, tells:noteTellLabels(r.misleading, r.reasons)},
     maya:  {text:d.maya,  cites:pick([0]),              misleading:mis, tells:T([0])},
     diego: {text:d.diego, cites:pick([0, 2]),           misleading:mis, tells:T([2, 1])},
     priya: {text:d.priya, cites:pick([0, bd.length-1]), misleading:mis, tells:T([0, 2])}
@@ -3627,7 +3764,6 @@ function r3RenderRate(claim, r){
   h += '<div class="r3kick">Round 3 · Rate <span class="mode">silent</span></div>'+roundStrip(3, "kick");
   h += '<div class="r3title">Which note helps a reader most?</div>';
   h += '<div class="r3sub">No names. Rate every note but your own. No lobbying.</div>';
-  h += r3FlagLines(claim.id, true);
   notes.forEach(function(n){
     var mine = n.pid==="you";
     h += '<div class="r3notecard'+(mine?" mine":"")+'"><div class="ntop">'+n.label+(mine?' · yours':'')+'<span class="cnt"><b>'+n.cites.length+'</b> '+(n.cites.length===1?"source":"sources")+' cited</span></div>';
@@ -3648,7 +3784,6 @@ function r3RenderFile(claim, r){
   var res = r.result || (r.result = r3ComputeResult(claim.id)), w = res.winner, p = P(w.pid), straight = noteChecksOut(w);
   var h = '<div class="r3col"><div class="r3scroll">'+'<div class="r3kick">Round 3 · File it <span class="mode talk">talk</span></div>'+roundStrip(3, "kick");
   h += '<div class="r3title">The team’s note.</div>';
-  h += r3FlagLines(claim.id, true);
   h += '<div class="readout">'+(p.isYou ? "Your note — read it out." : p.name+"’s note — "+p.name+", read it out.")+'</div>';
   h += '<div class="r3notecard win"><div class="byline">'+r3Av(w.pid,"big")+'<div><div class="name">'+(p.isYou?"Your note":p.name+"’s note")+'</div><div class="sub">rated most helpful · '+w.cites.length+' '+(w.cites.length===1?"source":"sources")+' cited</div></div></div>'+
     '<div class="nbody">'+escapeHtml(w.text)+'</div><div class="nauto'+(straight?" g":"")+'">'+r3WhyLine(w, true)+'</div><div class="ncites">'+r3CiteLabel(claim.id, w.cites)+'</div></div>';
@@ -3824,7 +3959,7 @@ function renderTells(){
 // so the cards and the "+N more" count can never drift from the real list. Chosen
 // for spread, not importance: four red across different surfaces, two green, so the
 // grid reads as "some of these mean it holds up" at a glance.
-var TELL_TOUR_SAMPLE = ["feel","grift","viral","media","coordination","joke"];
+var TELL_TOUR_SAMPLE = ["feel","grift","viral","coordination","joke","delay"];
 function tellGridMock(){
   var html = '<div class="onboardmock"><div class="onboardmock-grid">';
   TELL_TOUR_SAMPLE.forEach(function(k){
@@ -3906,20 +4041,9 @@ var ONBOARD_CONTENT = {
     // and never said what the round was FOR. This screen states the purpose in Tara's
     // words; "evidence" is hers — she felt it was missing. The tap-to-flip screen it
     // replaces was already redundant: finalizeOnboard() opens the chosen story itself.
-    {kicker:"ROUND 2 \u00b7 INVESTIGATION", big:"\ud83c\udfaf", title:"Your team is going to write what actually happened.",
-      sub:"Go find enough evidence to say it."},
-    {big:"\ud83d\udd75\ufe0f", title:"Who posted it?", sub:"Tap the source \u2014 opens background check",
-      mock:'<div class="onboardmock"><div class="onboardmock-flow"><div style="position:relative;"><div class="onboardmock-source">AI Hype Daily <span class="onboardmock-meta">@AIHypeDaily \u00b7 2.1M followers</span></div><div class="onboardmock-tap" style="right:-6px; bottom:-16px;">\ud83d\udc46</div></div><div class="onboardmock-arrow">\u2193</div><div class="onboardmock-tabs"><div class="onboardmock-tab active">\ud83d\udd75\ufe0f Background</div></div></div></div>'},
-    {big:"\ud83d\udd0d", title:"Then go looking", sub:"Search and Ask AI are right under the headline",
-      mock:'<div class="onboardmock"><div class="onboardmock-tabs"><div class="onboardmock-tab">\ud83d\udd75\ufe0f Background</div><div class="onboardmock-tab active">\ud83d\udd0d Search</div><div class="onboardmock-tab">\u2728 Ask AI</div></div></div>'},
-    // Blunter than "File your evidence" was — it never said what the tap was FOR.
-    // Rewritten 8/31/2026 (Tara): a 12-year-old about to be let loose needs the WHY,
-    // and the why is the table, not their own point. "Save what backs up your call"
-    // was rejected for exactly that reason — it teaches gathering ammunition. This
-    // frames the case file as what the table reasons from, and lands on the same
-    // question the reveal asks and the Round 3 note answers.
-    {big:"\ud83d\uddc2\ufe0f", title:"Save what holds up", sub:"Tap + Add to case \u2014 your team works out what happened from these",
-      mock:'<div class="onboardmock"><div class="onboardmock-evidbtn">+ Add to case</div></div>'}
+    // 9/16 (Tara): Round 2 is COR's three questions — one card, the questions ARE the job.
+    {kicker:"ROUND 2 \u00b7 INVESTIGATION", big:"\ud83d\udcdd", title:"Your team is writing a community note on this post.",
+      sub:'First, find out what\u2019s really going on:<div class="obq"><div><b>\ud83d\udd75\ufe0f Background:</b> Who\u2019s behind it?</div><div><b>\ud83d\udd0d Search:</b> What do other sources say?</div><div><b>\u2728 Ask AI:</b> What does AI say? Can you trust it?</div></div>Pin what you find. Your note can only use clues you pinned.'}
   ]},
   // "Where to look" (8/24/2026, expanded same day per Tara: more of an intro about
   // how manipulation actually works, and an actual look at the library).
@@ -3967,7 +4091,7 @@ var ONBOARD_CONTENT = {
   // Spotter's own "waiting on your teammates" beat is where the team catches up.
   note: {teamGated:false, choice:true, screens:[
     {kicker:"ROUND 2 → ROUND 3", big:"🎯", title:"Can your team say what actually happened yet?",
-      count:function(){ return r3GateCount()+" in your case file — enough to write."; }}
+      count:function(){ return r3GateCount()+" clues pinned."; }}
   ]},
   spread: {teamGated:false, screens:[
     {kicker:"THE SPREAD", big:"📊", title:"Attention isn't accuracy", sub:"A story spreads whether or not it's true"},
@@ -4167,6 +4291,17 @@ var BD_SLOTS = [ {x:0,y:2,r:-3}, {x:100,y:2,r:2.5}, {x:0,y:37,r:2}, {x:100,y:37,
 var BD_POST = {x:50, y:33};
 var bdLanded = {}, bdJustLanded = null, bdJustFlagged = null, bdKey = null, bdLastClaimId = null;
 var npcChallenges = {};        // claimId -> {clipId: npcPid} — a simulated teammate's challenge
+// 9/16 (Tara: optimize the board for laptops, sized to a 1366×768 Chromebook). The board is laid
+// out in COLUMNS from measured heights — clues left/right, house rules + the post in the middle —
+// so nothing overlaps at any height; the cork scrolls when the columns run long. Below ~760px of
+// pane width the middle column can't fit, so it drops to two: rules + post left, clues right.
+function bdGeom(W){
+  var pad = 16, gap = 14, cw = 232, pw = Math.min(270, W - 2*pad - 2*cw - 2*gap);
+  if(pw >= 220) return {mode:"three", cw:cw, pw:pw, lx:pad, cx:Math.round((W-pw)/2), rx:W-pad-cw};
+  var col = Math.floor((W - 2*pad - gap)/2);
+  return {mode:"two", cw:col, pw:col, lx:pad, cx:pad, rx:pad+col+gap};
+}
+function bdColFor(G, i){ return G.mode==="two" ? "R" : (i%2 ? "R" : "L"); }
 function bdSlotLeft(s, W){ var pad = 18, cw = 232; return pad + (W - 2*pad - cw) * s.x/100; }
 // Tara 9/14 (after playing): the board appears in Round 2 and stays through Round 3 (to cite
 // from) — never in Round 1 / triage, and it leaves at filing. The phone fills the screen otherwise.
@@ -4181,6 +4316,18 @@ function bdLook(clip){
   if(clip.who==="News / institution") return (/study|paper|journal|dataset|data\b/i.test(clip.text) ? "journal" : "report");
   if(clip.who==="Can't tell — bot or AI?") return "forum";
   return "social";     // Influencer, Friend, anything else that's a post
+}
+function clueName(claim, clip){
+  var bg = claim.background || {}, m = claim.media || {}, look = bdLook(clip);
+  if(CLUE_LOOKS[clip.look]) return clip.name || clip.who;
+  if(clip.look==="news") return m.outlet || "The original article";
+  if(clip.look){ var k = receiptKindLabel(clip); return k.charAt(0).toUpperCase()+k.slice(1); }
+  if(look==="ai") return "Assistant";
+  if(look==="profile") return bg.displayName || claim.source;
+  if(look==="forum") return redditMeta(claim, clip).sub;
+  if(look==="journal") return "Published study";
+  if(look==="report") return "Published report";
+  return clip.who || "Source";
 }
 function bdKindLabel(clip){ return clip.look ? receiptKindLabel(clip) : clip.source==="ai" ? "AI answer" : clip.source==="background" ? "account check" : (clip.who || "source"); }
 function bdSrcChrome(claim, clip, look){
@@ -4200,10 +4347,12 @@ function bdSrcChrome(claim, clip, look){
 function bdClipHTML(claim, e, slot, left, top, opts){
   var clip = e.clip, look = bdLook(clip), who = r3FlaggersOf(claim.id, e.clipId), fl = who.length>0;
   var owner = P(e.owner), mine = e.owner===MY_ID;
-  var h = '<div class="bdclip k-'+look+(clip.receipt?' hasreceipt':'')+(bdJustLanded===e.clipId?' landing':'')+(fl?' flag':'')+(bdJustFlagged===e.clipId?' justflagged':'')+'" style="left:'+left+'px; top:'+top+'px; transform:rotate('+slot.r+'deg)" data-clip="'+e.clipId+'"><div class="pinhead"></div>'+
-    '<div class="tag"><span class="ltr">Exhibit '+e.letter+'</span><span class="kind">'+escapeHtml(bdKindLabel(clip))+'</span></div>';
-  var chal = (!fl && !mine && opts.live) ? '<button class="bdchal" onclick="challengeClip('+claim.id+',\''+e.clipId+'\')">🚩 Challenge</button>' : '';
+  var cited = r3Writing(claim.id) && (getBoard(claim.id).r3 || {cites:[]}).cites.indexOf(e.clipId)>=0;
+  var h = '<div class="bdclip k-'+look+(cited?' cited':'')+(clip.receipt?' hasreceipt':'')+(bdJustLanded===e.clipId?' landing':'')+(fl?' flag':'')+(bdJustFlagged===e.clipId?' justflagged':'')+'" style="left:'+left+'px; top:'+top+'px; width:'+(opts.w||232)+'px; transform:rotate('+slot.r+'deg)" data-clip="'+e.clipId+'"><div class="pinhead"></div>'+
+    (cited ? '<div class="bdcited">✓ In your note</div>' : '')+'<div class="tag"><span class="ltr">Clue '+e.letter+'</span><span class="kind">'+escapeHtml(bdKindLabel(clip))+'</span></div>';
+  var chal = (!fl && !mine && opts.live) ? '<button class="bdchal" onclick="challengeClip('+claim.id+',\''+e.clipId+'\')">🚩 Weak clue?</button>' : '';
   var from = '<div class="from">'+r3Av(e.owner)+'<span>'+(mine ? "you pinned it" : escapeHtml((owner||{name:"someone"}).name)+" pinned it")+'</span>'+chal+'</div>';
+  if(!fl && opts.live && weakPick && weakPick.claimId===claim.id && weakPick.clipId===e.clipId) from += weakPickerHTML(claim.id, e.clipId, "board");
   if(clip.look){
     // a receipt clipping IS its chrome; the receipt strip goes under the "pinned it" line
     var inner = receiptInnerHTML(claim, clip), ri = inner.lastIndexOf('<div class="receipt">'), strip = ri>=0 ? inner.slice(ri) : '';
@@ -4212,20 +4361,74 @@ function bdClipHTML(claim, e, slot, left, top, opts){
     h += bdSrcChrome(claim, clip, look)+'<div class="body">'+escapeHtml(clip.text)+'</div>' + from;
   }
   if(fl){
-    var them = who.filter(function(pid){ return pid!==MY_ID; }), iDid = who.indexOf(MY_ID)>=0;
-    var line = iDid ? (them.length ? 'You and '+r3Names(them.map(P).filter(Boolean))+' challenged this — say why.' : 'You challenged this — tell your team why.')
-                    : (them.length===1 ? (P(them[0])||{name:"Someone"}).name+' challenged this — ask them why.' : r3Names(them.map(P).filter(Boolean))+' challenged this — ask them why.');
-    h += '<div class="bdchalnote">'+who.map(function(pid){ return r3Av(pid); }).join("")+'<span>'+escapeHtml(line)+'</span>'+(iDid && opts.live ? '<span class="undo" onclick="challengeClip('+claim.id+',\''+e.clipId+'\')">withdraw</span>' : '')+'</div>';
+    var iDid = who.indexOf(MY_ID)>=0;
+    h += '<div class="bdchalnote"><span>'+weakBoardLine(claim.id, e.clipId)+'<small>'+escapeHtml(weakRule(claim.id, e.clipId))+'</small></span>'+(iDid && opts.live ? '<span class="undo" onclick="challengeClip('+claim.id+',\''+e.clipId+'\')">take it back</span>' : '')+'</div>';
   }
   return h+'</div>';
 }
 // The challenge: aimed at a teammate's pin (you can't challenge your own — that's what
 // makes it a conversation); only your own is withdrawable. Rides on the flag machinery.
-function challengeClip(claimId, clipId){
+// 9/16 (Tara): a challenge says "this clue is weak" and names why — the COR worksheet's
+// strengths/weaknesses, in three reasons. The consequence is said where the flag lands.
+// 9/17 (evidence-types interview): three reasons + Other. ids are stable — a rename is copy-only.
+// Other flags at once, no typing: the kid explains out loud. NO answer key: nothing here knows
+// whether a clue is actually weak, and nothing ever says a flag was right.
+var WEAK_REASONS = [
+  {id:"gain",      label:"They gain if I believe it", short:"gains from it"},
+  {id:"one_story", label:"It\u2019s one person\u2019s story",  short:"one person\u2019s story"},
+  {id:"no_proof",  label:"No proof",                  short:"no proof"},
+  {id:"other",     label:"Other",                     short:"other"}
+];
+function weakReasonById(id){ return WEAK_REASONS.filter(function(r){ return r.id===id; })[0] || WEAK_REASONS[WEAK_REASONS.length-1]; }
+var weakReasons = {};   // claimId|clipId|pid -> reason id
+var weakPick = null;    // {claimId, clipId} while the reason picker is open
+function weakReasonOf(claimId, clipId, pid){
+  var id = weakReasons[claimId+"|"+clipId+"|"+pid];
+  if(id===undefined){ var c = clipById(claimId, clipId); id = (c && c.source==="ai") ? "no_proof" : "one_story"; }   // simulated teammates
+  return weakReasonById(id);
+}
+function weakLine(claimId, clipId){
+  var who = r3FlaggersOf(claimId, clipId);
+  return who.map(function(pid){ var r = weakReasonOf(claimId, clipId, pid); return (pid===MY_ID ? "You" : (P(pid)||{name:"Someone"}).name)+" flagged this as weak"+(r.id==="other" ? "" : ": "+r.short)+"."; }).join(" ")+(who.indexOf(MY_ID)>=0 ? " Tell your team why." : "");
+}
+function weakBoardLine(claimId, clipId){
+  return r3FlaggersOf(claimId, clipId).map(function(pid){ return '<span class="wf">'+r3Av(pid)+'Weak clue? \u2014 '+escapeHtml(weakReasonOf(claimId, clipId, pid).short)+'</span>'; }).join("");
+}
+function weakRule(claimId, clipId){
+  var names = r3FlaggersOf(claimId, clipId).map(function(pid){ return pid===MY_ID ? "you" : (P(pid)||{name:"they"}).name; });
+  var joined = names.length>1 ? names.slice(0,-1).join(", ")+" and "+names[names.length-1] : names[0];
+  return "Weak clues can\u2019t go in your note unless "+joined+" take"+(names.length===1 && names[0]!=="you" ? "s" : "")+" the flag back.";
+}
+function weakPickerHTML(claimId, clipId, where){
+  var h = '<div class="weakpick '+where+'"><div class="wq">Why might this clue be weak?</div>';
+  WEAK_REASONS.forEach(function(r){ h += '<button class="wr" data-reason="'+r.id+'" onclick="challengeClip('+claimId+',\''+clipId+'\',\''+r.id+'\'); event.stopPropagation();">'+escapeHtml(r.label)+'</button>'; });
+  return h+'<span class="wx" onclick="weakCancel(); event.stopPropagation();">Never mind</span></div>';
+}
+function weakCancel(){ weakPick = null; bdKey = null; render(); }
+// Phone-only rows (no laptop board): the flag line, the rule, or the button.
+function weakRowHTML(claimId, clipId, mine){
+  var who = r3FlaggersOf(claimId, clipId), iDid = who.indexOf(MY_ID)>=0, h = '';
+  if(!who.length && weakPick && weakPick.claimId===claimId && weakPick.clipId===clipId) return weakPickerHTML(claimId, clipId, "row");
+  if(who.length){
+    h += '<div class="rowchalline">'+who.map(function(pid){ return r3Av(pid); }).join("")+'<span>\ud83d\udea9 '+escapeHtml(weakLine(claimId, clipId))+'</span>'+(iDid ? '<span class="rowchalbtn on" onclick="challengeClip('+claimId+',\''+clipId+'\')">Take it back</span>' : '')+'</div>';
+    h += '<div class="weakrule">'+escapeHtml(weakRule(claimId, clipId))+'</div>';
+  } else if(!mine){
+    h += '<div class="rowchalline"><span class="rowchalbtn" onclick="challengeClip('+claimId+',\''+clipId+'\')">\ud83d\udea9 Weak clue?</span></div>';
+  }
+  return h;
+}
+// Aimed at a teammate's pin (you can't flag your own); only your own flag can be taken back.
+// No reason yet → open the picker; a reason → flag it.
+function challengeClip(claimId, clipId, reason){
   var e = r3Exhibit(claimId, clipId);
   if(!e || getBoard(claimId).filed) return;
-  if(e.owner===MY_ID && getR3(claimId).rulings[clipId]!=="flag") return;
   var was = getR3(claimId).rulings[clipId]==="flag";
+  if(e.owner===MY_ID && !was) return;
+  if(!was && reason===undefined){ weakPick = {claimId:claimId, clipId:clipId}; bdKey = null; render();
+    setTimeout(function(){ var wp = document.querySelector(".weakpick"); if(wp && wp.scrollIntoView) wp.scrollIntoView({block:"nearest", behavior:"smooth"}); }, 150);
+    return; }
+  if(was) delete weakReasons[claimId+"|"+clipId+"|"+MY_ID]; else weakReasons[claimId+"|"+clipId+"|"+MY_ID] = reason;
+  weakPick = null; bdKey = null;
   bdJustFlagged = was ? null : clipId;
   r3ToggleFlag(claimId, clipId);
 }
@@ -4249,7 +4452,7 @@ function bdBeatLabel(claim){
   var b = getBoard(claim.id);
   if(b.filed) return "Case filed";
   if(r3Writing(claim.id)) return "Write · on your phone";
-  return "Pin it · or challenge it";
+  return "Find clues for your note";
 }
 function renderBoardPane(){
   var el = document.getElementById("bdpane"); if(!el) return;
@@ -4266,7 +4469,7 @@ function renderBoardPane(){
   var live = !!claim && !b.filed && !r3Writing(claim.id);
   var ready = [];
   var flags = claim ? b.board.map(function(cid){ return cid+":"+r3FlaggersOf(claim.id, cid).join("."); }).join("|") : "";
-  var key = [claim ? claim.id : "-", round, live, claim ? b.board.join(",") : "", flags, ready.join(","), claim && b.filed ? "filed" : "", claim && b.r3 && b.r3.note ? "note" : "", PLAYERS.length, el.clientWidth].join("§");   // the one-shot landing/flag classes are NOT in the key: the next tick must not redraw them
+  var key = [claim ? claim.id : "-", round, live, claim ? b.board.join(",") : "", flags, ready.join(","), claim && b.filed ? "filed" : "", claim && b.r3 && b.r3.note ? "note" : "", claim && b.r3 && b.r3.cites ? b.r3.cites.join(",") : "", PLAYERS.length, el.clientWidth, weakPick ? weakPick.clipId : ""].join("§");   // the one-shot landing/flag classes are NOT in the key: the next tick must not redraw them
   if(key===bdKey) return;
   bdKey = key;
   var h = '<div class="bdhead">'+roundHead(round, "board", round===3 ? "The note is on your phone. The board stays up to cite from." : undefined)+'<div class="bdbeat">'+escapeHtml(bdBeatLabel(claim))+'</div></div>';
@@ -4281,24 +4484,24 @@ function renderBoardPane(){
     return;
   }
   var bg = claim.background || {}, eng = BASE_ENGAGEMENT[claim.id] || 10;
-  var px = W*BD_POST.x/100 - 135, py = H*BD_POST.y/100 - 60;
-  c += '<div class="bdclip thepost" style="left:'+px+'px; top:'+py+'px; transform:rotate(-1deg)"><div class="pinhead"></div><div class="tag">The post you\'re chasing</div>'+
+  var G = bdGeom(W), px = G.cx, py = 14;
+  c += '<div class="bdclip thepost" data-col="C" data-ord="1" style="left:'+px+'px; top:'+py+'px; width:'+G.pw+'px; transform:rotate(-1deg)"><div class="pinhead"></div><div class="tag">The post you\'re chasing</div>'+
     '<div class="pa"><span class="pav" style="background:linear-gradient(160deg, hsl('+claim.hue+',55%,42%), hsl('+claim.hue+',55%,22%))">'+escapeHtml(bg.displayName ? bg.displayName.charAt(0) : posterInitial(claim))+'</span><div><div class="pn">'+escapeHtml(bg.displayName || claim.source)+'</div><div class="pm">'+escapeHtml(bg.handle || '')+(bg.followers ? ' · '+escapeHtml(bg.followers)+' followers' : '')+'</div></div></div>'+
     '<div class="pt">'+claim.headline+'</div>'+
-    (claim.media ? '<div class="postmedia" style="cursor:default; background:#fafafa; border-color:#ddd"><div class="im" style="height:84px; background-image:url(\''+claim.media.image_url+'\')"></div><div class="strip" style="color:#666">'+favHTML(claim)+escapeHtml(claim.media.domain||"")+'<span class="go" style="color:#0a84ff">Round 2 · read it on your phone</span></div></div>' : '')+
+    (claim.media ? '<div class="postmedia" style="cursor:default; background:#fafafa; border-color:#ddd"><div class="im" style="height:84px; background-image:url(\''+claim.media.image_url+'\')"></div><div class="strip" style="color:#666">'+favHTML(claim)+escapeHtml(claim.media.domain||"")+'<span class="go" style="color:#0a84ff"></span></div></div>' : '')+
     '<div class="pe">❤️ '+formatCount(Math.round(eng*1000 + claim.id*173))+' · 💬 '+formatCount(Math.round(eng*180 + claim.id*37))+' · '+escapeHtml(claim.source)+'</div></div>';
-  var paths = '', cx = W*BD_POST.x/100, cy = py;
+  var cx = 0, cy = 0;
   var ex = r3Exhibits(claim.id);
   ex.forEach(function(e, i){
-    var s = BD_SLOTS[i % BD_SLOTS.length], left = bdSlotLeft(s, W), top = H*s.y/100;
-    c += bdClipHTML(claim, e, s, left, top, {live:live});
-    c = c.replace('data-clip="'+e.clipId+'"', 'data-clip="'+e.clipId+'" data-col="'+s.x+'" data-new="'+(bdLanded[e.clipId] ? 0 : 1)+'"');
+    var s = BD_SLOTS[i % BD_SLOTS.length], col = bdColFor(G, i), left = col==="R" ? G.rx : G.lx, top = 14;
+    c += bdClipHTML(claim, e, s, left, top, {live:live, w:G.cw});
+    c = c.replace('data-clip="'+e.clipId+'"', 'data-clip="'+e.clipId+'" data-col="'+col+'" data-ord="'+(10+i)+'" data-new="'+(bdLanded[e.clipId] ? 0 : 1)+'"');
     bdLanded[e.clipId] = true;
   });
   var need = BOARD_TOUR_EVIDENCE_THRESHOLD;
-  if(live){ for(var i = ex.length; i < need; i++){ var gs = BD_SLOTS[i % BD_SLOTS.length]; c += '<div class="bdghost" style="left:'+bdSlotLeft(gs, W)+'px; top:'+H*gs.y/100+'px; transform:rotate('+gs.r+'deg)">EXHIBIT '+letterFor(i)+'</div>'; } }
-  if(live) c += '<div class="bdrules"><div class="pinhead"></div><div class="t">House rules</div><div class="l"><span class="n">1</span>Leave the post. Go check it.</div><div class="l"><span class="n">2</span>Pin only what you\'d trust.</div><div class="l"><span class="n">3</span>Sketchy pin? Challenge it.</div></div>';
-  if(!ex.length && live) c += '<div class="bdempty">nothing pinned yet<small>ONLY THE EVIDENCE YOU\'D ACTUALLY TRUST GOES UP HERE</small></div>';
+  if(live){ for(var i = ex.length; i < need; i++){ var gs = BD_SLOTS[i % BD_SLOTS.length], gcol = bdColFor(G, i); c += '<div class="bdghost" data-col="'+gcol+'" data-ord="'+(10+i)+'" style="left:'+(gcol==="R" ? G.rx : G.lx)+'px; top:14px; width:'+G.cw+'px; transform:rotate('+gs.r+'deg)">CLUE '+letterFor(i)+'</div>'; } }
+  if(live) c += '<div class="bdrules" data-col="C" data-ord="0" style="left:'+G.cx+'px; top:14px; margin-left:0; width:'+G.pw+'px"><div class="pinhead"></div><div class="l">Pin clues you\'d trust. Flag ones you wouldn\'t.</div><div class="l">Judge the clue, not the post.</div></div>';
+  // 9/16: no "nothing pinned yet" overlay — the ghost slots already say where clues go.
   if(b.filed){
     // the note rides on the post (case-board-after-determination): pinned over it, stamped
     c += '<div class="bdstamp" style="top:'+(py-6)+'px">Case filed</div>';
@@ -4307,42 +4510,43 @@ function renderBoardPane(){
   }
   c += '<svg class="bdyarn"></svg>';
   cork.innerHTML = '<div class="bdcanvas" style="height:'+H+'px">'+c+'</div>';
-  bdLayout(cork, W, H, cx, cy);
+  bdLayout(cork, W, H);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ bdLayout(cork, W, H); });
   bdJustLanded = null; bdJustFlagged = null;
   // the foot: the goal line (mirrors the phone), the team, and Ready (the same gate as the phone's button)
   var n = ex.length, enough = n >= need, canGo = n >= R3_MIN_EVIDENCE, goal, cls = '';
   if(b.filed){ goal = 'Filed. The note is on the post — the feed is on your phone.'; cls = ' quiet'; }
   else if(r3Writing(claim.id)){ goal = 'Round 3 is on your phone: is the post misleading, which tells did you find, what actually happened. The board stays up to cite from.'; cls = ' quiet'; }
-  else if(n===0) goal = 'Aim for '+need+' pieces of evidence you trust. Then your team writes the community note.';
-  else if(!enough) goal = n+' on the board — aim for '+need+'. Anything up there you don\'t trust? Challenge it.';
-  else { goal = 'Enough on the board. Anything up there you don\'t trust? Challenge it. Then tell your team you\'re ready.'; cls = ' done'; }
+  else if(n===0) goal = 'Answer the 3 questions on your phone. Pin clues you trust.';
+  else if(!enough) goal = n+' of '+need+' clues. See a weak clue? Flag it and say why.';
+  else { goal = need+' clues pinned. When your team agrees, write your note.'; cls = ' done'; }
   var f = '<div class="bdgoal'+cls+'">'+goal+'</div><div class="bdteam">'+PLAYERS.map(function(p){ return r3Av(p.id, ready.indexOf(p.id)>=0 ? "ready" : ""); }).join("")+'</div>';
-  if(live) f += '<button class="bdready'+(enough?' pulse':'')+'"'+(canGo?'':' disabled')+' onclick="readyForNote('+claim.id+')">Ready to go →</button>';
+  if(live) f += '<button class="bdready'+(enough?' pulse':'')+'"'+(canGo?'':' disabled')+' onclick="readyForNote('+claim.id+')">Write our note →</button>';
   document.getElementById("bdfoot").innerHTML = f;
 }
 window.addEventListener("resize", function(){ bdKey = null; renderBoardPane(); });
-function bdLayout(cork, W, H, cx, cy){
-  var canvas = cork.querySelector(".bdcanvas"), post = cork.querySelector(".bdclip.thepost"), yarn = cork.querySelector(".bdyarn");
+function bdLayout(cork, W, H){
+  // Stack each column from measured heights, then draw the yarn from each clue's pin to the post's.
+  var canvas = cork.querySelector(".bdcanvas"), yarn = cork.querySelector(".bdyarn");
   if(!canvas) return;
-  var cols = {"0":[], "50":[], "100":[]};
-  if(post) cols["50"].push({el:post, top:parseFloat(post.style.top), h:post.offsetHeight, fixed:true});
-  cork.querySelectorAll(".bdclip[data-clip]").forEach(function(el){ (cols[el.getAttribute("data-col")] || cols["50"]).push({el:el, top:parseFloat(el.style.top), h:el.offsetHeight}); });
-  var maxBottom = H, GAP = 18;
+  var GAP = 18, maxBottom = H, cols = {};
+  cork.querySelectorAll("[data-col]").forEach(function(el){ var k = el.getAttribute("data-col"); (cols[k] = cols[k] || []).push(el); });
   Object.keys(cols).forEach(function(k){
-    var items = cols[k].sort(function(a, b){ return a.top - b.top; }), bottom = -1e9;
-    items.forEach(function(it){
-      if(!it.fixed && it.top < bottom + GAP){ it.top = bottom + GAP; it.el.style.top = it.top+"px"; }
-      bottom = it.top + it.h;
-      if(bottom + 24 > maxBottom) maxBottom = bottom + 24;
+    var y = 26;   // room above the top row for pins and the "In your note" badge
+    cols[k].sort(function(a, b){ return (+a.getAttribute("data-ord")) - (+b.getAttribute("data-ord")); }).forEach(function(el){
+      el.style.top = y+"px"; y += el.offsetHeight + GAP;
     });
+    if(y + 6 > maxBottom) maxBottom = y + 6;
   });
-  canvas.style.height = Math.max(H, maxBottom)+"px";
-  var paths = "";
+  canvas.style.height = maxBottom+"px";
+  var post = cork.querySelector(".bdclip.thepost");
+  if(!post || !yarn) return;
+  var cx = parseFloat(post.style.left) + post.offsetWidth/2, cy = parseFloat(post.style.top) + 4, paths = "";
   cork.querySelectorAll(".bdclip[data-clip]").forEach(function(el){
-    var pxp = parseFloat(el.style.left) + 116, pyp = parseFloat(el.style.top), mx = (pxp+cx)/2, my = (pyp+cy)/2 + 18;
+    var pxp = parseFloat(el.style.left) + el.offsetWidth/2, pyp = parseFloat(el.style.top) + 4, mx = (pxp+cx)/2, my = (pyp+cy)/2 + 18;
     paths += '<path class="'+(el.getAttribute("data-new")==="1" ? "new" : "")+'" d="M'+pxp+' '+pyp+' Q'+mx+' '+my+' '+cx+' '+cy+'"/>';
   });
-  if(yarn) yarn.innerHTML = paths;
+  yarn.innerHTML = paths;
 }
 
 
@@ -4353,7 +4557,7 @@ function clipById(claimId, clipId){ return (CLIPS[claimId]||[]).filter(function(
 function favHTML(claim){ var m = claim.media || {}; return '<span class="fav">'+(m.source_icon ? '<img src="'+m.source_icon+'" alt="" onerror="this.remove()">' : '')+escapeHtml((m.outlet||claim.subject).charAt(0))+'</span>'; }
 function accountAvatarStyle(claim){ return 'background:linear-gradient(160deg, hsl('+claim.hue+',55%,42%), hsl('+claim.hue+',55%,22%))'; }
 // The inside of a receipt clipping — the same HTML on the board (inside .bdclip) and on the
-// phone (inside .rcpt). Looks: news · swap · shop · versions · samephrase · reverse.
+// phone (inside .rcpt). Looks: news · swap · shop · versions · samephrase · + the four clue looks (clueInnerHTML).
 function receiptInnerHTML(claim, clip){
   var look = clip.look, b = claim.background || {}, m = claim.media || {}, a = claim.article || {}, h = '';
   if(look==="news"){
@@ -4379,13 +4583,8 @@ function receiptInnerHTML(claim, clip){
     var p = clip.phrase || {hits:[]};
     h += '<div class="src"><div class="sbar">🔍 <span class="q">'+escapeHtml(p.q||"")+'</span></div><div class="cnt">'+escapeHtml(p.count||"")+'</div></div>';
     p.hits.forEach(function(x){ h += '<div class="hit"><span class="hav" style="background:'+x.c+'"></span><span><span class="hn">'+escapeHtml(x.h)+'</span><span class="ht">'+x.t+'</span></span><span class="hd">'+escapeHtml(x.d)+'</span></div>'; });
-  } else if(look==="reverse"){
-    var r = clip.reverse || {kv:[]};
-    h += '<div class="src">🔍 Search this frame <span>· reverse image</span></div>';
-    h += '<div class="thumbrow"><div class="thumb now" style="'+(m.image_url ? 'background-image:url(\''+m.image_url+'\')' : '')+'"></div><div class="match"><b>'+escapeHtml((r.now||{}).label||"the post")+'</b><small>'+escapeHtml((r.now||{}).meta||"")+'</small></div></div>';
-    h += '<div class="arrow">⇅ same frame</div>';
-    h += '<div class="thumbrow"><div class="thumb old" style="'+(m.image_url ? 'background-image:url(\''+m.image_url+'\')' : '')+'"></div><div class="match"><b>'+escapeHtml((r.match||{}).title||"")+'</b><small>'+escapeHtml((r.match||{}).outlet||"")+' · '+escapeHtml((r.match||{}).date||"")+' · '+escapeHtml((r.match||{}).place||"")+'</small></div></div>';
-    h += '<div class="body">'+(r.kv||[]).map(function(kv){ return '<div class="kv"><span>'+escapeHtml(kv[0])+'</span><b>'+escapeHtml(kv[1])+'</b></div>'; }).join("")+'</div>';
+  } else if(CLUE_LOOKS[look]){
+    h += clueInnerHTML(claim, clip, false);
   } else {
     h += '<div class="body">'+escapeHtml(clip.text)+'</div>';
   }
@@ -4395,14 +4594,71 @@ function receiptInnerHTML(claim, clip){
 // Tara 9/14 (after playing): "receipts shouldn't show up while players are pinning" — the yellow
 // RECEIPT line (the one-line answer) stays off the clipping through Round 2 and appears once
 // pinning is over: Round 3, while the note is written, and after filing.
+// ---------------- THE FOUR CLUE LOOKS (evidence-clues brief 1c, 9/17/2026) ----------------
+// official · outlet · explainer · creator. Result row → open screen → board clipping, like the
+// article. Each look has ONE frame. A strong clue and a weak one are drawn by the same code with
+// the same colours: the only difference is what the words say (who issued it, whether anyone is
+// named, whether it links to anything, what the video shows). Clips carry no field that says which is which.
+var CLUE_LOOKS = {official:{fav:"🏛️"}, outlet:{fav:"📰"}, explainer:{fav:"📘"}, creator:{fav:"▶️"}};
+var openClueId = {};
+function openClue(claimId, clipId){ openClueId[claimId] = clipId; setCardMode(claimId, "clue"); }
+function clueSite(clip){ var d = clip.doc, p = clip.page, v = clip.vid; return d ? (d.url||"").split("/")[0] : p ? p.domain : v ? "clips.video" : ""; }
+function clueTitle(clip){ var d = clip.doc, p = clip.page, v = clip.vid; return d ? d.title : p ? p.headline : v ? v.caption : clip.text; }
+function clueSnip(clip){
+  var d = clip.doc, p = clip.page, v = clip.vid;
+  if(d) return d.date+" — "+(d.quote ? "“"+d.quote.t+"”" : d.lines[0]);
+  if(p) return p.date+" — "+(p.claim ? p.body : p.hl);
+  return v.handle+" · "+v.views+" views · "+v.ago+" ago";
+}
+function cluePinHTML(claim, clip){
+  return clipState[clip.id].shared ? '<span class="sadded" style="margin-left:8px">✓ Pinned</span>' : '<button class="btnfilled evidence" style="margin-left:8px" onclick="addToBoard('+claim.id+',\''+clip.id+'\')">📌 Pin it</button>';
+}
+function clueResultHTML(claim, clip){
+  var open = 'onclick="openClue('+claim.id+',\''+clip.id+'\')"';
+  var h = '<div class="sresult"><div class="ssite"><div class="sfav">'+CLUE_LOOKS[clip.look].fav+'</div><div style="min-width:0"><div class="ssitename">'+escapeHtml(clueSite(clip))+'</div></div><span class="stype plain">'+escapeHtml(clip.kind)+'</span></div>';
+  h += '<div class="stitle" '+open+' style="cursor:pointer">'+escapeHtml(clueTitle(clip))+'</div><div class="ssnip">'+escapeHtml(clueSnip(clip))+'</div>';
+  h += '<div class="saddwrap"><button class="btnfilled" '+open+'>'+(clip.look==="creator" ? 'Watch it →' : 'Open it →')+'</button>'+cluePinHTML(claim, clip)+'</div></div>';
+  return h;
+}
+// The thing itself. `big` = the open screen; otherwise the clipping (board + phone).
+function clueInnerHTML(claim, clip, big){
+  var h = '', d = clip.doc, p = clip.page, v = clip.vid;
+  if(clip.look==="official"){
+    h += '<div class="src"><div class="of-seal">'+escapeHtml(d.issuer.charAt(0))+'</div><div style="min-width:0"><div class="of-iss">'+escapeHtml(d.issuer)+'</div><div class="of-about">'+escapeHtml(d.about)+'</div></div></div>';
+    h += '<div class="of-title">'+escapeHtml(d.title)+'</div><div class="of-date">'+escapeHtml(d.date)+'</div>';
+    h += '<div class="body">'+(big || d.lines.length<3 ? d.lines : [d.lines[0], d.lines[d.lines.length-1]]).map(function(l){ return '<p>'+escapeHtml(l)+'</p>'; }).join("");
+    if(d.quote) h += '<blockquote>“'+escapeHtml(d.quote.t)+'”<cite>'+escapeHtml(d.quote.by)+'</cite></blockquote>';
+    h += '</div>';
+  } else if(clip.look==="outlet" || clip.look==="explainer"){
+    h += '<div class="src"><div class="nw-mast">'+escapeHtml(p.mast)+'<small>'+escapeHtml(p.domain)+'</small></div><div class="ck-kick">'+escapeHtml(p.kicker)+'</div><div class="nw-hl">'+escapeHtml(p.headline)+'</div>';
+    h += '<div class="ck-by">'+(p.by ? 'By '+escapeHtml(p.by)+' · ' : '')+escapeHtml(p.date)+'</div></div>';
+    if(p.claim) h += '<div class="ck-claim"><small>The claim</small>'+escapeHtml(p.claim)+'</div>';
+    h += '<div class="body">'+(big ? escapeHtml(p.body)+' ' : !p.hl ? escapeHtml(p.body.split(/(?<=[.!?])\s/)[0])+' ' : '')+(p.hl ? '<mark>'+escapeHtml(p.hl)+'</mark>' : '')+(big && p.after ? ' '+escapeHtml(p.after) : '')+'</div>';
+    if(p.links && p.links.length) h += '<div class="ck-links">'+p.links.map(function(l){ return '<span class="ck-chip">🔗 '+escapeHtml(l.t)+'<small>'+escapeHtml(l.d)+'</small></span>'; }).join("")+'</div>';
+  } else if(clip.look==="creator"){
+    h += '<div class="vd-frame" style="background:linear-gradient(170deg, hsl('+v.hue+',45%,34%), hsl('+v.hue+',50%,12%))"><span class="vd-play">▶</span><span class="vd-views">▶ '+escapeHtml(v.views)+'</span>';
+    h += '<div class="vd-cap"><b>'+escapeHtml(v.handle)+'</b> · '+escapeHtml(v.ago)+'<span>'+escapeHtml(v.caption)+'</span></div></div>';
+    h += '<div class="body"><small>On screen</small>'+escapeHtml(v.shows)+'</div>';
+  }
+  return h;
+}
+function renderClaimClue(claim){
+  var clip = clipById(claim.id, openClueId[claim.id]);
+  if(!clip || !CLUE_LOOKS[clip.look]) return '<div class="emptystate">Nothing open.</div>';
+  var url = clip.doc ? clip.doc.url : clip.page ? clip.page.url : "clips.video/"+clip.vid.handle;
+  var h = '<div class="browser cluepage"><div class="urlbar"><span class="lock">🔒</span><span class="u">'+escapeHtml(url)+'</span></div>';
+  h += '<div class="cluebig k-'+clip.look+'">'+clueInnerHTML(claim, clip, true)+'</div>';
+  h += '<div class="artpin">'+(clipState[clip.id].shared ? '<div class="sadded">✓ Pinned</div>' : '<button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clip.id+'\')">📌 Pin it</button>')+'</div>';
+  return h+'</div>';
+}
 function receiptsShown(claim){ var b = getBoard(claim.id); return !!(b.filed || r3Writing(claim.id)); }
-function receiptKindLabel(clip){ return {news:"the original article", swap:"loaded words", shop:"link in bio", versions:"version history", samephrase:"same phrase", reverse:"reverse image"}[clip.look] || (clip.who||"source"); }
+function receiptKindLabel(clip){ return clip.kind || {news:"the original article", swap:"loaded words", shop:"link in bio", versions:"version history", samephrase:"same phrase"}[clip.look] || (clip.who||"source"); }
 // A receipt on the phone: the clipping small, plus the one Add-to-case button.
 function phoneReceiptHTML(claim, clip){
   var st = clipState[clip.id];
   var h = '<div class="rcpt k-'+clip.look+'"><div class="kind">'+escapeHtml(receiptKindLabel(clip))+'</div>'+receiptInnerHTML(claim, clip)+'</div>';
-  if(!st.shared) h += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clip.id+'\')">+ Add to case</button></div>';
-  else h += '<div class="sadded">\u2713 Added to case</div>';
+  if(!st.shared) h += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clip.id+'\')">📌 Pin it</button></div>';
+  else h += '<div class="sadded">\u2713 Pinned</div>';
   return h;
 }
 // The post's media block on the case file (Round 2 opens the article) and the 🔁 Say it plain flip.
@@ -4410,32 +4666,7 @@ function postMediaHTML(claim){
   var m = claim.media, st = clipState["art-"+claim.id];
   if(!m) return "";
   return '<div class="postmedia'+(st && st.shared ? ' on' : '')+'" onclick="setCardMode('+claim.id+',\'article\')"><div class="im" style="background-image:url(\''+m.image_url+'\')"></div>'+
-    '<div class="strip">'+favHTML(claim)+escapeHtml(m.domain||"")+'<span class="go">'+(st && st.shared ? '📌 Pinned · read again' : 'Read the actual article →')+'</span></div>'+
-    '<div class="strip lens" onclick="setCardMode('+claim.id+',\'reverse\'); event.stopPropagation();">🔍 Search this image<span class="go">'+(reverseClip(claim) && clipState[reverseClip(claim).id].shared ? '📌 Pinned · look again' : 'where else has it been?')+'</span></div></div>';
-}
-// Tara 9/14 (after playing): reverse image search is something you DO to dive deeper, not a
-// result you get handed. The post's photo and the article's photo both carry 🔍 Search this
-// image → this screen: the frame you searched, then its visual matches. A story with a
-// planted reverse receipt (rev-N) shows the earlier copy — pin it from here. A story without
-// one honestly finds only the article itself.
-function reverseClip(claim){ return (CLIPS[claim.id]||[]).filter(function(c){ return c.look==="reverse"; })[0] || null; }
-function renderClaimReverse(claim){
-  var m = claim.media || {}, a = claim.article || {}, rc = reverseClip(claim);
-  var h = '<div class="browser lensb"><div class="urlbar"><span class="lock">🔒</span><span class="u">images.search/lens</span></div>';
-  h += '<div class="lenshead"><span class="lensq">🔍 Search this image</span><span class="lensx">✕</span></div>';
-  h += '<div class="lensframe"><div class="im" style="'+(m.image_url ? 'background-image:url(\''+m.image_url+'\')' : '')+'"></div><div class="cap">the frame from the post · '+escapeHtml(m.domain||"")+'</div></div>';
-  h += '<div class="lenssec">Visual matches</div>';
-  if(rc){
-    var r = rc.reverse || {}, mt = r.match || {};
-    h += '<div class="lensmatch old"><div class="th" style="'+(m.image_url ? 'background-image:url(\''+m.image_url+'\')' : '')+'"></div><div class="mt"><b>'+escapeHtml(mt.title||"")+'</b><small>'+escapeHtml(mt.outlet||"")+' · <span class="dt">'+escapeHtml(mt.date||"")+'</span> · '+escapeHtml(mt.place||"")+'</small><span class="first">earliest copy found</span></div></div>';
-    h += '<div class="lensmatch"><div class="th" style="'+(m.image_url ? 'background-image:url(\''+m.image_url+'\')' : '')+'"></div><div class="mt"><b>'+escapeHtml(a.headline||claim.headline)+'</b><small>'+escapeHtml(m.outlet||"")+' · '+escapeHtml(a.date||"")+'</small></div></div>';
-    h += '<div class="lenssec">What the search turned up</div>';
-    h += phoneReceiptHTML(claim, rc);
-  } else {
-    h += '<div class="lensmatch"><div class="th" style="'+(m.image_url ? 'background-image:url(\''+m.image_url+'\')' : '')+'"></div><div class="mt"><b>'+escapeHtml(a.headline||claim.headline)+'</b><small>'+escapeHtml(m.outlet||"")+' · '+escapeHtml(a.date||"")+'</small><span class="first">earliest copy found</span></div></div>';
-    h += '<div class="lensnone">No earlier copies of this image. It first appears with the article above'+(a.date ? ', '+escapeHtml(a.date) : '')+'.</div>';
-  }
-  return h+'</div>';
+    '<div class="strip">'+favHTML(claim)+escapeHtml(m.domain||"")+'<span class="go">'+(st && st.shared ? '📌 Pinned · read again' : 'Read the actual article →')+'</span></div></div>';
 }
 function postTextHTML(claim){
   if(!claim.loaded) return '<div class="posttext">'+claim.headline+'</div>';
@@ -4460,10 +4691,10 @@ function renderClaimArticle(claim){
   h += '<div class="mast">'+escapeHtml(m.outlet||"")+'<small>'+escapeHtml(m.domain||"")+'</small></div>';
   h += '<div class="artkick">'+escapeHtml(a.kicker||"")+'</div><div class="arthl">'+escapeHtml(a.headline)+'</div>';
   h += '<div class="artby">By <b>'+escapeHtml(a.by||m.outlet||"")+'</b> · <span class="dt">'+escapeHtml(a.date)+'</span></div>';
-  if(m.image_url) h += '<figure class="artfig"><div class="im" style="background-image:url(\''+m.image_url+'\')"></div><figcaption>'+escapeHtml(m.outlet||"")+' · photo<span class="lensbtn" onclick="setCardMode('+claim.id+',\'reverse\')">🔍 Search this image</span></figcaption></figure>';
+  if(m.image_url) h += '<figure class="artfig"><div class="im" style="background-image:url(\''+m.image_url+'\')"></div><figcaption>'+escapeHtml(m.outlet||"")+' · photo</figcaption></figure>';
   h += '<p class="artp lede">'+escapeHtml(a.lede||"")+'</p>';
   h += '<a class="artmore" href="'+escapeHtml(a.url)+'" target="_blank" rel="noopener">Read the full story at '+escapeHtml(m.domain||"the outlet")+' ↗</a>';
-  h += '<div class="artpin">'+(st.shared ? '<div class="sadded">\u2713 Added to case — it\'s on the board as a clipping</div>' : '<button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clip.id+'\')">+ Add to case</button>')+'</div>';
+  h += '<div class="artpin">'+(st.shared ? '<div class="sadded">\u2713 Pinned</div>' : '<button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clip.id+'\')">📌 Pin it</button>')+'</div>';
   return h+'</div>';
 }
 // The reveal (Tara, 9/14 triage, decision 2): after filing, ONLY the receipts the team actually
@@ -4477,7 +4708,7 @@ function plantedRevealHTML(claim, bd){
   pinned.forEach(function(c){
     var t = c.tell ? TELL[c.tell] : null, label = t ? t.emoji+' '+t.name : '✅ It holds up', checked = t ? tells.indexOf(t.name) >= 0 : (note && note.misleading==="no");
     var e = r3Exhibit(claim.id, c.id);
-    h += '<div class="pt" style="margin-top:8px">'+escapeHtml(label)+'</div><div class="pw">'+(e ? 'Exhibit '+e.letter+' · ' : '')+escapeHtml(receiptKindLabel(c))+' — '+escapeHtml(c.receipt)+'</div>';
+    h += '<div class="pt" style="margin-top:8px">'+escapeHtml(label)+'</div><div class="pw">'+(e ? 'Clue '+e.letter+' · ' : '')+escapeHtml(receiptKindLabel(c))+' — '+escapeHtml(c.receipt)+'</div>';
     h += '<div class="pc '+(checked?'hit':'miss')+'">'+(checked ? '✓ Your team\'s note checked it.' : (t ? '✗ Pinned, but the note didn\'t check it.' : '✗ Pinned, but the note called the post misleading.'))+'</div>';
   });
   return h+'</div>';
@@ -4556,7 +4787,7 @@ function renderStorySummary(){
   // tell is NOT repeated here — the Round 3 flash named it (Tara chose exactly this).
   html += '<div class="receiptcard story">';
   html += '<div class="receiptrow"><span>Case number</span><span>'+(bd.caseNo||claimNumber(claim.id))+'</span></div>';
-  html += '<div class="receiptrow"><span>Exhibits attached</span><span>'+bd.board.length+'</span></div>';
+  html += '<div class="receiptrow"><span>Clues pinned</span><span>'+bd.board.length+'</span></div>';
   html += '<div class="receiptrow"><span>Sources cited</span><span>'+(r3CiteLabel(claim.id, bd.r3 && bd.r3.sources || [])||"—")+'</span></div>';
   html += '<div class="receiptrow"><span>Filed</span><span>'+bd.filedAt+'</span></div>';
   html += '</div>';

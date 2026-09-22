@@ -262,7 +262,7 @@
 
 <header class="top">
   <div class="brand">INFODEMIC<span>Teacher console</span></div>
-  <div class="buildstamp">build 2026-09-20 · headlines first (v13) · design pass</div>
+  <div class="buildstamp">build 2026-09-20 · headlines first (v13) · design pass · 12 shown</div>
 </header>
 
 <div class="wrap">
@@ -652,7 +652,7 @@ function poolPanel(s, po){
 function poolCoverageLine(){
   if (storiesSource !== "live") return "";
   // v13: the deal is on every row from pull time, so coverage counts headlines too.
-  var have = {}; STORIES.forEach(function(s){ var t = tellOf(postOf(s)); if (t) have[t] = true; });
+  var qq = queueOrder(); var have = {}; qq.ready.concat(qq.rest).forEach(function(s){ var t = tellOf(postOf(s)); if (t) have[t] = true; });
   var missing = TELL_IDS6.filter(function(t){ return !have[t]; });
   return missing.length ? "Tells not in this pool: " + missing.map(tellName).join(" \u00b7 ") + " \u2014 pull headlines again for more." : "";
 }
@@ -934,6 +934,8 @@ var storiesLoaded = false; // the first read of the pool has come back (either w
 var pullNote = "";        // v13: a plain (non-error) line about the last pull
 var PENDING = {};         // v13: storyId -> ms when THIS tab asked for its package (call still open)
 var pollTimer = null;
+var HEADLINE_CAP = 12;      // how many fresh headlines the list shows (Tara 9/20: 10-15)
+var showAllHeadlines = false;
 var STALL_MS = 5 * 60000; // a row 'writing' longer than this with no open call here = stalled
 var TOPIC_ORDER = ["World","Politics","Disaster","Health","Science","Tech","Media","Gaming","Sports","Brands"];
 
@@ -1056,7 +1058,7 @@ function renderPullBar(){
     ? " \u00b7 pulled " + new Date(storiesPulledAt).toLocaleString()
     : "";
   var ready = STORIES.filter(function(s){ return statusOf(s) === "ready"; }).length;
-  var heads = STORIES.length - ready;
+  var heads = queueOrder().rest.length;
   $("pull-line").innerHTML = (storiesSource === "live"
       ? "<b>" + heads + " headline" + (heads === 1 ? "" : "s") + "</b> \u00b7 <b>" + ready + " ready to play</b>" + when
       : "<b>" + STORIES.length + " sample stories</b>") +
@@ -1083,7 +1085,21 @@ function queueOrder(){
   var rest = STORIES.filter(function(s){ return statusOf(s) !== "ready"; });
   var rank = function(s){ var i = TOPIC_ORDER.indexOf(s.subject); return i === -1 ? 99 : i; };
   rest.sort(function(a, b){ return rank(a) - rank(b) || String(a.subject).localeCompare(String(b.subject)) || ts(b.pulledAt) - ts(a.pulledAt); });
-  return { ready: ready, rest: rest };
+  // 9/20 Tara: "too many to scroll/choose from — limit it to 10-15". Candidates = the LATEST pull only
+  // (rows within 10 min of the newest pulled_at); round-robin across topics up to HEADLINE_CAP. Rows that
+  // are being written, failed, or in the feed always show, and don't count against the cap.
+  var busy = rest.filter(function(s){ return statusOf(s) !== "headline" || inFeed(s.id) !== -1; });
+  var heads = rest.filter(function(s){ return busy.indexOf(s) === -1; });
+  var newest = heads.reduce(function(m, s){ return Math.max(m, ts(s.pulledAt)); }, 0);
+  var fresh = heads.filter(function(s){ return !newest || ts(s.pulledAt) >= newest - 10 * 60000; });
+  var byTopic = {}, topics = [];
+  fresh.forEach(function(s){ if (!byTopic[s.subject]){ byTopic[s.subject] = []; topics.push(s.subject); } byTopic[s.subject].push(s); });
+  var picked = [], depth = 0, cap = showAllHeadlines ? fresh.length : HEADLINE_CAP;
+  while (picked.length < cap && topics.some(function(t){ return byTopic[t].length > depth; })){
+    topics.forEach(function(t){ if (picked.length < cap && byTopic[t][depth]) picked.push(byTopic[t][depth]); });
+    depth++;
+  }
+  return { ready: ready, rest: busy.concat(picked), shown: picked.length, fresh: fresh.length, older: heads.length - fresh.length };
 }
 function groupHead(label, n){
   var g = document.createElement("h3"); g.className = "qgroup";
@@ -1146,6 +1162,7 @@ function headlineRow(s){
   body.appendChild(ol); body.appendChild(rh);
   if (m.description && st === "headline"){ var ds = document.createElement("div"); ds.className = "ds"; ds.textContent = m.description; body.appendChild(ds); }
   var meta = document.createElement("div"); meta.className = "meta";
+  var subj = document.createElement("span"); subj.className = "tag subject"; subj.textContent = s.subject; meta.appendChild(subj);
   var lead = document.createElement("span"); lead.className = "post faint"; lead.style.margin = "0";
   if (st === "writing" && !stalled){ var sp = document.createElement("span"); sp.className = "spin"; lead.appendChild(sp); lead.appendChild(document.createTextNode("Writing the post and clues\u2026")); }
   else lead.textContent = st === "headline" ? "Will be written as" : stalled ? "Stalled while writing \u2014 was going to be" : "Couldn\u2019t be written \u2014 was going to be";
@@ -1177,18 +1194,20 @@ function renderQueue(){
     q.ready.forEach(function(s){ rs.appendChild(readyCard(s)); });
     host.appendChild(rs);
   }
-  var last = null, list = null;
-  q.rest.forEach(function(s){
-    if (s.subject !== last){
-      last = s.subject;
-      var n = q.rest.filter(function(x){ return x.subject === s.subject; }).length;
-      var sec = document.createElement("section"); sec.className = "qsec";
-      sec.appendChild(groupHead(s.subject, n + " headline" + (n === 1 ? "" : "s")));
-      list = document.createElement("div"); list.className = "qlist";
-      sec.appendChild(list); host.appendChild(sec);
+  if (q.rest.length){
+    var sec = document.createElement("section"); sec.className = "qsec";
+    sec.appendChild(groupHead("Fresh headlines", q.fresh > q.shown ? q.shown + " of " + q.fresh + " from your last pull" : "from your last pull"));
+    var list = document.createElement("div"); list.className = "qlist";
+    q.rest.forEach(function(s){ list.appendChild(headlineRow(s)); });
+    sec.appendChild(list);
+    if (q.fresh > HEADLINE_CAP){
+      var more = document.createElement("button"); more.className = "btn ghost small"; more.id = "more-headlines"; more.style.alignSelf = "center";
+      more.textContent = showAllHeadlines ? "Show fewer" : "Show all " + q.fresh + " headlines";
+      more.onclick = function(){ showAllHeadlines = !showAllHeadlines; renderQueue(); };
+      sec.appendChild(more);
     }
-    list.appendChild(headlineRow(s));
-  });
+    host.appendChild(sec);
+  }
   // Empty states. Live pool with no fresh headlines: say what Pull does and that it is free.
   if (storiesSource === "live" && !q.rest.length){
     var es = document.createElement("div"); es.className = "emptystate wide";
