@@ -2022,7 +2022,7 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-09-20 · multiplayer catches up";
+var BUILD = "2026-09-22 · phones catch up";
 var revealState = {active:false, order:[], index:0};
 // ---------------- TRIAGE (8/31/2026) ----------------
 // Replaces the old "you may only investigate what you disagreed about" gate. The table
@@ -2711,6 +2711,23 @@ function onJoinedRoom(code, playerId){
   loadDropForRoom(code);
   render();
 }
+// 9/22: realtime is a speed-up, not the source of truth. A locked phone / switched app drops the
+// socket silently and misses every tap until it reloads. So: re-read the room whenever the page
+// wakes, and every few seconds while in a room — two tiny selects, idempotent on every reader.
+var RESYNC_MS = 4000, resyncBusy = false;
+function resyncRoom(){
+  if(!roomCode || currentApp === "lobby" || resyncBusy) return;
+  resyncBusy = true;
+  Promise.all([InfodemicSync.getPlayers(roomCode), InfodemicSync.getRoomState(roomCode)])
+    .then(function(r){ applyPlayers(r[0]); applyRemoteState(r[1]); })
+    .catch(function(e){ console.warn("resync failed", e); })
+    .then(function(){ resyncBusy = false; });
+}
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) resyncRoom(); });
+window.addEventListener("focus", resyncRoom);
+window.addEventListener("online", resyncRoom);
+window.addEventListener("pageshow", resyncRoom);
+setInterval(function(){ if(roomCode && !sessionState.showingEnd) resyncRoom(); }, RESYNC_MS);
 function applyPlayers(rows){
   var prev = {}; PLAYERS.forEach(function(p){ prev[p.id] = p; });
   PLAYERS = rows.map(function(r){
