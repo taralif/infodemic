@@ -70,6 +70,12 @@
     font-size:14.5px; font-weight:600; padding:11px 24px; margin-top:9px; }
   .onboard-waiting{ font-size:13.5px; color:var(--ios-label2); }
 
+  .onboard-full{ position:relative; }
+  .onboard-arrow{ position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.1); color:#fff; font-size:24px; line-height:32px; text-align:center; pointer-events:none; }
+  .onboard-arrow.l{ left:10px; } .onboard-arrow.r{ right:10px; animation:obnudge 1.6s ease-in-out infinite; }
+  @keyframes obnudge{ 0%,100%{ transform:translate(0,-50%); } 50%{ transform:translate(4px,-50%); } }
+  @media (prefers-reduced-motion: reduce){ .onboard-arrow.r{ animation:none; } }
+  .onboard-tapnext{ position:absolute; bottom:64px; left:0; right:0; text-align:center; font-size:12.5px; font-weight:700; color:rgba(255,255,255,.55); pointer-events:none; }
   .onboard-dots{ position:absolute; bottom:44px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
   .onboard-dot{ width:6px; height:6px; border-radius:3px; background:rgba(255,255,255,.3); }
   .onboard-dot.active{ background:#fff; }
@@ -473,6 +479,7 @@
   /* Pinned under the scroll region, so the button never scrolls away and the list can grow. */
   .cardback-foot{ flex:0 0 auto; padding:10px 16px 14px; border-top:0.5px solid var(--ios-sep); display:flex; flex-direction:column; gap:5px; background:var(--ios-cardback); }
   .readybtn{ width:100%; padding:13px; border-radius:14px; border:none; font-family:inherit; font-size:15px; font-weight:800; background:var(--ios-green); color:#04140a; cursor:pointer; box-shadow:0 8px 22px rgba(48,209,88,.25); }
+  .cardback-foot.compact{ padding:8px 16px 10px; } .cardback-foot.compact .readybtn{ padding:10px; font-size:14px; }
   .readybtn:disabled{ background:var(--ios-bg3); color:var(--ios-label3); cursor:default; box-shadow:none; }
   .readybtn.pulse{ animation:readypulse 1.6s ease-in-out infinite; }
   @keyframes readypulse{ 0%,100%{box-shadow:0 8px 22px rgba(48,209,88,.25);} 50%{box-shadow:0 8px 30px rgba(48,209,88,.6);} }
@@ -785,6 +792,38 @@
   .profilestat{ display:flex; flex-direction:column; align-items:center; }
   .profilestat .num{ font-size:14.5px; font-weight:800; }
   .profilestat .lbl{ font-size:9.5px; color:var(--ios-label3); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
+  /* 9/28 Look them up — the profile names itself as the account's own claims */
+  .selfhead{ display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--ios-label2); margin:0 4px 8px; }
+  .selfhead .q{ font-size:13px; }
+  .lkprompt{ margin-top:14px; font-size:13px; font-weight:600; color:var(--ios-label2); text-align:center; line-height:1.4; }
+  .lkactions{ margin-top:8px; flex-wrap:wrap; align-items:center; }
+  .lkactions .lookbtn{ flex:1; }
+  .lkpinned{ font-size:12.5px; font-weight:800; color:var(--ios-green); padding:0 6px; }
+  .btabs{ display:flex; gap:4px; margin:-2px -6px 12px; padding:4px 4px 0; background:rgba(0,0,0,.35); border-radius:10px 10px 0 0; }
+  .btab{ flex:1; min-width:0; display:flex; align-items:center; gap:6px; font:600 11px/1.2 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; color:var(--ios-label3); padding:7px 9px; border-radius:9px 9px 0 0; white-space:nowrap; overflow:hidden; border:none; background:transparent; text-align:left; cursor:pointer; }
+  .btab .t{ overflow:hidden; text-overflow:ellipsis; }
+  .btab.on{ background:rgba(255,255,255,.1); color:var(--ios-label); cursor:default; }
+  .btab.plus{ flex:0 0 26px; justify-content:center; font-size:15px; padding:5px 0; cursor:default; }
+  .btab .f{ width:14px; height:14px; border-radius:4px; flex:none; display:inline-flex; align-items:center; justify-content:center; font-size:8px; font-weight:800; color:#fff; }
+  .btab .f.g{ background:#fff; color:#4285f4; }
+  .ssitename small{ display:block; font-weight:500; color:var(--ios-label3); font-size:10.5px; }
+  .lkres .lk-facts{ margin-top:8px; background:var(--ios-bg2); border-radius:10px; padding:4px 11px; }
+  .lkres .lk-fr{ display:flex; gap:10px; font-size:12px; line-height:1.4; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.07); }
+  .lkres .lk-fr:last-child{ border-bottom:none; }
+  .lkres .lk-fr .k{ flex:0 0 42%; color:var(--ios-label2); font-weight:600; }
+  .lkres .rdt{ margin-bottom:9px; }
+  /* the board clipping of a lookup result */
+  .k-lookup{ background:#fff!important; color:#202124; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important; }
+  .k-lookup .src{ display:flex; align-items:center; gap:7px; border-bottom:1px solid #eee; color:#202124; background:#fff; }
+  .k-lookup .lk-fav{ width:20px; height:20px; border-radius:50%; background:#f1f3f4; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex:none; }
+  .k-lookup .lk-fav.rd{ background:#ff4500; color:#fff; font-size:8.5px; }
+  .k-lookup .lk-site{ font-size:11px; font-weight:800; line-height:1.2; min-width:0; } .k-lookup .lk-site small{ display:block; font-weight:500; color:#70757a; font-size:9.5px; }
+  .k-lookup .lk-chip{ margin-left:auto; font-size:9px; font-weight:800; padding:2px 6px; border-radius:5px; background:#f1f3f4; color:#444; flex:none; }
+  .k-lookup .lk-title{ font-size:12.5px; font-weight:700; color:#1a0dab; line-height:1.3; margin-bottom:3px; } .k-lookup .lk-title.rd{ color:#1c1c1c; }
+  .k-lookup .body{ font-size:11px; color:#4d5156; line-height:1.4; }
+  .k-lookup .lk-facts{ margin-top:6px; border:1px solid #eee; border-radius:6px; padding:2px 8px; }
+  .k-lookup .lk-fr{ display:flex; gap:8px; font-size:10.5px; line-height:1.35; padding:4px 0; border-bottom:1px solid #f1f1f1; } .k-lookup .lk-fr:last-child{ border-bottom:none; }
+  .k-lookup .lk-fr .k{ flex:0 0 42%; color:#5f6368; font-weight:700; }
   .profilejoined{ font-size:11px; color:var(--ios-label3); }
   /* Build stamp on the lobby. Added 8/25/2026 after three separately-verified fixes
      all appeared "not to work" on device: the code on disk was correct every time,
@@ -874,6 +913,7 @@
   .saddwrap{margin-top:9px;}
   .sadded{margin-top:9px; font-size:12px; font-weight:800; color:var(--ios-green);}
 
+  .aiwarn{ background:rgba(255,159,10,.14); border:1px solid rgba(255,159,10,.35); color:#ffd28a; border-radius:12px; padding:10px 12px; font-size:12.5px; line-height:1.4; margin-bottom:12px; } .aiwarn b{ color:#ffb340; }
   .aihdr{display:flex; align-items:center; gap:9px; padding-bottom:11px; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,.1);}
   .aimark{width:27px; height:27px; border-radius:8px; background:linear-gradient(150deg,#7b61ff,#4dc7ff); display:flex; align-items:center; justify-content:center; font-size:14px; flex:none;}
   .ainame{font-size:13px; font-weight:800;}
@@ -1100,6 +1140,8 @@
     padding:46px 22px 12px; display:flex; flex-direction:column; align-items:center; gap:9px;}
   .storyfoot{flex:0 0 auto; padding:12px 22px 30px; background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.85) 40%);}
   .storykick{font-size:10.5px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; color:var(--ios-green);}
+  .storyxnote{ text-align:left; background:#fff; color:#0f1419; border-radius:16px; padding:12px; margin:14px 0 2px; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; }
+  .storyxnote .xpost{ margin-bottom:8px; } .storyxnote .xprev{ margin-top:0; }
   .storytitle{font-size:22px; font-weight:800; letter-spacing:-.3px; line-height:1.2;}
   .storysub{font-size:13px; font-weight:600; color:var(--ios-label2); line-height:1.45; margin-bottom:6px;}
   .storynote{width:100%; text-align:left; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.13);
@@ -1746,7 +1788,7 @@ var CALL_META = {
 // tell and its receipt clip(s); the story summary reveals it after filing against what the
 // team checked. Loaded-words swaps (`plain`, `swaps`) pay tell 1 off on every spun post.
 var CLAIMS = [
-  {id:1, subject:"Disaster", topic:"a flood clip from the Northeast", hue:205, sourceUrl:"tiktok.com/@stormchaserlive/video/91002", wired:true,
+  {id:1, subject:"Disaster", topic:"a flood clip from the Northeast", searchQuery:"flash flood warning new york connecticut", hue:205, sourceUrl:"tiktok.com/@stormchaserlive/video/91002", wired:true,
     hook:"Flood warnings are real and time-sensitive — but is 'streets already underwater' what the alert says, or what the caption adds?",
     npcVotes:{maya:"misinfo", diego:"true", priya:"biased"},
     headline:"🚨 BREAKING: flash floods slamming parts of NY & CT right now, streets already underwater. Share this now so people can get out in time 🌊",
@@ -1763,8 +1805,15 @@ var CLAIMS = [
              receipt:"a WARNING, dated Sunday morning — the caption says streets are already underwater"},
     background:{ funding:[{k:"Who's behind it", v:"Run by one person, no company listed"},{k:"How it makes money", v:"Ad revenue from video views"},{k:"Paid posts tagged?", v:"No sponsorship disclosures found"}],
           handle:"@StormChaserLive", displayName:"Storm Chaser Live 🌩️", bio:"chasing storms so you don't have to 🌪️ | clips from the field | not a meteorologist",
-          verified:false, followers:"612K", following:"340", posts:"14,102", joined:"Joined Jun 2021"}},
-  {id:2, subject:"World", topic:"Saudi Arabia and the Houthis", hue:20, sourceUrl:"x.com/geopulsenow/status/88120", wired:true,
+          verified:false, followers:"612K", following:"340", posts:"14,102", joined:"Joined Jun 2021",
+          lookup:[
+            {kind:"stats", fav:"📊", site:"CreatorTrack", url:"creatortrack.io › stormchaserlive", chip:"Creator stats",
+             title:"Storm Chaser Live — account stats and history", snip:"Averages 19 videos a day across 11 states, most posted within an hour of local news alerts."},
+            {kind:"news", fav:"📰", site:"The Prairie Ledger", url:"prairieledger.com › news", chip:"News",
+             title:"Viral weather pages are reposting chasers' footage, photographers say", snip:"Several storm chasers told the paper their videos went viral on large accounts, including Storm Chaser Live, with the watermarks cropped out and no credit given."},
+            {kind:"reddit", sub:"r/stormchasing", user:"u/hail_yeah_22", ago:"3mo", up:"1.2k", com:214,
+             title:"Is Storm Chaser Live actually out chasing? Genuine question", top:["u/wx_nerd_ok", "Half his \"live\" clips are from people in this sub. Mine was on there within 40 min."]}]}},
+  {id:2, subject:"World", topic:"Saudi Arabia and the Houthis", searchQuery:"saudi arabia houthis options", hue:20, sourceUrl:"x.com/geopulsenow/status/88120", wired:true,
     hook:"The real report lists several messy options, not a two-way fork — worth checking what's being left out, and who else is saying it this exact way.",
     npcVotes:{maya:"biased", diego:"true", priya:"biased"},
     headline:"Saudi Arabia vs the Houthis: either they strike back and risk a bigger war, or sit back and look weak. There's no third option on the table rn.",
@@ -1781,8 +1830,15 @@ var CLAIMS = [
              receipt:"\"few options… all of which carry heavy costs\" — several, not two"},
     background:{ funding:[{k:"Who's behind it", v:"Run by two former grad students, named in the pinned post"},{k:"How it makes money", v:"Ad revenue and a paid newsletter tier"},{k:"Paid posts tagged?", v:"No paid tags found in the last year"}],
           handle:"@GeoPulseNow", displayName:"GeoPulse", bio:"🌍 breaking down world conflicts in plain English | maps, threads, no jargon",
-          verified:false, followers:"612K", following:"340", posts:"7,015", joined:"Joined Jan 2021"}},
-  {id:3, subject:"Tech", topic:"robots in factories", hue:265, sourceUrl:"tiktok.com/@futureshocknow/video/55310", wired:true,
+          verified:false, followers:"612K", following:"340", posts:"7,015", joined:"Joined Jan 2021",
+          lookup:[
+            {kind:"stats", fav:"📊", site:"CreatorTrack", url:"creatortrack.io › geopulsenow", chip:"Creator stats",
+             title:"GeoPulse — account stats and history", snip:"Posts about 30 conflict threads a week. Gained 400K followers in March, mostly from one viral map thread."},
+            {kind:"news", fav:"✓", site:"NewsGrade", url:"newsgrade.org › ratings", chip:"Media rater",
+             title:"GeoPulse: mixed — clear maps, headlines flatten the story", snip:"Threads usually link a news source. Summaries often boil a many-sided conflict down to two sides. No corrections policy."},
+            {kind:"reddit", sub:"r/geopolitics", user:"u/map_person_88", ago:"5d", up:"486", com:131,
+             title:"Anyone else notice GeoPulse lines showing up word-for-word on other accounts?", top:["u/not_a_bot_i_swear", "Saw the same line on a few pages yesterday. Could just be people copying a big account though."]}]}},
+  {id:3, subject:"Tech", topic:"robots in factories", searchQuery:"humanoid robots replacing factory workers", hue:265, sourceUrl:"tiktok.com/@futureshocknow/video/55310", wired:true,
     hook:"Which factories, how many robots, doing what jobs — the post makes it sound universal. And check what's in the bio.",
     npcVotes:{maya:"misinfo", diego:"biased", priya:"true"},
     headline:"Everyone's already doing it: factories are quietly swapping workers for humanoid robots and nobody's stopping it 🤖",
@@ -1790,7 +1846,7 @@ var CLAIMS = [
     plain:"An engineering site lists seven companies testing humanoid robots in select factories, mostly as pilot programs.",
     swaps:[["Everyone's already doing it","seven companies are piloting","a count became 'everyone'"],["quietly swapping","testing","'quietly' = someone's hiding it"],["nobody's stopping it","in select factories","a pilot became a takeover"]],
     tell:null, cardTell:"everyones-doing-it", cardWords:"Everyone's already doing it",
-    planted:{tell:"grift", receipts:["shop-3","bg-3"], why:"the link in bio sells an 'AI-proof your career' course — the product needs the panic to be true"},
+    planted:{tell:"grift", receipts:["shop-3","lk-3-a"], why:"the link in bio sells an 'AI-proof your career' course — the product needs the panic to be true"},
     media:{image_url:"https://cms.interestingengineering.com/wp-content/uploads/2026/09/ai-humanoids.jpg",
            source_icon:"https://i.newsdata.io/interestingengineering.png", source_url:"https://interestingengineering.com", domain:"interestingengineering.com", outlet:"Interesting Engineering"},
     article:{headline:"7 humanoid robot makers taking over real-world factories", url:"https://interestingengineering.com/ai-robotics/top-7-ai-humanoid-robot-companies",
@@ -1800,9 +1856,17 @@ var CLAIMS = [
     background:{ funding:[{k:"Who's behind it", v:"Run by two anonymous tech bloggers, per their own FAQ page"},{k:"How it makes money", v:"Affiliate links in bio and ad revenue"},{k:"Paid posts tagged?", v:"No paid tags found in recent posts"}],
           handle:"@FutureShockNow", displayName:"Future Shock Now", bio:"🤖 tech that's coming for your job (allegedly) | tips welcome | 🔗 AI-proof yourself below",
           verified:false, followers:"612K", following:"301", posts:"4,110", joined:"Joined Jan 2021",
+          lookup:[
+            {kind:"stats", fav:"📊", site:"CreatorTrack", url:"creatortrack.io › futureshocknow", chip:"Creator stats",
+             title:"Future Shock Now — account stats and history", snip:"Its most-clicked link is a $149 'AI-Proof Your Career' course. Posts about robots taking jobs spike the week a new course opens.",
+             receipt:"the account sells a $149 course on the same fear the post spreads"},
+            {kind:"news", fav:"⭐", site:"CourseCheck", url:"coursecheck.com › reviews", chip:"Review site",
+             title:"AI-Proof Your Career review: 2.8★ from 214 buyers", snip:"Buyers say most of the course repeats the creators' free videos. Several say refunds took weeks."},
+            {kind:"reddit", sub:"r/cscareerquestions", user:"u/segfault_sally", ago:"2w", up:"1.9k", com:402,
+             title:"Is Future Shock Now worth following or is it just doom?", top:["u/old_plc_guy", "Robots are coming for some jobs, sure. Doesn't mean you need his $149 course."]}],
           shop:{url:"linktr.ee/futureshocknow", links:[{t:"🎬 Watch: the robot takeover, explained", hot:false},{t:"🎓 AI-PROOF YOUR CAREER — the course", hot:true},{t:"📩 Join 30K on the newsletter", hot:false}],
                 item:{name:"AI-Proof Your Career (video course)", pitch:"\"Before a robot takes your shift\" · 4.9★", price:"$149"}}}},
-  {id:4, subject:"Brands", topic:"Apple's always-listening AI", hue:335, sourceUrl:"x.com/techalertsnow/status/77012", wired:true,
+  {id:4, subject:"Brands", topic:"Apple's always-listening AI", searchQuery:"apple ai always listening", hue:335, sourceUrl:"x.com/techalertsnow/status/77012", wired:true,
     hook:"Is Apple actually building an always-on, always-listening AI — or is this describing a much more limited feature everyone's skipping past?",
     npcVotes:{maya:"misinfo", diego:"misinfo", priya:"biased"},
     headline:"🚨 BREAKING: Apple's new AI is being built to listen to you ALL DAY, even when you're not asking it anything. Share this now before it's buried.",
@@ -1820,13 +1884,20 @@ var CLAIMS = [
     background:{ funding:[{k:"Who's behind it", v:"No owner named anywhere on the page"},{k:"How it makes money", v:"Ad revenue from post engagement"},{k:"Paid posts tagged?", v:"No paid tags found in recent posts"}],
           handle:"@TechAlertsNow", displayName:"Tech Alerts Now", bio:"📱 breaking tech news before your feed catches up | tips welcome",
           verified:false, followers:"612K", following:"94", posts:"14,320", joined:"Joined Jan 2021",
+          lookup:[
+            {kind:"stats", fav:"📊", site:"CreatorTrack", url:"creatortrack.io › techalertsnow", chip:"Creator stats",
+             title:"Tech Alerts Now — account stats and history", snip:"Posts about 40 times a day. Around 1 in 5 posts is deleted within a week. Most posts rewrite other sites' headlines."},
+            {kind:"news", fav:"✓", site:"NewsGrade", url:"newsgrade.org › ratings", chip:"Media rater",
+             title:"Tech Alerts Now: not rated — no named staff, no corrections", snip:"We couldn't find an editor, an address or a corrections page. Posts rarely link to where the news came from."},
+            {kind:"reddit", sub:"r/apple", user:"u/lightning_port", ago:"6d", up:"742", com:188,
+             title:"Tech Alerts Now broke the foldable news first, give them credit", top:["u/mag_safe_mike", "Broke it by copying a blog post 20 minutes later lol"]}],
           versions:{label:"this claim · 4 tries this month", rows:[
             {t:"Apple testing a Siri that doesn't need 'Hey Siri'", d:"Sep 2", n:"380", w:3},
             {t:"Apple's next Siri might <mark>listen more</mark> 👀", d:"Sep 6", n:"9.1K", w:12},
             {t:"Apple AI will <mark>listen ALL DAY</mark> 😳", d:"Sep 10", n:"2.1M", w:40},
             {t:"🚨 BREAKING: … <mark>listen to you ALL DAY</mark> … Share this now", d:"Sep 13 · pinned", n:"14M", w:100, win:true}],
             correction:{who:"@TechAlertsNow (creator)", text:"ok it still needs you to talk to it first, but the point stands 🙃", likes:"212", views:"14M", edited:"No"}}}},
-  {id:5, subject:"Health", topic:"a Tylenol study", hue:150, sourceUrl:"x.com/healthlinereport/status/66018", wired:true,
+  {id:5, subject:"Health", topic:"a Tylenol study", searchQuery:"tylenol pregnancy study daughters", hue:150, sourceUrl:"x.com/healthlinereport/status/66018", wired:true,
     hook:"It's an early animal study, not a human trial — worth checking how the researchers themselves describe its limits before assuming it applies to people.",
     npcVotes:{maya:"true", diego:"true", priya:"biased"},
     // STRAIGHT — the green. The account reports the study the way the study reports itself.
@@ -1842,7 +1913,15 @@ var CLAIMS = [
              receipt:"the article carries the limits the post carries"},
     background:{ funding:[{k:"Who's behind it", v:"A digital health-news outlet; editorial staff listed on its masthead"},{k:"How it makes money", v:"Display advertising and a subscriber newsletter"},{k:"Paid posts tagged?", v:"Sponsored content is labeled when it runs"}],
           handle:"@HealthLineReport", displayName:"HealthLine Report", bio:"Health & medical research news, plain-language summaries with links to the original studies",
-          verified:true, followers:"612K", following:"240", posts:"8,102", joined:"Joined Jan 2015"}}
+          verified:true, followers:"612K", following:"240", posts:"8,102", joined:"Joined Jan 2015",
+          lookup:[
+            {kind:"stats", fav:"W", site:"Wikipedia", url:"en.wikipedia.org › HealthLine_Report", chip:"Encyclopedia",
+             title:"HealthLine Report — Wikipedia", snip:"HealthLine Report is an American digital health-news outlet founded in 2015. Its editors and medical reviewers are listed on its website.",
+             receipt:"named editors, labeled sponsorships — the bio checks out"},
+            {kind:"news", fav:"✓", site:"NewsGrade", url:"newsgrade.org › ratings", chip:"Media rater",
+             title:"HealthLine Report: rated mostly factual", snip:"Links to the original study in almost every story. Headlines sometimes run ahead of the findings. Publishes corrections."},
+            {kind:"reddit", sub:"r/medicine", user:"u/tired_resident", ago:"8mo", up:"312", com:88,
+             title:"HealthLine Report headlines are pure clickbait", top:["u/pharmD_lurker", "Headlines are hype, sure, but they link the actual paper every time. Read past the headline."]}]}}
 ];
 CLAIMS.forEach(function(c){ c.source = c.background.handle; });
 var DEFAULT_FEED_SIZE = 5;
@@ -1886,7 +1965,7 @@ var TELLS = [
   {key:"feel",       name:"It's written to make you feel it",               emoji:"\ud83c\udf36", kind:"red", where:"card", spoke:"post",
    q:"How does this make me feel? Do I want it to be true?", desc:"A charged word where a plain one would do, wording bigger than the story, someone to blame with nothing to check. The receipt is the article\u2019s plainer wording next to the post."},
   {key:"grift",       name:"Somebody gets paid if I believe it",             emoji:"\ud83d\udcb8", kind:"red", where:"dig", spoke:"background",
-   q:"Is this account selling something \u2014 a product, a course, a vibe?", desc:"Check the money panel and the link in bio. A product that only makes sense if the post is true is the receipt."},
+   q:"Is this account selling something \u2014 a product, a course, a vibe?", desc:"Look the account up and check the link in bio. A product that only makes sense if the post is true is the receipt."},
   {key:"viral",      name:"It's made to go viral",                         emoji:"\ud83d\udce3", kind:"red", where:"dig", spoke:"background",
    q:"Is this trying to get shared, or trying to be true?", desc:"BREAKING, stop scrolling, \u2018I wasn\u2019t going to post this\u2019, rage bait \u2014 a wrapper that would work on any story. The receipt is the account\u2019s version history: the wildest version is the one that got pinned."},
   {key:"coordination", name:"Everyone started saying it at the same time",    emoji:"\ud83d\udd01", kind:"red", where:"dig", spoke:"search",
@@ -1964,7 +2043,7 @@ var CLIPS = {
             claim:"\"Factories are swapping workers for humanoid robots.\"", body:"We asked all seven companies on the list. Five answered. Most run pilot programs: a few dozen robots at one plant, moving bins and parts. None reported layoffs tied to the robots.", links:[{t:"Interesting Engineering list", d:"Sep 13"},{t:"Company answers (5 of 7)", d:"PDF"},{t:"U.S. factory jobs data", d:"Aug 2026"}]}},
     {id:"vid-3", look:"creator", who:"Video", kind:"video", name:"@dee.on.the.line", text:"@dee.on.the.line films the one humanoid robot at her plant. It carries bins behind a fence marked PILOT AREA.",
       vid:{handle:"@dee.on.the.line", name:"Dee", caption:"everyone keeps asking so here's THE robot at our plant. one. it moves bins. that's the whole job.", views:"212K", ago:"2d", shows:"A humanoid robot carrying a bin behind a yellow safety fence. A sign on the fence reads PILOT AREA.", hue:265}},
-    {id:"3d", text:"A post amplifying the claim with a stock photo of a robot that doesn't match any real factory.", who:"Can't tell — bot or AI?", detail:"Account has no posting history before this week.", tell:null},
+    {id:"3d", text:"Factories are already full of these robots, look at this 😳", who:"Can't tell — bot or AI?", detail:"That photo is a stock render, not a real factory. OP's account has no posts before this week.", tell:null},
     {id:"3ai1", text:"A handful of companies are piloting humanoid robots in specific tasks — that's very different from robots already running factories broadly.", who:"AI assistant", detail:null, tell:null, source:"ai"},
     {id:"3ai2", text:"Humanoid robots in manufacturing are a real and growing trend, but current deployment is small-scale and experimental, not a full workforce swap yet.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
@@ -1977,7 +2056,7 @@ var CLIPS = {
             claim:"\"Apple's new AI will listen to you all day.\"", body:"Experts agree that phones already listen more than companies admit. Insiders say the new AI will go even further. Many users report ads for things they only talked about.", links:[]}},
     {id:"vid-4", look:"creator", who:"Video", kind:"video", name:"@jess.unplugged", text:"@jess.unplugged: \"my mom talked about cat food ONE time and got cat food ads. they're already listening.\"",
       vid:{handle:"@jess.unplugged", name:"Jess", caption:"my mom talked about cat food ONE time and got cat food ads the next day. they're already listening. turn it all off.", views:"640K", ago:"1d", shows:"Jess talking to the camera, holding up her phone.", hue:335}},
-    {id:"4d", text:"An account reposting the claim with 'BREAKING' added; original source unclear.", who:"Can't tell — bot or AI?", detail:"Created three weeks ago, mostly reposts.", tell:null},
+    {id:"4d", text:"BREAKING: Apple's AI is going to listen to you ALL DAY", who:"Can't tell — bot or AI?", detail:"No link, no source. OP made this account three weeks ago and only reposts.", tell:null},
     {id:"4ai1", text:"There's no confirmed Apple feature that records audio constantly all day — reports describe optional, activation-based listening, not passive surveillance.", who:"AI assistant", detail:null, tell:null, source:"ai"},
     {id:"4ai2", text:"Voice assistants have always required some form of activation to avoid battery and privacy issues; always-listening AI would be a major shift Apple hasn't announced.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ],
@@ -1993,7 +2072,7 @@ var CLIPS = {
             claim:"\"A study links Tylenol in pregnancy to changes in daughters' reproductive organs.\"", body:"That is what the study found, in rats. Animal studies show where to look next. They cannot show the same thing happens in people. Guidance for pregnant patients has not changed.", links:[{t:"The study", d:"Sep 9"},{t:"Obstetricians' group guidance", d:"2025"},{t:"FDA page on acetaminophen", d:"updated 2026"}]}},
     {id:"vid-5", look:"creator", who:"Video", kind:"video", name:"@nursing.with.sam", text:"@nursing.with.sam holds up the printed study and reads the limits section out loud.",
       vid:{handle:"@nursing.with.sam", name:"Sam · nursing student", caption:"reading the actual Tylenol study so you don't have to panic. page 9, the limits section. it's rats.", views:"88K", ago:"1d", shows:"Sam holding the printed study up to the camera. The line about rats is highlighted.", hue:150}},
-    {id:"5d", text:"A repost of the headline with 'doctors don't want you to know this' added.", who:"Can't tell — bot or AI?", detail:"Account has no history before this week.", tell:null},
+    {id:"5d", text:"Doctors don't want you to know this about Tylenol in pregnancy", who:"Can't tell — bot or AI?", detail:"OP didn't link the study, and the account has no posts before this week.", tell:null},
     {id:"5ai1", text:"This is an animal study, so it can suggest a biological pathway worth studying further, but it can't confirm the same effect happens in humans.", who:"AI assistant", detail:null, tell:null, source:"ai"},
     {id:"5ai2", text:"Acetaminophen safety in pregnancy has been studied for decades with mixed findings — this adds one data point, not a final answer.", who:"AI assistant", detail:null, tell:null, source:"ai"}
   ]
@@ -2022,7 +2101,7 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-09-22 · phones catch up";
+var BUILD = "2026-09-28 · the full picture (multiplayer)";
 var revealState = {active:false, order:[], index:0};
 // ---------------- TRIAGE (8/31/2026) ----------------
 // Replaces the old "you may only investigate what you disagreed about" gate. The table
@@ -2191,7 +2270,8 @@ function endStats(){
     var r = getReach(c.id);
     var b = getBoard(c.id);
     return {id:c.id, headline:c.headline, subject:c.subject,
-            peak:r.peak||0, shares:Math.round(r.shares||0), looseMs:r.looseMs, note:r3NoteText(b)};
+            peak:r.peak||0, shares:Math.round(r.shares||0), looseMs:r.looseMs, note:r3NoteText(b),
+            clues:(b.board||[]).length, cited:((b.r3 && b.r3.note && b.r3.note.cites) || []).length};
   }).sort(function(a,b){ return b.shares - a.shares; });
   var totalShares = 0, looseSum = 0, looseN = 0, maxShares = 1;
   rows.forEach(function(r){
@@ -2224,40 +2304,41 @@ function renderEndScreen(){
   var html = '<div class="endwrap"><div class="endscroll">';
   html += '<div class="endhero">';
   html += '<div class="endkicker">Session complete</div>';
-  html += '<div class="endtitle">Your cases are filed.</div>';
+  html += '<div class="endtitle">You got the full picture.</div>';
   html += '<div class="endsub">' + s.contestedN + ' ' + (s.contestedN===1?'story':'stories') + ' closed in ' +
           fmtDuration(s.sessionMs) + ', start to finish' +
           (s.leftN>0 ? '. The other ' + s.leftN + ' are still out there' : '') +
-          ' — here\'s how far it all got.</div>';
+          ' — here\'s what your team found.</div>';
   html += '</div>';
 
   // 1. The meter they've watched all session, finally all the way green. It animates
   //    from wherever it stood just before the last case was filed, so the ending is a
   //    movement they can see, not a static 100%.
   html += '<div class="endcard">';
-  html += '<div class="endcardtag">'+(s.leftN>0 ? 'Where the feed landed' : 'The feed is quiet')+'</div>';
+  html += '<div class="endcardtag">'+(s.leftN>0 ? 'Your feed, read together' : 'Every story, read together')+'</div>';
   html += '<div class="endbar"><div class="r" id="endbar-r" style="width:' + sessionState.lastLiveRedPct + '%"></div>' +
           '<div class="g" id="endbar-g" style="width:' + (100 - sessionState.lastLiveRedPct) + '%"></div></div>';
-  html += '<div class="endbarkeys"><span style="color:var(--ios-label3);">' + s.leftN + ' still spreading</span>' +
-          '<span style="color:var(--ios-green);">' + s.filedN + ' contained</span></div>';
+  html += '<div class="endbarkeys"><span style="color:var(--ios-label3);">' + s.leftN + ' not looked at</span>' +
+          '<span style="color:var(--ios-green);">' + s.filedN + ' with your note on it</span></div>';
   html += '</div>';
 
   // 2. ...but it wasn't free. What the stories collected on the way to being stopped.
+  // 9/28: what the team DID, not what the stories cost.
+  var cluesN = s.rows.reduce(function(a, r){ return a + (r.clues||0); }, 0), citedN = s.rows.reduce(function(a, r){ return a + (r.cited||0); }, 0);
   html += '<div class="endcard">';
-  html += '<div class="endcardtag">Before you stopped it</div>';
-  html += '<div class="endbignum">' + formatCount(s.totalShares) + '<span class="endbigunit">shares</span></div>';
-  html += '<div class="endbigsub">collected while these stories sat un-filed. Average time from "we\'re taking this one" to "case filed": ' +
-          fmtDuration(s.avgLooseMs) + '. Every second of that was reach.</div>';
+  html += '<div class="endcardtag">What your team did</div>';
+  html += '<div class="endbignum">' + cluesN + '<span class="endbigunit">clues pinned</span></div>';
+  html += '<div class="endbigsub">' + s.filedN + ' ' + (s.filedN===1?'note':'notes') + ' written and rated, backed by ' + citedN + ' cited ' + (citedN===1?'source':'sources') + '. Nobody handed you an answer key — you worked it out together.</div>';
   html += '</div>';
 
+  var cluesMax = s.rows.reduce(function(a, r){ return Math.max(a, r.clues||0); }, 1);
   html += '<div class="endcard"><div class="endcardtag">Story by story</div>';
   s.rows.forEach(function(r, i){
-    var pct = Math.max(3, Math.round(100*r.shares/s.maxShares));
+    var pct = Math.max(3, Math.round(100*(r.clues||0)/Math.max(1, cluesMax)));
     html += '<div class="endrow' + (i===0?' first':'') + '"><div class="endrank">' + (i+1) + '</div><div class="endrowmain">';
     html += '<div class="endrowhead">' + r.headline + '</div>';
     html += '<div class="endrowbar"><span data-w="' + pct + '"></span></div>';
-    html += '<div class="endrowmeta">' + formatCount(r.shares) + ' shares' +
-            (r.looseMs!=null ? ' · loose ' + fmtDuration(r.looseMs) : '') + '</div>';
+    html += '<div class="endrowmeta">' + (r.clues||0) + ' ' + ((r.clues||0)===1?'clue':'clues') + ' pinned · ' + (r.cited||0) + ' cited in the note</div>';
     // Was "Filed as 🚩 Misinfo" — a determination that no longer exists. The note's own
     // line is both truer and more legible: it says what the table concluded, in their words.
     if(r.note) html += '<div class="endrowverdict">📝 ' + r.note + '</div>';
@@ -2265,13 +2346,6 @@ function renderEndScreen(){
   });
   html += '</div>';
 
-  if(worst){
-    html += '<div class="endcard"><div class="endcardtag">Travelled furthest</div>';
-    html += '<div class="endrowhead" style="margin-bottom:9px;">' + worst.headline + '</div>';
-    html += '<div class="endnote">It was the loudest thing on your feed' +
-            (worst.looseMs!=null ? ' for ' + fmtDuration(worst.looseMs) : '') +
-            '. Nothing about it was truer than the rest — it just sat longer.</div></div>';
-  }
   if(s.skippedN > 0){
     html += '<div class="endcard"><div class="endcardtag">Never called</div>';
     html += '<div class="endnote">' + s.skippedN + ' ' + (s.skippedN===1?'story':'stories') +
@@ -2284,8 +2358,7 @@ function renderEndScreen(){
   if(s.leftN > 0){
     html += '<div class="endcard"><div class="endcardtag">Still out there</div>';
     html += '<div class="endnote">' + s.leftN + ' ' + (s.leftN===1?'story':'stories') +
-            ' never got looked at, so nothing happened to ' + (s.leftN===1?'it':'them') +
-            ' \u2014 ' + (s.leftN===1?'it\'s':'they\'re') + ' still going. Worth saying out loud now that it\'s over: was leaving ' +
+            ' never got looked at \u2014 ' + (s.leftN===1?'it\'s':'they\'re') + ' still in the feed with nobody\'s context on ' + (s.leftN===1?'it':'them') + '. Worth saying out loud now that it\'s over: was leaving ' +
             (s.leftN===1?'it':'them') + ' the same thing as ' + (s.leftN===1?'it':'them') + ' being fine?</div></div>';
   }
 
@@ -2299,8 +2372,9 @@ function renderEndScreen(){
   // bar grows in, instead of the whole report arriving pre-settled.
   setTimeout(function(){
     var r = document.getElementById("endbar-r"), g = document.getElementById("endbar-g");
-    if(r) r.style.width = "0%";
-    if(g) g.style.width = "100%";
+    var gp = Math.round(100 * s.filedN / Math.max(1, s.filedN + s.leftN));   // 9/28: the share read together
+    if(r) r.style.width = (100 - gp) + "%";
+    if(g) g.style.width = gp + "%";
     var bars = document.querySelectorAll(".endrowbar span");
     for(var i=0;i<bars.length;i++){ bars[i].style.width = (bars[i].getAttribute("data-w")||0) + "%"; }
   }, 90);
@@ -2348,6 +2422,9 @@ CLAIMS.forEach(function(claim){
   if(b.shop) CLIPS[claim.id].push({id:"shop-"+claim.id, look:"shop", source:"background", who:"Link in bio", text:b.handle+"'s link in bio: "+b.shop.item.name+" ("+b.shop.item.price+") — "+b.shop.item.pitch, detail:b.shop.url, tell:tellFor("shop-"+claim.id), receipt:"the product needs the post to be true"});
   if(b.versions) CLIPS[claim.id].push({id:"ver-"+claim.id, look:"versions", source:"background", who:"Version history", text:b.handle+" posted this claim "+b.versions.rows.length+" ways this month; the wildest one is pinned ("+b.versions.rows[b.versions.rows.length-1].n+" views).", detail:"A correction sits in the comments ("+b.versions.correction.likes+" likes); the post was never edited.", tell:tellFor("ver-"+claim.id), receipt:b.versions.rows.length+" tries — the wildest one got pinned"});
 });
+
+// 9/28 Look them up: every account's search results, as ordinary clues (see lookupClipsFor).
+CLAIMS.forEach(function(claim){ lookupClipsFor(claim).forEach(function(c){ CLIPS[claim.id].push(c); }); });
 
 var clipState = {};
 Object.keys(CLIPS).forEach(function(id){
@@ -2512,11 +2589,11 @@ function P(id){ return PLAYERS.filter(function(p){ return p.id===id; })[0]; }
 // lost." Three rounds, every header: 1 Gut check · 2 Investigation · 3 Community note, the
 // current one lit, the ones behind it ticked. Variants: "top" (Round 1 bar), "head" (card
 // back head), "kick" (above a beat's kick line), "full" (a full-screen door).
-var ROUND_NAMES = ["Gut check", "Investigation", "Community note"];
+var ROUND_NAMES = ["Gut check", "Investigation", "Community note"];   // 9/28: "Headline check" tried and reverted (too long) — Tara
 // Tara 9/14 (after playing): "a better information hierarchy for round 1, 2, 3" → the ROUND
 // TITLE is the headline of every screen, its job in one line, and the 1-2-3 strip sits under
 // it, smaller. roundHead() = that block; roundStrip() alone is the small strip.
-var ROUND_JOBS = ["Trust your gut on every post.", "Find the clues your community note needs.", "Write what actually happened."];
+var ROUND_JOBS = ["How straight is each headline with you?", "Find the clues your community note needs.", "Write what actually happened."];
 function roundHead(now, variant, job){
   return '<div class="rhead '+(variant||"")+'"><div class="rtitle">Round '+now+' · '+ROUND_NAMES[now-1]+'</div>'+(job===false ? '' : '<div class="rjob">'+escapeHtml(job || ROUND_JOBS[now-1])+'</div>')+roundStrip(now, variant)+'</div>';
 }
@@ -2965,6 +3042,14 @@ function wireInvestigationData(claimsArr){
       CLIPS[claim.id].push({ id:"bg-"+claim.id, source:"background",
         text: b.displayName+" ("+b.handle+") — "+b.followers+" followers · "+b.joined, detail:null, tell:null });
     }
+    // 9/28 Look them up: every account gets its lookup — the authored three when the row has
+    // background.lookup, otherwise the top result built from its funding rows. A grift receipt
+    // that named the old money panel ("bg") moves to that top result, off the profile.
+    if(!CLIPS[claim.id].some(function(c){ return c.look==="lookup"; })){
+      lookupClipsFor(claim).forEach(function(c){ CLIPS[claim.id].push(c); });
+      var pl = claim.planted;
+      if(pl && pl.tell==="grift") CLIPS[claim.id].forEach(function(c){ if(c.id==="bg-"+claim.id) c.tell = null; });
+    }
   });
   Object.keys(CLIPS).forEach(function(id){
     CLIPS[id].forEach(function(c){
@@ -3178,7 +3263,7 @@ function renderRound1Start(){
   var html = '<div class="r1start">';
   html += '<div class="r1startbadge">ROUND 1</div>';
   html += '<div class="r1starttitle">Gut Check</div>';
-  html += '<div class="r1startsub">'+CLAIMS.length+' stories, one shared 60-second clock. Red, yellow, or green — go with your gut on each one before time runs out.</div>';
+  html += '<div class="r1startsub">'+CLAIMS.length+' stories, one shared 60-second clock. Red, yellow, or green — call how straight each headline is before time runs out.</div>';
   html += '<div class="r1starthint">Getting your team ready…</div>';
   html += '</div>';
   document.getElementById("screenArea").innerHTML = html;
@@ -3432,7 +3517,6 @@ function renderFeedCard(claim, justSorted, idx){
   if(roundState.ended && status==="agreed"){
     html += '<div class="railitem"><span class="railicon">✅</span><span class="raillabel agreed">same call</span></div>';
   }
-  html += '<div class="raildisc">🎵</div>';
   html += '</div>';
 
   // Corner action cluster — the story's two spokes, always visible together once
@@ -3573,6 +3657,10 @@ function renderCardBack(claim, variant){
     // One way back — to the case — and no other tabs.
     html += '<div class="cardback-backlink" onclick="setCardMode('+claim.id+',\'case\')">← Back to the case</div>';
     html += renderClaimBackground(claim);
+  } else if(board.filed && mode==="lookup"){
+    // 9/28: the lookup stays readable after filing, like the profile it came from.
+    html += '<div class="cardback-backlink" onclick="setCardMode('+claim.id+',\'background\')">← Back to their profile</div>';
+    html += renderClaimLookup(claim);
   } else if(board.filed){
     // Case closed — land straight on the (read-only) board/receipt, no menu
     // or tabs to get lost in. Search/Ask AI aren't reachable post-filing.
@@ -3597,14 +3685,15 @@ function renderCardBack(claim, variant){
     html += renderCaseFile(claim);
   } else {
     // A tool — a whole screen, one way back. The 🗂️ count is the only trace of home.
-    var backTo = (mode==="article" || mode==="clue") ? "search" : "case";
-    html += '<div class="cardback-navback" onclick="setCardMode('+claim.id+',\''+backTo+'\')"><span class="chev">\u2039</span> Back<span class="cnt">Clues '+nEx+' of '+needEx+'</span></div>';
+    var backTo = (mode==="article" || mode==="clue") ? "search" : (mode==="lookup" ? "background" : "case");
+    html += '<div class="cardback-navback" onclick="setCardMode('+claim.id+',\''+backTo+'\')"><span class="chev">\u2039</span> '+(mode==="lookup" ? "Back to their profile" : "Back")+'<span class="cnt">Clues '+nEx+' of '+needEx+'</span></div>';
     html += qHeadHTML(mode);
     if(mode==="search") html += renderClaimSearch(claim);
     else if(mode==="ai") html += renderClaimAI(claim);
     else if(mode==="evidence") html += renderClaimEvidence(claim);
     else if(mode==="article") html += renderClaimArticle(claim);
     else if(mode==="clue") html += renderClaimClue(claim);
+    else if(mode==="lookup") html += renderClaimLookup(claim);
     else html += renderClaimBackground(claim);
   }
   html += '</div>';
@@ -3612,6 +3701,11 @@ function renderCardBack(claim, variant){
   // button under the case file, grey until the minimum, and the PLAYER ends Round 2 —
   // the gate no longer fires itself at four. The B18 question isn't asked a second time:
   // the button is that decision.
+  // 9/28 (Brian): what's next should be obvious wherever you are — once the note can be
+  // written, the button rides along on every tool screen too, not just the case file's foot.
+  if(homeMode && mode!=="case" && canGo){
+    html += '<div class="cardback-foot compact"><button class="readybtn'+(enough?' pulse':'')+'" onclick="readyForNote('+claim.id+')">Write our note \u2192</button></div>';
+  }
   if(homeMode && mode==="case"){
     html += '<div class="cardback-foot">';
     var tapped = roomCode && r3ReadyTapped(claim.id, MY_ID), waitingOn = tapped ? r3ReadyWaiting(claim.id) : [];
@@ -3649,7 +3743,7 @@ function renderToolPills(claim){
   return html + '</div>';
 }
 var Q_HEADS = {
-  background:["\ud83d\udd75\ufe0f","Who\u2019s behind it?","Who runs this account? Do they get anything if you believe it?"],
+  background:["\ud83d\udd75\ufe0f","Who\u2019s behind it?","Read how they describe themselves. Then look them up \u2014 does anyone else say the same?"],
   evidence:["\ud83e\uddfe","What\u2019s the evidence?","What does the post show you? Does it prove what the post says?"],
   search:["\ud83d\udd0d","What do other sources say?","Look for the same story somewhere else. Do sources you trust report it?"],
   ai:["\u2728","What does AI say?","AI isn\u2019t a source. Check what it\u2019s based on before you trust it."]
@@ -3691,7 +3785,7 @@ function renderPostBlock(claim){
 function renderCaseFile(claim){
   var b = getBoard(claim.id), need = BOARD_TOUR_EVIDENCE_THRESHOLD;
   // 9/16: the clue list reads as the note being built — its sources, before the words.
-  var html = '<div class="notecue"><div class="nk">\u24d8 Your community note <span class="cnt">'+b.board.length+' of '+need+' clues</span></div><div class="ng">Your team writes it in Round 3, using the clues pinned here.</div></div>';
+  var html = '<div class="notecue"><div class="nk">\u24d8 Your community note <span class="cnt">'+b.board.length+' of '+need+' clues</span></div><div class="ng">This list is the whole team\u2019s \u2014 everyone\u2019s pins land here. Your team writes the note from them in Round 3.</div></div>';
   // 9/16: with a board on the laptop, the clue list lives there — the phone doesn't repeat it.
   if(boardVisible()) return html + '<div class="boardptr">\ud83d\udccc Your clues are on the board. Flag weak ones there.</div>';
   html += '<div class="groupcard">';
@@ -3839,9 +3933,20 @@ function redditHTML(claim, clip){
          (clip.detail ? '<div class="rdt-c"><span class="cu">'+escapeHtml(["u/mod_note","u/lurker_since_09","u/checks_things"][r.com%3])+'</span> '+escapeHtml(clip.detail)+'</div>' : '')+'</div>';
 }
 // The query a player would plausibly have typed, from the post's headline.
+// 9/28 (Tara, 9/22 play): the query must read like something a person TYPED, not the headline
+// chopped mid-sentence. An authored `searchQuery` wins; otherwise build one from the story's real
+// headline (or the post's) — hype and filler out, the first six content words, lowercase.
+var SEARCH_STOP = ("a an the and or but of to in on for with at by from as is are was were be been this that these those it its "+
+  "they them their there here now right just so very really already rn new see says said say share breaking stop scrolling "+
+  "everyone everyones nobody nobodys doing quietly how why what who when where which may might could will would can "+
+  "you your yours i me my we our us he she his her not no yes up out over into about after before than then more most have has had against get gets taking issued").split(" ");
 function searchQueryFor(claim){
-  var h = claim.headline.toLowerCase().replace(/<[^>]+>/g, "");
-  return h.replace(/[^\w\s'-]/g,"").split(/\s+/).filter(Boolean).slice(0,9).join(" ");
+  if(claim.searchQuery) return escapeHtml(claim.searchQuery);
+  var src = (claim.article && claim.article.headline) || claim.headline || "";
+  var words = src.replace(/<[^>]+>/g, "").toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9\s-]/g, " ").split(/\s+/)
+    .filter(function(w){ return w && w.length > 1 && SEARCH_STOP.indexOf(w) < 0 && !/^\d{1,2}$/.test(w); });
+  var seen = {}; words = words.filter(function(w){ if(seen[w]) return false; seen[w] = 1; return true; });
+  return escapeHtml(words.slice(0, 6).join(" "));
 }
 var caseToastShown = false, caseToastTimer = null;
 // Taught once, at the moment it makes sense, then never again — see .casetoast.
@@ -3874,6 +3979,8 @@ function addToBoard(claimId, clipId){
 function renderClaimAI(claim){
   var html = '<div class="aihdr"><div class="aimark">\u2728</div><div><div class="ainame">Ask AI</div>'
            + '<div class="aisub">answers can be wrong \u2014 check them</div></div></div>';
+  // 9/28 (Brian): make "AI can be wrong" the first thing on the screen, not the small print.
+  html += '<div class="aiwarn"><b>\u26a0\ufe0f AI can be confidently wrong.</b> It doesn\u2019t check facts, and it may not know this story. Treat what it says as a lead, then check it.</div>';
   html += '<div class="aiuser">Is this true? "'+claim.headline+'"</div>';
   if(!aiRevealed[claim.id]){
     html += '<div class="airow"><div class="aiav">\u2728</div><div class="aitxt typingdots">\u25cf \u25cf \u25cf</div></div>';
@@ -3901,6 +4008,8 @@ function renderClaimAI(claim){
   return html;
 }
 
+// (9/28: the money panel below is no longer drawn on the profile — its rows are the facts table
+// on the lookup's top result. renderFundingPanel is kept for reference only.)
 // "Who's really behind this post" — a short account snapshot per claim (flags +
 // a one-line note), injected into CLIPS as a source:"background" item so it can be
 // marked as evidence and shows up on the shared board exactly like any other exhibit.
@@ -3927,7 +4036,10 @@ function renderClaimBackground(claim){
   // with this account" callouts. Whatever's worth noticing (a suspiciously young
   // account, a bio that undercuts its own authority, a link-in-bio incentive) has to
   // be read off the profile itself, same as it would on the real platform.
-  var html = '<div class="profilecard">';
+  // 9/28 (Joel via Tara): the profile is the account's OWN claims — named as such — and the way
+  // to check them is to leave the page. The money panel moved into the lookup's top result.
+  var html = '<div class="selfhead"><span class="q">💬</span> How they describe themselves</div>';
+  html += '<div class="profilecard">';
   html += '<div class="profileavatar" style="background:linear-gradient(160deg, hsl('+claim.hue+',55%,42%), hsl('+claim.hue+',55%,22%));">'+b.displayName.charAt(0)+'</div>';
   html += '<div class="profilename">'+b.displayName+(b.verified?' <span class="profilebadge">✔️</span>':'')+'</div>';
   html += '<div class="profilehandle">'+b.handle+'</div>';
@@ -3938,19 +4050,94 @@ function renderClaimBackground(claim){
   });
   html += '</div>';
   html += '<div class="profilejoined">📅 '+b.joined+'</div>';
-  html += renderFundingPanel(b);
   html += '</div>';
-  if(!s.shared){
-    html += '<div class="rowctrl" style="margin-top:12px;"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clipId+'\')">📌 Pin it</button></div>';
-  } else {
-    html += '<div class="resolvedtext" style="margin-top:12px;"><span>✓ Pinned</span></div>';
-  }
+  var filed = getBoard(claim.id).filed;
+  html += '<div class="lkprompt">Ever heard of '+escapeHtml(b.displayName||b.handle)+' before? Either way, don\u2019t take their word for it.</div>';
+  html += '<div class="rowctrl lkactions"><button class="btnfilled lookbtn" onclick="setCardMode('+claim.id+',\'lookup\')">Look them up →</button>';
+  if(s.shared) html += '<span class="lkpinned">✓ Pinned</span>';
+  else if(!filed) html += '<button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+clipId+'\')">📌 Pin it</button>';
+  html += '</div>';
   // Track F: what's BEHIND the profile — the link in bio (tell 2's receipt) and the account's
-  // other tries at this claim (tell 3's receipt). Read off the account, same as the money panel.
+  // other tries at this claim (tell 3's receipt). Both are the account's own pages, so they stay
+  // on the profile (9/28 build call); only the money panel moved out to the lookup.
   var shop = clipById(claim.id, "shop-"+claim.id), ver = clipById(claim.id, "ver-"+claim.id);
   if(shop){ html += '<div class="sectionhead" style="margin-top:18px;">🔗 Link in bio</div>'+phoneReceiptHTML(claim, shop); }
   if(ver){ html += '<div class="sectionhead" style="margin-top:18px;">🕘 This claim, this month</div>'+phoneReceiptHTML(claim, ver); }
   return html;
+}
+
+// ---------------- LOOK THEM UP (9/28/2026) ----------------
+// Joel (via Tara): the background check should teach LATERAL reading — don't take an account's
+// word for itself, look it up somewhere else. "Look them up →" opens a new tab searching the
+// account's NAME (not the post's claim). The results are ordinary clues: 📌, Weak clue?, citable
+// in Round 3 — mixed strength, no answer key. EVERY account gets a lookup, honest ones included,
+// so having one gives nothing away. The money panel moved here: its three rows are the facts
+// table on the TOP result. Authored per account as background.lookup (stats/encyclopedia ·
+// news/media rater · reddit); an account without one (generated feeds, until the generator
+// writes them) still gets the top result, built from its funding rows.
+function lookupName(b){
+  var n = String(b.displayName || "").replace(/[^\p{L}\p{N}\s'.&-]/gu, "").replace(/\s+/g, " ").trim();
+  return n || String(b.handle || "").replace(/^@/, "");
+}
+function lookupClipsFor(claim){
+  var b = claim.background;
+  if(!b) return [];
+  var pl = claim.planted || {receipts:[]}, name = lookupName(b);
+  var src = (b.lookup && b.lookup.length) ? b.lookup : [{kind:"stats", fav:"📊", site:"CreatorTrack",
+    url:"creatortrack.io › "+String(b.handle||"").replace(/^@/, "").toLowerCase(), chip:"Creator stats",
+    title:name+" — account stats and history",
+    snip:[b.joined, b.posts ? b.posts+" posts" : "", b.followers ? b.followers+" followers" : ""].filter(Boolean).join(" · ")}];
+  return src.slice(0, 3).map(function(r, i){
+    var id = "lk-"+claim.id+"-"+"abc".charAt(i), facts = (i===0 && b.funding && b.funding.length) ? b.funding : null;
+    var tell = pl.receipts.indexOf(id)>=0 ? pl.tell : null;
+    // Generated feeds name the money panel ("bg") as the grift receipt. The money lives here now.
+    if(!tell && facts && pl.tell==="grift" && pl.receipts.indexOf("bg-"+claim.id)>=0) tell = "grift";
+    var receipt = r.receipt || (tell==="grift" && facts ? "how it makes money: "+facts[1].v : null);
+    return {id:id, look:"lookup", lk:r.kind, source:"background", who:"Look-up", kind:r.chip || (r.kind==="reddit" ? "Reddit" : "Search result"),
+      name: r.kind==="reddit" ? r.sub : r.site, fav:r.fav, site:r.site, url:r.url, title:r.title, snip:r.snip, facts:facts,
+      sub:r.sub, user:r.user, ago:r.ago, up:r.up, com:r.com, top:r.top,
+      text:r.title, detail: r.kind==="reddit" ? (r.top ? r.top[0]+" "+r.top[1] : "") : r.snip,
+      tell:tell, receipt:receipt};
+  });
+}
+function lookupCount(b){
+  var seed = 0; String(b.handle||"x").split("").forEach(function(ch){ seed = (seed*31 + ch.charCodeAt(0)) % 99991; });
+  return (12 + seed % 88) + "," + String(100 + seed % 900).slice(-3);
+}
+function lookupFactsHTML(facts){
+  if(!facts) return "";
+  return '<div class="lk-facts">'+facts.map(function(f){ return '<div class="lk-fr"><span class="k">'+escapeHtml(f.k)+'</span><span>'+escapeHtml(f.v)+'</span></div>'; }).join("")+'</div>';
+}
+function lookupRedditHTML(c){
+  return '<div class="rdt"><div class="rdt-top"><span class="ico"></span><span class="sub">'+escapeHtml(c.sub||"")+'</span> · Posted by '+escapeHtml(c.user||"")+' · '+escapeHtml(c.ago||"")+'</div>'+
+    '<div class="rdt-title">'+escapeHtml(c.title)+'</div><div class="rdt-stats"><span>⬆ '+escapeHtml(c.up||"")+'</span><span>💬 '+escapeHtml(c.com||"")+' comments</span></div>'+
+    (c.top ? '<div class="rdt-c"><span class="cu">'+escapeHtml(c.top[0])+'</span> '+escapeHtml(c.top[1])+'</div>' : '')+'</div>';
+}
+function lookupResultHTML(claim, c, filed){
+  var st = clipState[c.id] || {}, h = '<div class="sresult lkres">';
+  if(c.lk==="reddit") h += lookupRedditHTML(c);
+  else {
+    h += '<div class="ssite"><div class="sfav">'+escapeHtml(c.fav||"🔗")+'</div><div style="min-width:0"><div class="ssitename">'+escapeHtml(c.site||"")+'<small>'+escapeHtml(c.url||"")+'</small></div></div><span class="stype '+(c.lk==="news" ? "inst" : "plain")+'">'+escapeHtml(c.kind)+'</span></div>';
+    h += '<div class="stitle">'+escapeHtml(c.title)+'</div><div class="ssnip">'+escapeHtml(c.snip||"")+'</div>'+lookupFactsHTML(c.facts);
+  }
+  if(st.shared) h += '<div class="sadded">✓ Pinned</div>';
+  else if(!filed) h += '<div class="saddwrap"><button class="btnfilled evidence" onclick="addToBoard('+claim.id+',\''+c.id+'\')">📌 Pin it</button></div>';
+  return h+'</div>';
+}
+// The new tab: a browser tab strip (their profile stays open in the first tab), then the
+// Search results layout, queried on the account's name.
+function renderClaimLookup(claim){
+  var b = claim.background || {}, clips = (CLIPS[claim.id]||[]).filter(function(c){ return c.look==="lookup"; });
+  if(!clips.length) return '<div class="emptystate">Nothing turns up for this account.</div>';
+  var name = lookupName(b), filed = getBoard(claim.id).filed;
+  var pinned = clips.filter(function(c){ return (clipState[c.id]||{}).shared; }).length;
+  var h = '<div class="btabs"><button class="btab" onclick="setCardMode('+claim.id+',\'background\')"><span class="f" style="'+accountAvatarStyle(claim)+'">'+escapeHtml(name.charAt(0))+'</span><span class="t">'+escapeHtml(b.handle||"")+'</span></button>'+
+          '<span class="btab on"><span class="f g">G</span><span class="t">'+escapeHtml(name)+' – Search</span></span><span class="btab plus">+</span></div>';
+  h += '<div class="srchbar"><span class="mag">🔍</span><span class="q">'+escapeHtml(name)+'</span><span class="x">✕</span></div>';
+  h += '<div class="srchtabs"><span class="srchtab on">All</span><span class="srchtab">News</span><span class="srchtab">Images</span><span class="srchtab">Videos</span></div>';
+  h += '<div class="srchcount">About '+lookupCount(b)+' results · '+pinned+' pinned</div>';
+  clips.forEach(function(c){ h += lookupResultHTML(claim, c, filed); });
+  return h;
 }
 
 function renderClaimBoard(claim){
@@ -4111,7 +4298,7 @@ function r3RenderWriteIntro(claim, r){
   var nCh = getBoard(claim.id).board.filter(function(cid){ return r3Flagged(claim.id, cid); }).length;
   return '<div class="r3full">'+roundStrip(3, "full")+'<div class="onboard-kicker">Round 3 · Community note</div><div class="onboard-big">📝</div>'+
     '<div class="onboard-title">Now write what actually happened.</div>'+
-    '<div class="onboard-sub">Silent, 90 seconds. Is the post misleading? Check the tells you found, say what actually happened in a sentence or two, and cite your clues'+(nCh ? '. '+nCh+' clue'+(nCh===1?' was':'s were')+' flagged as weak and can\'t be cited' : '')+'. The note your team rates most helpful goes on the post.</div>'+
+    '<div class="onboard-sub">Silent, 90 seconds. Is the post misleading? Check the tells you found, say what actually happened (or why it holds up) in a sentence or two, and tick the clues from your board that back it up'+(nCh ? '. '+nCh+' clue'+(nCh===1?' was':'s were')+' flagged as weak and can\'t be cited' : '')+'. The note your team rates most helpful goes on the post.</div>'+
     '<div class="onboard-cta"><button class="r3btn" onclick="r3Go('+claim.id+',\'write\')">Start writing</button></div></div>';
 }
 
@@ -4230,12 +4417,15 @@ function r3RenderWrite(claim, r){
     var k = pre+i, on = !!r.reasons[k];
     h += '<div class="xopt tell'+(on?' on':'')+(mis===null?' dim':'')+'" onclick="r3ToggleReason('+claim.id+',\''+k+'\')"><span class="r sq"></span><span><span class="tt">'+escapeHtml(x.t)+'</span>'+(x.q ? '<span class="tq">'+escapeHtml(x.q)+'</span>' : '')+'</span></div>';
   });
-  h += '<div class="xq">Briefly explain what actually happened, now that you\'ve done your investigation<small>Plain and neutral, like you\'re telling a friend. Back it up with your clues.</small></div>';
-  h += '<textarea class="communitynote xta" id="r3ta" maxlength="280" placeholder="Type your note…" oninput="r3Type('+claim.id+', this)">'+escapeHtml(d)+'</textarea>';
+  // 9/28: the "No" branch explains too — why it holds up, from what the team checked.
+  h += (mis==="no"
+    ? '<div class="xq">In your own words: what did you check?<small>Required. What did your clues show that backs the post up? Plain and neutral.</small></div>'
+    : '<div class="xq">Briefly explain what actually happened, now that you\'ve done your investigation<small>Plain and neutral, like you\'re telling a friend. Back it up with your clues.</small></div>');
+  h += '<textarea class="communitynote xta" id="r3ta" maxlength="280" placeholder="'+(mis==="no" ? 'e.g. The study says the same thing, limits and all.' : 'Type your note…')+'" oninput="r3Type('+claim.id+', this)">'+escapeHtml(d)+'</textarea>';
   h += '<div class="xcount'+(d.length>280?' over':'')+'" id="r3count">'+d.length+' / 280</div>';
   // Sources: the exhibits, as checkboxes. Checked ones post as links under the note.
   // Challenges were made on the board in Round 2; here they show, they don't toggle.
-  h += '<div class="xsrc"><div class="xlbl">Sources <small>— check the clues your note uses; they post as links under it</small></div>';
+  h += '<div class="xsrc"><div class="xlbl">Sources <small>— these are the clues your team pinned in Round 2. Tick the ones that back up what you wrote (at least one). They post as links under your note.</small></div>';
   r3Exhibits(claim.id).forEach(function(e){
     var on = r.cites.indexOf(e.clipId)>=0, fl = r3Flagged(claim.id, e.clipId), ai = e.clip.source==="ai";
     if(fl && on){ r.cites.splice(r.cites.indexOf(e.clipId), 1); on = false; }   // a challenge un-cites it (triage 9/14)
@@ -4250,7 +4440,7 @@ function r3RenderWrite(claim, r){
   r.cites.forEach(function(cid){ var e = r3Exhibit(claim.id, cid); if(e && e.clip.source!=="ai") h += '<span class="pl">'+escapeHtml(clueName(claim, e.clip))+' — '+escapeHtml(e.clip.text)+'</span>'; });
   h += '<div class="pf"><span>Rated <b>helpful</b> by your team</span><span class="rate">Is this note helpful?</span></div></div></div>';
   h += '</div></div>';
-  var hint = mis===null ? "Answer the first question." : (r.cites.length===0 ? "Check at least one source." : (!d.trim().length ? "Now say what actually happened." : (r.cites.length===1 ? "A second source makes it stronger." : "Cited: "+r3CiteLabel(claim.id, r.cites))));
+  var hint = mis===null ? "Answer the first question." : (r.cites.length===0 ? "Check at least one source." : (!d.trim().length ? (mis==="no" ? "Now say why it holds up." : "Now say what actually happened.") : (r.cites.length===1 ? "A second source makes it stronger." : "Cited: "+r3CiteLabel(claim.id, r.cites))));
   h += '<div class="citehint'+(r3CanWrite(claim.id) && r.cites.length>=2 ? " good" : "")+'" id="r3writeHint">'+hint+'</div>';
   h += '</div><div class="r3foot"><button class="r3btn" id="r3writeDone" '+(r3CanWrite(claim.id)?"":"disabled")+' onclick="r3WriteDone('+claim.id+')">Submit note</button></div></div>';
   return h;
@@ -4649,11 +4839,9 @@ var ONBOARD_CONTENT = {
     {kicker:"BEFORE YOU SCROLL", title:"Something in this feed is off.",
       sub:function(){ return CLAIMS.length+" stories are about to land. Some of them are playing you."; },
       mock:OB_FEED_ART},
-    {kicker:"YOUR JOB", title:"Stop the spread.",
-      sub:"Work out what\u2019s really going on in these news stories.",
-      mock:OB_STACK_ART},
-    {kicker:"ROUND 1 \u00b7 GUT CHECK", title:"How straight is it with you?",
-      sub:"That\u2019s the only call you\u2019re making right now.",
+    // 9/28 (Brian): slides 2 + 3 combined, and the job named — how straight is the headline.
+    {kicker:"ROUND 1 \u00b7 GUT CHECK", title:"How straight is this headline with you?",
+      sub:"Some posts report the news. Some spin it to play you. Red, yellow or green \u2014 that\u2019s your only call right now.",
       mock:OB_FLAGS_ART},
     {kicker:"🤐 ON YOUR OWN", title:"No talking. No comparing.",
       sub:function(){ return "Call all "+CLAIMS.length+" of them yourself. You\u2019ll see why in a minute."; },
@@ -4672,7 +4860,7 @@ var ONBOARD_CONTENT = {
     // replaces was already redundant: finalizeOnboard() opens the chosen story itself.
     // 9/16 (Tara): Round 2 is COR's three questions — one card, the questions ARE the job.
     {kicker:"ROUND 2 \u00b7 INVESTIGATION", big:"\ud83d\udcdd", title:"Your team is writing a community note on this post.",
-      sub:'First, find out what\u2019s really going on:<div class="obq"><div><b>\ud83d\udd75\ufe0f Background:</b> Who\u2019s behind it?</div><div><b>\ud83d\udd0d Search:</b> What do other sources say?</div><div><b>\u2728 Ask AI:</b> What does AI say? Can you trust it?</div></div>Pin what you find. Your note can only use clues you pinned.'}
+      sub:'First, find out what\u2019s really going on:<div class="obq"><div><b>\ud83d\udd75\ufe0f Background:</b> Who\u2019s behind it? Read how they describe themselves, then look them up.</div><div><b>\ud83d\udd0d Search:</b> What do other sources say?</div><div><b>\u2728 Ask AI:</b> What does AI say? Can you trust it?</div></div>Pin what you find. <b>Your whole team pins to one board</b> \u2014 your teammates\u2019 clues show up next to yours, and your note can use any of them.'}
   ]},
   // "Where to look" (8/24/2026, expanded same day per Tara: more of an intro about
   // how manipulation actually works, and an actual look at the library).
@@ -4689,8 +4877,10 @@ var ONBOARD_CONTENT = {
     // makes the game look like it's explaining its own joke.
     {kicker:"SPOTTING", big:"\ud83e\udd14", title:"How can you tell you\u2019re being manipulated?", sub:"There\u2019s almost always a sign"},
     {title:TELLS.length+" tells to look out for", sub:"Red means slow down. Green means it holds up.", mock:tellGridMock()},
-    {title:"Read the profile, not just the post", sub:"Bio, join date, what they link to",
+    {title:"Read how they describe themselves", sub:"Bio, join date, what they link to \u2014 that\u2019s their side of it",
       mock:'<div class="onboardmock"><div class="onboardmock-mini"><div class="onboardmock-miniavatar">D</div><div class="onboardmock-minibio">your fav products, dupes + drama \ud83d\udecd\ufe0f | shop my finds below \ud83d\udd17</div><div class="onboardmock-minimeta">2.2M followers \u00b7 <b>Joined Jun 2020</b></div></div></div>'},
+    {title:"Then look them up", sub:"Search their name somewhere else. Does it match what they say?",
+      mock:'<div class="onboardmock"><div class="onboardmock-row"><div class="onboardmock-rowtext">\ud83d\udd0d Dupe Daily \u2014 creator stats</div><div class="onboardmock-rowmeta">earns on <b>every link in bio</b> \u00b7 creatortrack.io</div></div><div class="onboardmock-row"><div class="onboardmock-rowtext">r/BeautyGuruChatter: is Dupe Daily sponsored?</div><div class="onboardmock-rowmeta">one person\u2019s take \u00b7 reddit</div></div></div>'},
     {title:"Check the date and the caption", sub:"Same picture can carry a different story",
       mock:'<div class="onboardmock"><div class="onboardmock-row"><div class="onboardmock-rowtext">The same photo, posted before</div><div class="onboardmock-rowmeta"><b>3 years ago</b> \u00b7 different caption</div></div><div class="onboardmock-row"><div class="onboardmock-rowtext">Wire coverage of the same event</div><div class="onboardmock-rowmeta">named outlet \u00b7 dated</div></div></div>'},
     {title:"Ask what it\u2019s citing", sub:"A confident answer isn\u2019t a source",
@@ -4901,7 +5091,10 @@ function renderOnboard(){
     }
     html += '</div>';
   }
+  // 9/28 (Brian): tapping to advance wasn't obvious — visible arrows + a hint on every non-last screen.
   if(gate.screens.length > 1){
+    if(onboardScreenIdx > 0) html += '<div class="onboard-arrow l" aria-hidden="true">\u2039</div>';
+    if(!isLast) html += '<div class="onboard-arrow r" aria-hidden="true">\u203a</div><div class="onboard-tapnext">Tap to continue \u2192</div>';
     html += '<div class="onboard-dots">';
     gate.screens.forEach(function(_, i){
       html += '<div class="onboard-dot'+(i===onboardScreenIdx?' active':'')+'"></div>';
@@ -4959,7 +5152,7 @@ function bdLook(clip){
 }
 function clueName(claim, clip){
   var bg = claim.background || {}, m = claim.media || {}, look = bdLook(clip);
-  if(CLUE_LOOKS[clip.look]) return clip.name || clip.who;
+  if(CLUE_LOOKS[clip.look] || clip.look==="lookup") return clip.name || clip.who;
   if(clip.look==="news") return m.outlet || "The original article";
   if(clip.look){ var k = receiptKindLabel(clip); return k.charAt(0).toUpperCase()+k.slice(1); }
   if(look==="ai") return "Assistant";
@@ -5143,7 +5336,7 @@ function renderBoardPane(){
   });
   var need = BOARD_TOUR_EVIDENCE_THRESHOLD;
   if(live){ for(var i = ex.length; i < need; i++){ var gs = BD_SLOTS[i % BD_SLOTS.length], gcol = bdColFor(G, i); c += '<div class="bdghost" data-col="'+gcol+'" data-ord="'+(10+i)+'" style="left:'+(gcol==="R" ? G.rx : G.lx)+'px; top:14px; width:'+G.cw+'px; transform:rotate('+gs.r+'deg)">CLUE '+letterFor(i)+'</div>'; } }
-  if(live) c += '<div class="bdrules" data-col="C" data-ord="0" style="left:'+G.cx+'px; top:14px; margin-left:0; width:'+G.pw+'px"><div class="pinhead"></div><div class="l">Pin clues you\'d trust. Flag ones you wouldn\'t.</div><div class="l">Judge the clue, not the post.</div></div>';
+  if(live) c += '<div class="bdrules" data-col="C" data-ord="0" style="left:'+G.cx+'px; top:14px; margin-left:0; width:'+G.pw+'px"><div class="pinhead"></div><div class="l">This board is the team\'s. Everyone\'s pins land here.</div><div class="l">Pin clues you\'d trust. Flag ones you wouldn\'t.</div><div class="l">Judge the clue, not the post.</div></div>';
   // 9/16: no "nothing pinned yet" overlay — the ghost slots already say where clues go.
   if(b.filed){
     // the note rides on the post (case-board-after-determination): pinned over it, stamped
@@ -5231,6 +5424,15 @@ function receiptInnerHTML(claim, clip){
     var p = clip.phrase || {hits:[]};
     h += '<div class="src"><div class="sbar">🔍 <span class="q">'+escapeHtml(p.q||"")+'</span></div><div class="cnt">'+escapeHtml(p.count||"")+'</div></div>';
     p.hits.forEach(function(x){ h += '<div class="hit"><span class="hav" style="background:'+x.c+'"></span><span><span class="hn">'+escapeHtml(x.h)+'</span><span class="ht">'+x.t+'</span></span><span class="hd">'+escapeHtml(x.d)+'</span></div>'; });
+  } else if(look==="lookup"){
+    // 9/28: a search result about the account, torn out of the lookup tab.
+    if(clip.lk==="reddit"){
+      h += '<div class="src"><span class="lk-fav rd">r/</span><div class="lk-site">'+escapeHtml(clip.sub||"")+'<small>'+escapeHtml(clip.user||"")+' · '+escapeHtml(clip.ago||"")+'</small></div><span class="lk-chip">Reddit</span></div>';
+      h += '<div class="lk-title rd">'+escapeHtml(clip.title)+'</div>'+(clip.top ? '<div class="body"><b>'+escapeHtml(clip.top[0])+'</b> '+escapeHtml(clip.top[1])+'</div>' : '');
+    } else {
+      h += '<div class="src"><span class="lk-fav">'+escapeHtml(clip.fav||"🔗")+'</span><div class="lk-site">'+escapeHtml(clip.site||"")+'<small>'+escapeHtml(clip.url||"")+'</small></div><span class="lk-chip">'+escapeHtml(clip.kind)+'</span></div>';
+      h += '<div class="lk-title">'+escapeHtml(clip.title)+'</div><div class="body">'+escapeHtml(clip.snip||"")+'</div>'+lookupFactsHTML(clip.facts);
+    }
   } else if(CLUE_LOOKS[look]){
     h += clueInnerHTML(claim, clip, false);
   } else {
@@ -5389,46 +5591,22 @@ function renderStorySummary(){
   storyCardKey = pendingStory;
 
   var bd = getBoard(claim.id);
-  var reach = getReach(claim.id);
-  // Two honest ways to say how far it got, because a fast table makes the share count
-  // tiny and "0 shares before your note landed" reads as broken rather than as a win.
-  // Under 200, the measure is how long it was loose — which is the thing they actually
-  // controlled, and a table that files in twenty seconds should be told so.
-  var rawShares = Math.round(reach.shares || 0);
-  var bigVal, bigUnit, bigSub;
-  if(rawShares >= 200){
-    bigVal = formatCount(rawShares); bigUnit = "shares";
-    bigSub = "before your note landed on it. Then it stopped.";
-  } else {
-    bigVal = fmtDuration(reach.looseMs || 0); bigUnit = "loose";
-    bigSub = "and then your note landed. You got to this one fast.";
-  }
-
+  // 9/28 (Tara, for the 9/29 demo): the win is the full picture and the note your team put on the
+  // post — not a spread you stopped. The reach graph + share count are gone; the middle of the
+  // screen is the post with YOUR note under it, the way anyone scrolling past would now see it.
+  var note = (bd.r3 && bd.r3.note) || null, bg = claim.background || {};
   var html = '<div class="storywrap"><div class="storyscroll">';
-  html += '<div class="storykick">Case filed \u00b7 '+(bd.caseNo||claimNumber(claim.id))+'</div>';
-  html += '<div class="storytitle">You stopped this one.</div>';
-
-  // ---- the visual: reach climbing, then your note, then flat --------------
-  // The whole session has been telling them heat climbs on its own while a story sits
-  // loose. This is the one moment they get to SEE it stop, so it's a drawn line rather
-  // than a number: rising, a marker where the note landed, flat after.
-  html += '<div class="stopviz">';
-  html += '<svg viewBox="0 0 300 116" preserveAspectRatio="none" aria-hidden="true">';
-  html += '<defs><linearGradient id="stopfill" x1="0" y1="0" x2="0" y2="1">'+
-          '<stop offset="0%" stop-color="rgba(255,69,58,.42)"/><stop offset="100%" stop-color="rgba(255,69,58,0)"/>'+
-          '</linearGradient></defs>';
-  // The climb, then the flat. Two paths so they can be timed separately.
-  html += '<path class="stopfill" d="M0,112 C42,104 76,84 104,64 C132,45 156,26 186,18 L300,18 L300,116 L0,116 Z" fill="url(#stopfill)"/>';
-  html += '<path class="stopclimb" d="M0,112 C42,104 76,84 104,64 C132,45 156,26 186,18" fill="none" stroke="var(--ios-red)" stroke-width="3.5" stroke-linecap="round"/>';
-  html += '<path class="stopflat" d="M186,18 L300,18" fill="none" stroke="var(--ios-green)" stroke-width="3.5" stroke-linecap="round"/>';
-  html += '<circle class="stopdot" cx="186" cy="18" r="5.5" fill="var(--ios-green)"/>';
-  html += '</svg>';
-  html += '<div class="stopmark">\ud83e\uddef your note</div>';
+  html += '<div class="storykick">Case filed · '+(bd.caseNo||claimNumber(claim.id))+'</div>';
+  html += '<div class="storytitle">You got the full picture.</div>';
+  html += '<div class="storysub">Your team looked it up, argued it out, and said what actually happened.</div>';
+  html += '<div class="storyxnote">';
+  html += '<div class="xpost"><div class="postav">'+posterInitial(claim)+'</div><div><span class="n">'+escapeHtml(bg.displayName||claim.source)+'</span><span class="h">'+escapeHtml(bg.handle||"")+'</span><div class="t">'+escapeHtml(String(claim.headline||"").replace(/<[^>]+>/g, ""))+'</div></div></div>';
+  html += '<div class="xprev"><div class="ph"><span class="ic">i</span>Readers added context they thought people might want to know</div>';
+  html += '<div class="pt">'+escapeHtml(note && note.text ? note.text : "Your team’s note")+'</div>';
+  ((note && note.cites) || []).forEach(function(cid){ var c = clipById(claim.id, cid); if(c && c.source!=="ai") html += '<span class="pl">🔗 '+escapeHtml(clueName(claim, c))+'</span>'; });
+  html += '<div class="pf"><span>Rated <b>helpful</b> by your team</span></div></div>';
   html += '</div>';
-  // Track F (9/14) put the "Receipts confirmed" box here; Tara cut it after playing (9/14 eve).
-
-  html += '<div class="stopbig">'+bigVal+'<span class="stopunit">'+bigUnit+'</span></div>';
-  html += '<div class="storysub">'+bigSub+'</div>';
+  html += '<div class="storysub" style="margin-top:10px">Anyone who sees this post now sees what you found.</div>';
 
   // ---- the receipt (9/4/2026, from the approved Round 3 mock) ----------------
   // Same rows as the filed case card, so the summary is the graph + the receipt. The
@@ -5447,7 +5625,7 @@ function renderStorySummary(){
   html += '<div class="pausecard">';
   html += '<div class="pausekick">\u270b One thing to take with you</div>';
   html += '<div class="pauseline">The post that gets you fastest is the one to slow down on.</div>';
-  html += '<div class="pausesub">That feeling \u2014 the one that makes you want to share it before you finish reading \u2014 is somebody\u2019s work. It\u2019ll be in your feed tonight, and nobody\u2019s going to hand you a case file.</div>';
+  html += '<div class="pausesub">That feeling \u2014 the one that makes you want to share it before you finish reading \u2014 is somebody\u2019s work. It\u2019ll be in your feed tonight \u2014 and now you know how to look it up.</div>';
   html += '</div>';
 
   html += '</div><div class="storyfoot"><div class="storybtn" onclick="dismissStory()">Back to the feed</div></div>';
