@@ -2018,7 +2018,7 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-09-28 · the full picture";
+var BUILD = "2026-09-30 · smooth scroll";
 var revealState = {active:false, order:[], index:0};
 // ---------------- TRIAGE (8/31/2026) ----------------
 // Replaces the old "you may only investigate what you disagreed about" gate. The table
@@ -2692,6 +2692,24 @@ function maybeEndEarly(){
 // feed mid-scroll — mirrors the same fix in infodemic-multiplayer-prototype.html
 // (8/16/2026 playtest: card-to-card jump didn't always work seamlessly).
 var scrollAnimUntil = 0;
+// 9/30 (Tara, on her phone: "not scrolling so well, especially in the investigation round in
+// search"): the 2.2s heat tick rebuilt the whole feed with innerHTML, including an open card's
+// Search list, halfway through a swipe. iOS drops momentum scrolling when the scroller is
+// replaced, so the list stuttered and jumped. Now the tick waits while a finger is down or the
+// page is still moving, and while a card is flipped it only updates the 🔥 % in the top bar.
+var userScrollUntil = 0;
+(function(){
+  function busy(){ userScrollUntil = Date.now() + 1500; }
+  ["touchstart","touchmove","touchend","wheel","scroll"].forEach(function(t){
+    document.addEventListener(t, busy, {passive:true, capture:true});
+  });
+})();
+function anyCardFlipped(){ for(var k in claimFlipped){ if(claimFlipped[k]) return true; } return false; }
+function updateSpreadBadge(){
+  var el = document.querySelector(".r1topbar .spreadbadge"); if(!el) return;
+  var s = spreadStats(); var pr = s.total>0 ? Math.round(100*s.redHeat/s.total) : 0;
+  el.textContent = "\ud83d\udd25 "+pr+"%";
+}
 function scrollToNextCard(claimId){
   var current = document.getElementById("slide-"+claimId);
   if(!current || !current.nextElementSibling) return;
@@ -5027,7 +5045,11 @@ setInterval(function(){
   var typingInNote = document.activeElement && document.activeElement.classList &&
     document.activeElement.classList.contains("communitynote");
   var scrollingCards = Date.now() < scrollAnimUntil;
-  if((currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) && !typingInNote && !scrollingCards) render();
+  var userScrolling = Date.now() < userScrollUntil;
+  if(currentApp==="round1" && !onSubScreen && anyCardFlipped()){
+    // a card's back is open (Round 2 tools live here): heat isn't shown on it, so don't rebuild it
+    updateSpreadBadge();
+  } else if((currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) && !typingInNote && !scrollingCards && !userScrolling) render();
 }, 2200);
 
 function tickClock(){
