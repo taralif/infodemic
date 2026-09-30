@@ -1575,6 +1575,7 @@
   }
 
   /* ================= CLASS BOARD (read-only wall, 9/30/2026) ================= */
+  html.wallmode{overflow:auto!important; height:auto!important; overscroll-behavior:auto!important;}
   body.wallmode{background:#140f0a!important; overflow:auto!important; display:block!important; height:auto!important; min-height:100vh;}
   body.wallmode .wrap, body.wallmode .bdpane, body.wallmode #r3Scrim{display:none!important;}
   #wall{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif; color:#f3eadb; min-height:100vh; padding:22px 30px 40px; box-sizing:border-box;}
@@ -5776,6 +5777,7 @@ render();   // the lobby: join a room, start one, or play solo (startSolo → in
   var W = {word:null, drop:null, rooms:[], players:{}, focus:"all", sig:"", timer:null, hours:12, err:null, updated:null};
   var DB = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   render = function(){};                 // the game underneath never draws again
+  document.documentElement.classList.add("wallmode");   // the game locks html scrolling (phone-sized); the wall needs it back
   document.body.classList.add("wallmode");
   document.title = "INFODEMIC — Class board";
   var root = document.createElement("div"); root.id = "wall"; document.body.appendChild(root);
