@@ -484,6 +484,19 @@
   .readybtn.pulse{ animation:readypulse 1.6s ease-in-out infinite; }
   @keyframes readypulse{ 0%,100%{box-shadow:0 8px 22px rgba(48,209,88,.25);} 50%{box-shadow:0 8px 30px rgba(48,209,88,.6);} }
   .readynote{ font-size:11px; color:var(--ios-label3); font-weight:600; text-align:center; }
+  /* 9/30 (Tara): after "Write our note" the phone has to SAY you're waiting on your team. */
+  .readywait{ border:1.5px solid rgba(48,209,88,.55); background:rgba(48,209,88,.10); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:7px; animation:rwIn .25s ease-out; }
+  @keyframes rwIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  .readywait .rw-top{ display:flex; align-items:center; gap:8px; font-size:14.5px; font-weight:800; color:#fff; }
+  .readywait .rw-check{ width:20px; height:20px; border-radius:50%; background:var(--ios-green); color:#04140a; font-size:12px; font-weight:900; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .readywait .rw-people{ display:flex; flex-wrap:wrap; gap:6px; }
+  .readywait .rw-p{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:var(--ios-label2, #ccc); background:rgba(255,255,255,.06); border-radius:999px; padding:3px 9px 3px 3px; }
+  .readywait .rw-p .r3av{ width:18px; height:18px; font-size:8px; }
+  .readywait .rw-p.in{ color:var(--ios-green); }
+  .readywait .rw-p.out .st{ animation:rwDots 1.2s steps(4) infinite; display:inline-block; width:1.4em; overflow:hidden; white-space:nowrap; vertical-align:bottom; }
+  @keyframes rwDots{ from{width:0;} to{width:1.4em;} }
+  .readywait .rw-sub{ font-size:11.5px; line-height:1.35; color:var(--ios-label3); font-weight:600; }
+  .cardback-foot.compact .readywait{ padding:8px 10px; gap:5px; } .cardback-foot.compact .readywait .rw-sub{ display:none; }
   .cardback-navback{ display:flex; align-items:center; gap:2px; font-size:14px; font-weight:700; color:var(--ios-blue); cursor:pointer; margin:-4px 0 10px; }
   .cardback-navback .chev{ font-size:22px; line-height:1; margin-top:-2px; }
   .cardback-navback .cnt{ margin-left:auto; font-size:11px; font-weight:800; color:#9bebb4; background:rgba(48,209,88,.14); border-radius:999px; padding:4px 9px; }
@@ -521,6 +534,24 @@
     display:inline-block; margin-top:2px; background:var(--ios-red); color:#fff; font-size:13px; font-weight:700;
     padding:9px 14px; border-radius:12px;
   }
+  /* 9/30 (Tara): "a way to signal which story the team is actively working on, otherwise
+     people may be on the wrong page." Three pieces: the live card is marked, every other card
+     points at it, and a bar under the header follows you when the live card is off screen. */
+  .feedcard.live{ box-shadow:0 0 0 2.5px var(--ios-green), 0 0 26px rgba(48,209,88,.35), 0 14px 34px rgba(0,0,0,.45); border-radius:14px; }
+  .liveribbon{ position:absolute; top:12px; left:12px; right:12px; z-index:25; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .liveribbon .tag{ background:var(--ios-green); color:#04140a; font-size:11px; font-weight:900; letter-spacing:.5px; padding:5px 10px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.4); }
+  .liveribbon .who{ display:inline-flex; align-items:center; gap:5px; background:rgba(0,0,0,.55); color:#fff; font-size:11px; font-weight:700; padding:3px 9px 3px 4px; border-radius:999px; }
+  .liveribbon .who .r3av{ width:18px; height:18px; font-size:8px; } .liveribbon .who .r3av + .r3av{ margin-left:-6px; }
+  .agreedcta.golive{ background:rgba(48,209,88,.16); color:#8ff0a8; border:1px solid rgba(48,209,88,.45); cursor:pointer; }
+  .teamonbar{ position:absolute; left:12px; right:12px; top:calc(98px + 8px); z-index:39; display:flex; align-items:center; gap:9px;
+    background:rgba(20,40,26,.94); border:1.5px solid rgba(48,209,88,.6); border-radius:14px; padding:8px 11px; cursor:pointer;
+    box-shadow:0 10px 26px rgba(0,0,0,.5); transform:translateY(-8px); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
+  .teamonbar.show{ opacity:1; transform:none; pointer-events:auto; }
+  .teamonbar .ic{ font-size:17px; flex:0 0 auto; }
+  .teamonbar .tx{ flex:1; min-width:0; }
+  .teamonbar .k{ font-size:10px; font-weight:900; letter-spacing:.5px; color:var(--ios-green); text-transform:uppercase; }
+  .teamonbar .h{ font-size:12.5px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .teamonbar .go{ flex:0 0 auto; background:var(--ios-green); color:#04140a; font-size:12px; font-weight:900; padding:6px 10px; border-radius:999px; }
   .agreedcta{
     display:block; width:fit-content; margin:8px 86px 0 0; background:rgba(255,255,255,.12);
     color:rgba(255,255,255,.7); font-size:12.5px; font-weight:600;
@@ -1571,6 +1602,7 @@
     .navbar, .r1topbar{ height:calc(51px + env(safe-area-inset-top));
                         padding-top:env(safe-area-inset-top); }
     .appbody, .feedscroll{ top:calc(51px + env(safe-area-inset-top)); }
+    .teamonbar{ top:calc(51px + env(safe-area-inset-top) + 8px); }
     .home-indicator{ bottom:max(8px, env(safe-area-inset-bottom)); }
   }
 </style>
@@ -2101,7 +2133,7 @@ var roundState = {started:false, startedAt:null, endedAt:null, ended:false, seco
 // claim's votes before Round 2 shows up. Self-paced (tap to advance), no autoplay.
 // Bump this whenever a change ships, so "is the phone running the new file?"
 // is a thing you can read off the lobby instead of guess at.
-var BUILD = "2026-09-28 · the full picture (multiplayer)";
+var BUILD = "2026-09-30 · your team's story (multiplayer)";
 var revealState = {active:false, order:[], index:0};
 // ---------------- TRIAGE (8/31/2026) ----------------
 // Replaces the old "you may only investigate what you disagreed about" gate. The table
@@ -2188,6 +2220,54 @@ function commitChase(){
 // remains). Nothing here decides WHICH stories get chased — that stays with the table.
 function liveClaim(){
   return CLAIMS.filter(function(c){ return triagePicked(c.id) && !getBoard(c.id).filed; })[0] || null;
+}
+// ---- WHICH STORY IS THE TEAM ON (9/30/2026, Tara on phones) ----
+// Each phone publishes the card it has open (slice.at); the live card shows who's inside, and a
+// bar under the header points back at the live story whenever it's scrolled off screen.
+function syncMyWhere(){
+  if(!roomCode) return;
+  var open = CLAIMS.filter(function(c){ return claimFlipped[c.id]; })[0];
+  var at = open ? open.id : null, s = mySlice();
+  if((s.at === undefined ? null : s.at) === at) return;
+  s.at = at; writeMySlice();
+}
+function teammatesIn(claimId){
+  return PLAYERS.filter(function(p){ return !p.isYou && p.id !== MY_ID && sliceOf(p.id).at === claimId; });
+}
+function namesAnd(list){ return list.length<2 ? (list[0]||"") : list.slice(0,-1).join(", ")+" and "+list[list.length-1]; }
+function liveRibbonHTML(claim){
+  var h = '<div class="liveribbon"><span class="tag">🎯 YOUR TEAM\'S STORY</span>';
+  var inn = teammatesIn(claim.id);
+  if(inn.length) h += '<span class="who">'+inn.map(function(p){ return r3Av(p.id); }).join("")+namesAnd(inn.map(function(p){ return escapeHtml(p.name); }))+' '+(inn.length===1?'is':'are')+' digging</span>';
+  return h + '</div>';
+}
+function teamOnBarHTML(){
+  var live = roundState.ended && !sessionState.ended ? liveClaim() : null;
+  if(!live || r3ActiveClaim() !== null || triageState.active) return '';
+  var inn = teammatesIn(live.id);
+  var k = inn.length ? namesAnd(inn.map(function(p){ return escapeHtml(p.name); }))+' '+(inn.length===1?'is':'are')+' on' : 'Your team is on';
+  return '<div class="teamonbar" id="teamonbar" onclick="goToLiveStory()"><span class="ic">🎯</span><span class="tx"><div class="k">'+k+'</div><div class="h">'+live.headline+'</div></span><span class="go" id="teamongo">Go ↑</span></div>';
+}
+// Show the bar only when the live card isn't what you're looking at (less than ~40% on screen).
+function updateTeamOnBar(){
+  var bar = document.getElementById("teamonbar"), fs = document.getElementById("feedscroll"), live = liveClaim();
+  if(!bar || !fs || !live) return;
+  var card = document.getElementById("slide-"+live.id); if(!card) return;
+  var a = fs.getBoundingClientRect(), b = card.getBoundingClientRect();
+  var vis = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  var off = vis < Math.min(b.height, a.height) * 0.4;
+  bar.classList.toggle("show", off);
+  var go = document.getElementById("teamongo"); if(go) go.textContent = b.top < a.top ? "Go \u2191" : "Go \u2193";
+}
+function goToLiveStory(){
+  var live = liveClaim(); if(!live) return;
+  // close any other card you had open so you land on the live card's front
+  Object.keys(claimFlipped).forEach(function(id){ if(+id !== live.id) claimFlipped[id] = false; });
+  render();
+  setTimeout(function(){
+    var el = document.getElementById("slide-"+live.id);
+    if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"});
+  }, 40);
 }
 function storyLocked(claimId){
   var live = liveClaim();
@@ -3173,6 +3253,24 @@ function maybeEndEarly(){
 // feed mid-scroll — mirrors the same fix in infodemic-multiplayer-prototype.html
 // (8/16/2026 playtest: card-to-card jump didn't always work seamlessly).
 var scrollAnimUntil = 0;
+// 9/30 (Tara, on her phone: "not scrolling so well, especially in the investigation round in
+// search"): the 2.2s heat tick rebuilt the whole feed with innerHTML, including an open card's
+// Search list, halfway through a swipe. iOS drops momentum scrolling when the scroller is
+// replaced, so the list stuttered and jumped. Now the tick waits while a finger is down or the
+// page is still moving, and while a card is flipped it only updates the 🔥 % in the top bar.
+var userScrollUntil = 0;
+(function(){
+  function busy(){ userScrollUntil = Date.now() + 1500; }
+  ["touchstart","touchmove","touchend","wheel","scroll"].forEach(function(t){
+    document.addEventListener(t, busy, {passive:true, capture:true});
+  });
+})();
+function anyCardFlipped(){ for(var k in claimFlipped){ if(claimFlipped[k]) return true; } return false; }
+function updateSpreadBadge(){
+  var el = document.querySelector(".r1topbar .spreadbadge"); if(!el) return;
+  var s = spreadStats(); var pr = s.total>0 ? Math.round(100*s.redHeat/s.total) : 0;
+  el.textContent = "\ud83d\udd25 "+pr+"%";
+}
 function scrollToNextCard(claimId){
   var current = document.getElementById("slide-"+claimId);
   if(!current || !current.nextElementSibling) return;
@@ -3466,10 +3564,15 @@ function renderRound1(){
   if(!roundState.ended) html += '<div class="roundbadge'+(roundState.secondsLeft<=10?' urgent':'')+'" id="roundbadge" onclick="forceTimesUp()">⏱ '+roundState.secondsLeft+'s</div>';
   html += '</div></div>';
 
+  html += teamOnBarHTML();
   html += '<div class="feedscroll" id="feedscroll">';
   order.forEach(function(c, idx){ html += renderFeedCard(c, justSorted, idx); });
   html += '</div>';
   document.getElementById("screenArea").innerHTML = html;
+  syncMyWhere();
+  var fsEl = document.getElementById("feedscroll");
+  if(fsEl) fsEl.addEventListener("scroll", updateTeamOnBar, {passive:true});
+  setTimeout(updateTeamOnBar, 0);
 
   var newEl = document.getElementById("feedscroll");
   if(newEl && !justSorted) newEl.scrollTop = prevScroll;
@@ -3493,7 +3596,8 @@ function renderFeedCard(claim, justSorted, idx){
   // staggered by position so contested claims appear to settle into the front
   // of the deck one after another, not just pop in all at once.
   var justSorting = justSorted && roundState.ended;
-  var cardCls = "feedcard" + (justSorting ? " justsorted" : "");
+  var isLive = roundState.ended && !board.filed && liveClaim() && liveClaim().id === claim.id;
+  var cardCls = "feedcard" + (justSorting ? " justsorted" : "") + (isLive ? " live" : "");
   var styleAttr = justSorting ? ('animation-delay:'+(Math.min(idx,8)*70)+'ms;') : '';
   var html = '<div class="'+cardCls+'" style="'+styleAttr+'" id="slide-'+claim.id+'">';
   html += '<div class="cardflip-inner'+(flipped?' flipped':'')+'">';
@@ -3504,6 +3608,7 @@ function renderFeedCard(claim, justSorted, idx){
   // caption laid over someone else's picture. Round 1 never shows the real headline.
   if(claim.media && claim.media.image_url) html += '<div class="feedbg" style="'+bgImg(claim.media.image_url)+'"></div>';
   html += '<div class="feedtopscrim"></div><div class="feedbottomscrim"></div>';
+  if(isLive) html += liveRibbonHTML(claim);
 
   // Rail is decorative/ambient furniture now (poster avatar + the spinning disc) —
   // everything actionable and story-specific (investigate, case board, agreed/filed
@@ -3613,7 +3718,8 @@ function renderFeedCard(claim, justSorted, idx){
     } else {
       // While another story is live this card has no tools, so "dig in anyway" would be
       // a lie — the bare line just says it's still loose.
-      html += '<div class="agreedcta">'+(storyLocked(claim.id) ? 'Still out there' : 'Still out there — dig in anyway')+'</div>';
+      if(storyLocked(claim.id)) html += '<div class="agreedcta golive" onclick="goToLiveStory()">🎯 Your team\'s on another story — go there</div>';
+      else html += '<div class="agreedcta">Still out there — dig in anyway</div>';
     }
   }
   html += '</div>'; // end feedbottom
@@ -3703,15 +3809,17 @@ function renderCardBack(claim, variant){
   // the button is that decision.
   // 9/28 (Brian): what's next should be obvious wherever you are — once the note can be
   // written, the button rides along on every tool screen too, not just the case file's foot.
-  if(homeMode && mode!=="case" && canGo){
+  var iTapped = roomCode && r3ReadyTapped(claim.id, MY_ID);
+  if(homeMode && mode!=="case" && canGo && iTapped){
+    html += '<div class="cardback-foot compact">'+readyWaitHTML(claim)+'</div>';
+  } else if(homeMode && mode!=="case" && canGo){
     html += '<div class="cardback-foot compact"><button class="readybtn'+(enough?' pulse':'')+'" onclick="readyForNote('+claim.id+')">Write our note \u2192</button></div>';
   }
   if(homeMode && mode==="case"){
     html += '<div class="cardback-foot">';
     var tapped = roomCode && r3ReadyTapped(claim.id, MY_ID), waitingOn = tapped ? r3ReadyWaiting(claim.id) : [];
     if(tapped){
-      html += '<button class="readybtn" disabled>Waiting on '+(waitingOn.length ? r3Names(waitingOn) : 'the team')+'…</button>';
-      html += '<div class="readynote">You write the moment everyone\'s tapped.</div>';
+      html += readyWaitHTML(claim);
     } else {
       var others = roomCode && canGo ? PLAYERS.filter(function(p){ return !p.isYou && r3ReadyTapped(claim.id, p.id); }) : [];
       html += '<button class="readybtn'+(enough?' pulse':'')+'"'+(canGo?'':' disabled')+' onclick="readyForNote('+claim.id+')">Write our note →</button>';
@@ -3829,6 +3937,23 @@ function readyForNote(claimId){
   writeMySlice();
   r3CheckGates(claimId);
   render();
+}
+// 9/30 (Tara): "something on mobile to tell the user once they hit write the note that you're
+// waiting on other teammates to be ready." Replaces the old grey "Waiting on …" button, and now
+// also shows on the tool screens (Search, Ask AI…), where the tap used to give no feedback at all.
+function readyWaitHTML(claim){
+  var waiting = r3ReadyWaiting(claim.id).filter(function(p){ return !p.isYou; });
+  var names = waiting.map(function(p){ return escapeHtml(p.name); });
+  var who = names.length===0 ? "the team" : names.length===1 ? names[0] : names.slice(0,-1).join(", ")+" and "+names[names.length-1];
+  var h = '<div class="readywait" role="status" aria-live="polite">';
+  h += '<div class="rw-top"><span class="rw-check">\u2713</span>You\'re ready \u2014 waiting on '+who+'</div>';
+  h += '<div class="rw-people">';
+  PLAYERS.forEach(function(p){
+    var inn = r3ReadyTapped(claim.id, p.id);
+    h += '<span class="rw-p '+(inn?'in':'out')+'">'+r3Av(p.id)+(p.isYou?'You':escapeHtml(p.name))+' '+(inn?'\u2713':'<span class="st">\u2026</span>')+'</span>';
+  });
+  h += '</div><div class="rw-sub">Everyone taps <b>Write our note</b>, then you all start writing together. Keep digging while you wait.</div></div>';
+  return h;
 }
 function r3ReadyKey(claimId){ return "r3:"+claimId; }
 function r3ReadyTapped(claimId, pid){ return (onboardReady[r3ReadyKey(claimId)] || []).indexOf(pid) !== -1; }
@@ -5683,7 +5808,11 @@ setInterval(function(){
   var typingInNote = document.activeElement && document.activeElement.classList &&
     document.activeElement.classList.contains("communitynote");
   var scrollingCards = Date.now() < scrollAnimUntil;
-  if((currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) && !typingInNote && !scrollingCards) render();
+  var userScrolling = Date.now() < userScrollUntil;
+  if(currentApp==="round1" && !onSubScreen && anyCardFlipped()){
+    // a card's back is open (Round 2 tools live here): heat isn't shown on it, so don't rebuild it
+    updateSpreadBadge();
+  } else if((currentApp==="spread" || (currentApp==="round1" && !onSubScreen)) && !typingInNote && !scrollingCards && !userScrolling) render();
 }, 2200);
 
 function tickClock(){
