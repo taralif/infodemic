@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Infodemic — no one ever taught us to read a feed</title>
+<meta name="description" content="Infodemic is a free cooperative multiplayer game where teens practice reading a social feed: they investigate viral claims and work together to figure out what's credible and what's designed to mislead. For ages 11+.">
+<meta property="og:title" content="Infodemic: no one ever taught us to read a feed">
+<meta property="og:description" content="A free classroom game where teens investigate viral claims together and figure out what's credible and what's designed to mislead. Ages 11+.">
+<meta property="og:image" content="https://playinfodemic.org/infodemic-share.jpg">
+<meta property="og:url" content="https://playinfodemic.org/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -342,6 +348,20 @@
   .credit p a{ color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); }
   .credit p a:hover{ border-color:var(--ink); }
 
+  /* ---------- ad match (10/4) ---------- */
+  .hero-facts{ font-size:11.5px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:var(--faint); margin:-14px 0 34px; }
+  .video-shell{ background:var(--panel); border:1px solid var(--line-soft); border-radius:24px; padding:14px; margin:0 0 56px; }
+  .video-shell video{ display:block; width:100%; height:auto; aspect-ratio:16/9; border-radius:14px; background:#0d0d0f; }
+  .beat .bnum{ color:var(--amber); }
+  .beat .bnum .rn{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:var(--amber); color:#0a0a0b; font-size:10.5px; margin-right:8px; letter-spacing:0; }
+  .who{ display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:0 0 10px; }
+  @media (max-width:860px){ .who{ grid-template-columns:1fr; } }
+  .who-card{ background:var(--panel); border:1px solid var(--line-soft); border-radius:20px; padding:30px 30px 28px; display:flex; flex-direction:column; }
+  .who-card .wlabel{ font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--blue); margin-bottom:14px; }
+  .who-card h3{ font-family:var(--serif); font-weight:400; font-size:24px; letter-spacing:-.5px; line-height:1.2; margin:0 0 12px; }
+  .who-card p{ font-size:15.5px; color:var(--dim); line-height:1.6; margin:0 0 22px; flex:1; }
+  .who-card .btn-text{ align-self:flex-start; }
+
   .stat{ display:flex; flex-direction:column; }
   .stat .txt{ margin-bottom:18px; }
   .stat .src{
@@ -358,7 +378,7 @@
 
   <div class="masthead">
     <div class="wordmark">Infodemic</div>
-    <div class="kicker">A game about noticing when your feed is playing you. For classrooms, families, anyone with a phone.</div>
+    <div class="kicker">A cooperative game about noticing when your feed is playing you. For classrooms and families.</div>
   </div>
   <div class="hairline"></div>
 
@@ -367,13 +387,13 @@
     <div>
       <h1>No one ever taught us to read a feed.</h1>
       <p class="lede">
-        Half of American teens say the news just arrives — on a phone, between a friend's post and an ad,
-        never saying where it came from. <b>Infodemic is a game where a room full of people slows that
-        feed down</b>, checks what's in it, and argues its way to common ground.
+        <b>Infodemic is a classroom game that does.</b> Students scroll a simulated feed together,
+        investigate the viral claims in it, and work out what's credible and what's designed to mislead.
       </p>
+      <p class="hero-facts">For ages 11+ &middot; Free &amp; open source</p>
       <div class="cta-row">
-        <a class="btn" href="#demo">Play a round</a>
-        <a class="btn-text" href="#playtest">Run it with a group &rarr;</a>
+        <a class="btn" href="#playtest">Try it with your class</a>
+        <a class="btn-text" href="#how">Watch how it plays &rarr;</a>
       </div>
     </div>
 
@@ -396,6 +416,24 @@
         </div>
       </div>
       <p class="stage-note">This is how fast it comes at you. The game slows it down and gives you the tools to read it.</p>
+    </div>
+  </div>
+
+  <!-- ================= WHO IT'S FOR (ad match 10/4) ================= -->
+  <div class="who">
+    <div class="who-card">
+      <div class="wlabel">For teachers</div>
+      <h3>Looking for an engaging way to help students build media literacy skills?</h3>
+      <p>Infodemic is a cooperative multiplayer game where teens practice navigating a simulated social feed,
+         investigating viral claims, and working together to figure out what's credible and what's designed to mislead.</p>
+      <a class="btn-text" href="#playtest">Try it with your students &rarr;</a>
+    </div>
+    <div class="who-card">
+      <div class="wlabel">For parents</div>
+      <h3>Worried about what your kids are seeing online?</h3>
+      <p>Infodemic is a cooperative multiplayer game that helps tweens and teens practice slowing down,
+         questioning what they see, and figuring out what's credible and what's designed to mislead.</p>
+      <a class="btn-text" href="#playtest">Try it with your kids &rarr;</a>
     </div>
   </div>
 
@@ -440,21 +478,28 @@
     <h2>Three rounds per story, about ten minutes.</h2>
     <p class="sub">Everyone's on their own phone. The game happens when they disagree.</p>
 
+    <div class="video-shell">
+      <video controls playsinline preload="none" poster="infodemic-demo-poster.jpg"
+             aria-label="35-second tour of Infodemic: gut check, investigate, write the note">
+        <source src="infodemic-demo-35s.mp4" type="video/mp4">
+      </video>
+    </div>
+
     <div class="beats">
       <div class="beat">
-        <div class="bnum">01</div>
-        <h3>Gut check</h3>
-        <p>Read the feed the way you always do: fast, headline only. One call per post: how straight is this headline with you? That first call is the baseline.</p>
+        <div class="bnum"><span class="rn">1</span>ROUND 1 &middot; GUT CHECK</div>
+        <h3>First, a gut check.</h3>
+        <p>Students scroll real headlines you picked that morning and rate each one: straight with them, or playing them? The team splits, and the disagreement tells them what's worth digging into.</p>
       </div>
       <div class="beat">
-        <div class="bnum">02</div>
-        <h3>Investigate</h3>
-        <p>The team picks the story it split on and goes to work. Search it. Ask an AI, and remember it can be wrong. Look the account up somewhere other than its own profile. Everything anyone finds lands in one shared case file — and there's no answer key waiting at the end.</p>
+        <div class="bnum"><span class="rn">2</span>ROUND 2 &middot; INVESTIGATE</div>
+        <h3>Investigate.</h3>
+        <p>Background check. Search. Ask AI. The team takes the story it split on, looks the account up somewhere other than its own profile, and pins everything it finds to one shared board.</p>
       </div>
       <div class="beat">
-        <div class="bnum">03</div>
-        <h3>Write the note</h3>
-        <p>Everyone writes a community note, the way you'd write one on X: is the post misleading, which tells did you find, what actually happened (or why it holds up), with the evidence underneath. The note the team rates most helpful goes on the post.</p>
+        <div class="bnum"><span class="rn">3</span>ROUND 3 &middot; WRITE THE NOTE</div>
+        <h3>Say what actually happened.</h3>
+        <p>Each student writes a community note, with the evidence underneath. No answer key, just the full picture. The team rates the notes, and the most helpful one goes on the post.</p>
       </div>
     </div>
 
@@ -559,9 +604,9 @@
 
   <!-- ================= PLAYTEST ================= -->
   <section id="playtest">
-    <div class="eyebrow"><span>Help us test it</span><span class="count">05</span></div>
-    <h2>It's a prototype. Break it.</h2>
-    <p class="sub">Grab two to four people, give it twenty minutes, then tell us everything that went wrong.</p>
+    <div class="eyebrow"><span>Try it with your class</span><span class="count">05</span></div>
+    <h2>Try it with your class.</h2>
+    <p class="sub">Groups of two to four, about thirty minutes, on phones, laptops or tablets. Free to use.</p>
 
     <div class="doors">
       <a class="door one" href="infodemic-content-pipeline-prototype.html">
@@ -582,16 +627,16 @@
 
       <a class="door three" href="https://docs.google.com/forms/d/e/1FAIpQLSeq_sDe6WZ9SYxYOBk271ADGM8owfev6GI_71DawuFJrp_pLA/viewform" target="_blank" rel="noopener">
         <div class="dnum">STEP THREE</div>
-        <h3>Tell us what broke</h3>
-        <p>Every player fills this in separately — including the kids. Three minutes. Confusing, boring or
-           broken is the most useful thing you can tell us, so please don't smooth it over.</p>
+        <h3>Tell us how it went</h3>
+        <p>After you play, every player fills this in separately, including the kids. Three minutes. Confusing,
+           boring or broken is the most useful thing you can tell us, so please don't smooth it over.</p>
         <div class="go">Open the form <span class="arrow">&rarr;</span></div>
       </a>
     </div>
 
     <div class="caveat">
-      <b>The multiplayer part is new, and it will misbehave.</b> Someone can't join, a screen doesn't update,
-      a code doesn't work — that's exactly what we're trying to find. Note what happened and put it in the form.
+      <b>Infodemic is new and still being tested in classrooms.</b> If someone can't join or a screen doesn't update,
+      note what happened and put it in the form. That's how it gets better.
     </div>
   </section>
 
@@ -612,7 +657,7 @@
 
   <footer>
     <div class="footrow">
-      <span>Prototype, 2026 &middot; not a finished product</span>
+      <span>Free &amp; open source &middot; an Assembly Code project &middot; 2026</span>
       <span>Open source at <a href="https://github.com/taralif/infodemic">github.com/taralif/infodemic</a></span>
     </div>
   </footer>
